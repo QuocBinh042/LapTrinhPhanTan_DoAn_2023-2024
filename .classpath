@@ -37,16 +37,6 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="l/jcalendar-1.4.jar"/>
-	<classpathentry kind="lib" path="l/jcommon-1.0.23.jar"/>
-	<classpathentry kind="lib" path="l/jfreechart-1.0.19.jar"/>
-	<classpathentry kind="lib" path="l/LGoodDatePicker-11.2.1.jar"/>
-	<classpathentry kind="lib" path="l/sqljdbc42.jar"/>
-	<classpathentry kind="lib" path="l/twilio-7.14.4-jar-with-dependencies.jar"/>
-	<classpathentry kind="lib" path="lib/jcalendar-1.4.jar"/>
-	<classpathentry kind="lib" path="lib/jcommon-1.0.23.jar"/>
-	<classpathentry kind="lib" path="lib/jfreechart-1.0.19.jar"/>
 	<classpathentry kind="lib" path="lib/LGoodDatePicker-11.2.1.jar"/>
-	<classpathentry kind="lib" path="lib/sqljdbc42.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
