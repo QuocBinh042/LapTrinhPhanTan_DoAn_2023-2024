@@ -2,16 +2,16 @@ package service;
 
 import java.util.ArrayList;
 
-import entity.CTDVPhong;
+import entity.DetailServiceRoom;
 
 public interface CTDVPService {
-	public boolean createCTDVPhong(CTDVPhong ctdvPhong);
+	public boolean createCTDVPhong(DetailServiceRoom ctdvPhong);
 
-	public ArrayList<CTDVPhong> getAllCTDVPhong();
+	public ArrayList<DetailServiceRoom> getAllCTDVPhong();
 
-	public ArrayList<CTDVPhong> timKiemCTDVPhongTheoMaHD(String maHD);
+	public ArrayList<DetailServiceRoom> timKiemCTDVPhongTheoMaHD(String maHD);
 
-	public ArrayList<CTDVPhong> timKiemCTDVPhongTheoTenDV(String maHD, String maDV);
+	public ArrayList<DetailServiceRoom> timKiemCTDVPhongTheoTenDV(String maHD, String maDV);
 
 	public boolean capNhatSoLuongCTDVPhong(int soLuong, String maDV, String maHD);
 

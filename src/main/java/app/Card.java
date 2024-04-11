@@ -136,7 +136,7 @@ public class Card extends JFrame {
 	}
 
 	private JPanel createNVPanel() {
-		entity.NhanVien nv = daoNV.timKiemNhanVienTheoMa(maNV).get(0);
+		entity.Employee nv = daoNV.timKiemNhanVienTheoMa(maNV).get(0);
 		JPanel pnlNV = new JPanel();
 		lbTenNV = new JLabel();
 		lbTenNV.setText(nv.getTenNV().trim());

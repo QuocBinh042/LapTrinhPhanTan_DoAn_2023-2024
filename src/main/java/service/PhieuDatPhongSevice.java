@@ -2,14 +2,14 @@ package service;
 
 import java.util.ArrayList;
 
-import entity.PhieuDatPhong;
+import entity.Booking;
 
 public interface PhieuDatPhongSevice {
-	public boolean createPDP(PhieuDatPhong pdp);
+	public boolean createPDP(Booking pdp);
 
-	public ArrayList<PhieuDatPhong> getAllPDP();
+	public ArrayList<Booking> getAllPDP();
 
-	public ArrayList<PhieuDatPhong> searchPDPByID(String maPDP);
+	public ArrayList<Booking> searchPDPByID(String maPDP);
 
 	public boolean updatePDPStatusByID(int tinhTrang, String maPDP);
 

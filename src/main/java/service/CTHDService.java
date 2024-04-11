@@ -2,17 +2,17 @@ package service;
 
 import java.util.ArrayList;
 
-import entity.ChiTietHoaDon;
+import entity.DetailBill;
 
 public interface CTHDService {
-	public boolean createCTPhong(ChiTietHoaDon cthd);
+	public boolean createCTPhong(DetailBill cthd);
 
 	public String timKiemCTHDTheoMaPhong(String tenPhong);
 
-	public ArrayList<ChiTietHoaDon> timKiemCTHDTheoTenPhong(String tenPhong);
+	public ArrayList<DetailBill> timKiemCTHDTheoTenPhong(String tenPhong);
 
-	public ArrayList<ChiTietHoaDon> timKiemCTHDTheoMaHD(String maHD);
+	public ArrayList<DetailBill> timKiemCTHDTheoMaHD(String maHD);
 
-	public boolean capNhatGioTraPhong(ChiTietHoaDon chiTietHoaDon);
+	public boolean capNhatGioTraPhong(DetailBill chiTietHoaDon);
 
 }

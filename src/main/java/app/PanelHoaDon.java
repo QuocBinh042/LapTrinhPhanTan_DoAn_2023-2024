@@ -179,11 +179,11 @@ public class PanelHoaDon extends JPanel {
 		
 	}
 
-	public void loadData(ArrayList<entity.HoaDon> dsHD) {
+	public void loadData(ArrayList<entity.Bill> dsHD) {
 		// delete all
 		deleteAllDataJtable();
 		// Load data
-		for (entity.HoaDon hd : dsHD) {
+		for (entity.Bill hd : dsHD) {
 			tableModel.addRow(new Object[] { hd.getMaHoaDon(), dateFormat.format(hd.getNgayThanhToan()),
 					hd.getGioThanhToan().toString(), hd.getKh().getTenKH(), hd.getNv().getTenNV(),
 					hd.getKh().getSdthoai(), formatter.format(hd.getTongHoaDon()) });
@@ -214,7 +214,7 @@ public class PanelHoaDon extends JPanel {
 	private Object xuLyTimKiem() {
 		// TODO Auto-generated method stub
 		deleteAllDataJtable();
-		ArrayList<entity.HoaDon> ds = daoHD.timKiemHoaDon(txtTimMaHD.getText(), txtTimNV.getText(), txtTimKH.getText());
+		ArrayList<entity.Bill> ds = daoHD.timKiemHoaDon(txtTimMaHD.getText(), txtTimNV.getText(), txtTimKH.getText());
 		// Load data
 		if (ds.size() > 0) {
 			loadData(ds);

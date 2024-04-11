@@ -2,18 +2,18 @@ package service;
 
 import java.util.ArrayList;
 
-import entity.Phong;
+import entity.Room;
 
 public interface PhongService {
-	public ArrayList<Phong> getAllRooms();
+	public ArrayList<Room> getAllRooms();
 
-	public ArrayList<Phong> getRoomsByStatus(String tinhTrang);
+	public ArrayList<Room> getRoomsByStatus(String tinhTrang);
 
-	public ArrayList<Phong> getRoomsByType(String tinhTrang);
+	public ArrayList<Room> getRoomsByType(String tinhTrang);
 
-	public boolean addRoom(Phong phong);
+	public boolean addRoom(Room phong);
 
-	public boolean updateRoom(Phong phong);
+	public boolean updateRoom(Room phong);
 
 	public void deleteRoom(String maPhong);
 
@@ -21,12 +21,12 @@ public interface PhongService {
 
 	public boolean updateRoomStatusByRoomName(String tinhTrang, String tenPhong);
 
-	public ArrayList<Phong> searchRoomsByRoomType(String loaiPhong);
+	public ArrayList<Room> searchRoomsByRoomType(String loaiPhong);
 
-	public ArrayList<Phong> searchRoomsByRoomStatus(String tinhTrangPhong);
+	public ArrayList<Room> searchRoomsByRoomStatus(String tinhTrangPhong);
 
-	public ArrayList<Phong> searchRoomsByCapacity(int sucChua);
+	public ArrayList<Room> searchRoomsByCapacity(int sucChua);
 
-	public ArrayList<Phong> searchRoomsByRoomName(String tenPhong);
+	public ArrayList<Room> searchRoomsByRoomName(String tenPhong);
 
 }

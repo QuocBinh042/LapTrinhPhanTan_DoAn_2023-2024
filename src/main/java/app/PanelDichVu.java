@@ -30,7 +30,7 @@ public class PanelDichVu extends JPanel implements MouseListener {
 	private JTable table;
 	private DefaultTableModel tableModel;
 	private Box bLeft, bRight;
-	private ArrayList<entity.DichVu> dsDichVu;
+	private ArrayList<entity.Service> dsDichVu;
 	private DAODichVu daoDV;
 	private DecimalFormat formatter = new DecimalFormat("###");
 	private static int maDVTT = 0;
@@ -238,7 +238,7 @@ public class PanelDichVu extends JPanel implements MouseListener {
 				} else if (soLuong > 10) {
 					tinhTrang = "Còn hàng";
 				}
-				entity.DichVu dv = new entity.DichVu(maDV, tenDV, donGia, donVi, soLuong, tinhTrang);
+				entity.Service dv = new entity.Service(maDV, tenDV, donGia, donVi, soLuong, tinhTrang);
 				int i = JOptionPane.showConfirmDialog(null, "Bạn có chắc chắn muốn thêm mới dịch vụ không ?", "Chú ý!",
 						JOptionPane.YES_OPTION);
 				if (i == JOptionPane.YES_OPTION) {
@@ -274,7 +274,7 @@ public class PanelDichVu extends JPanel implements MouseListener {
 						table.setValueAt(donGia, r, 2);
 						table.setValueAt(donVi, r, 3);
 						table.setValueAt(soLuong, r, 4);
-						entity.DichVu dv = new entity.DichVu((String) table.getValueAt(r, 0), tenDV, donGia, donVi,
+						entity.Service dv = new entity.Service((String) table.getValueAt(r, 0), tenDV, donGia, donVi,
 								soLuong, tinhTrang);
 						daoDV.update(dv);
 						if (Integer.parseInt(table.getValueAt(r, 4).toString()) == 0) {
@@ -356,7 +356,7 @@ public class PanelDichVu extends JPanel implements MouseListener {
 	// Lay toan bo dich vu
 	private void layToanBoDV() {
 		dsDichVu = daoDV.getAllDichVu();
-		for (entity.DichVu dv : dsDichVu) {
+		for (entity.Service dv : dsDichVu) {
 			tableModel.addRow(new Object[] { dv.getMaDichVu(), dv.getTenDichVu(), formatter.format(dv.getDonGia()),
 					dv.getDonVi(), dv.getSoLuong(), dv.getTinhTrang() });
 			locDVDaXoa();
@@ -387,7 +387,7 @@ public class PanelDichVu extends JPanel implements MouseListener {
 		xoaToanBoDV();
 		String tt = cbTinhTrang.getSelectedItem().toString();
 		dsDichVu = daoDV.getDichVuCB(tt);
-		for (entity.DichVu dv : dsDichVu) {
+		for (entity.Service dv : dsDichVu) {
 			tableModel.addRow(new Object[] { dv.getMaDichVu(), dv.getTenDichVu(), formatter.format(dv.getDonGia()),
 					dv.getDonVi(), dv.getSoLuong(), dv.getTinhTrang() });
 		}
@@ -398,7 +398,7 @@ public class PanelDichVu extends JPanel implements MouseListener {
 	private void xuLyGoiY() {
 		dsDichVu = daoDV.getAllDichVu();
 		String tenDV = "";
-		for (entity.DichVu dv : dsDichVu) {
+		for (entity.Service dv : dsDichVu) {
 			tenDV += dv.getTenDichVu().toString() + ";";
 		}
 		String[] data = tenDV.split(";");

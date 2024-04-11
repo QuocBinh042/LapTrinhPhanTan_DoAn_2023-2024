@@ -35,7 +35,7 @@ public class PanelPhong extends JPanel implements MouseListener {
 	private DefaultTableModel tableModel;
 	private DialogLoaiPhong quanlyLP;
 	private DAOPhong daoPhong;
-	private ArrayList<entity.Phong> dsPhong;
+	private ArrayList<entity.Room> dsPhong;
 	private ArrayList<entity.LoaiPhong> dsLP;
 	private DAOLoaiPhong daoLP;
 	private MaTuDong maPTD = new MaTuDong();
@@ -238,7 +238,7 @@ public class PanelPhong extends JPanel implements MouseListener {
 	// Lay toan bo danh sach phong
 	private void layToanBoPhong() {
 		dsPhong = daoPhong.getAllPhong();
-		for (entity.Phong p : dsPhong) {
+		for (entity.Room p : dsPhong) {
 			tableModel.addRow(new Object[] { p.getMaPhong(), p.getTenPhong(), p.getLoaiPhong().getMaLoaiPhong(),
 					p.getLoaiPhong().getTenLoaiPhong(), p.getLoaiPhong().getSucChua(),
 					formatter.format(p.getLoaiPhong().getGiaLoaiPhong()), p.getTinhTrangPhong(), p.getMoTa() });
@@ -264,7 +264,7 @@ public class PanelPhong extends JPanel implements MouseListener {
 				double giaP = Double.parseDouble(txtGiaPhong.getText());
 				String moTa = txaMoTa.getText();
 				entity.LoaiPhong lp = new entity.LoaiPhong(maLP, loaiP, sucChua, giaP);
-				entity.Phong p = new entity.Phong(maP, tenP, lp, "Còn trống", moTa);
+				entity.Room p = new entity.Room(maP, tenP, lp, "Còn trống", moTa);
 				int i = JOptionPane.showConfirmDialog(null, "Bạn có chắc chắn muốn thêm mới phòng không ?", "Chú ý!",
 						JOptionPane.YES_OPTION);
 				if (i == JOptionPane.YES_OPTION) {
@@ -307,7 +307,7 @@ public class PanelPhong extends JPanel implements MouseListener {
 					table.setValueAt(tinhTrang, r, 6);
 					table.setValueAt(moTa, r, 7);
 					entity.LoaiPhong lp = new entity.LoaiPhong(maLP, loaiP, sucChua, giaP);
-					entity.Phong p = new entity.Phong(table.getValueAt(r, 0).toString(), tenP, lp, tinhTrang, moTa);
+					entity.Room p = new entity.Room(table.getValueAt(r, 0).toString(), tenP, lp, tinhTrang, moTa);
 					daoPhong.update(p);
 					JOptionPane.showMessageDialog(null, "Cập nhật thông tin phòng thành công!");
 				}
@@ -417,7 +417,7 @@ public class PanelPhong extends JPanel implements MouseListener {
 	private void xuLyGoiY() {
 		dsPhong = daoPhong.getAllPhong();
 		String maP = "";
-		for (entity.Phong p : dsPhong) {
+		for (entity.Room p : dsPhong) {
 			maP += p.getMaPhong().toString() + ";";
 		}
 		String[] data = maP.split(";");
@@ -444,7 +444,7 @@ public class PanelPhong extends JPanel implements MouseListener {
 		xoaToanBoPhong();
 		String lc = cbTinhTrang.getSelectedItem().toString();
 		dsPhong = daoPhong.getCBTT(lc);
-		for (entity.Phong p : dsPhong) {
+		for (entity.Room p : dsPhong) {
 			tableModel.addRow(new Object[] { p.getMaPhong(), p.getTenPhong(), p.getLoaiPhong().getMaLoaiPhong(),
 					p.getLoaiPhong().getTenLoaiPhong(), p.getLoaiPhong().getSucChua(),
 					formatter.format(p.getLoaiPhong().getGiaLoaiPhong()), p.getTinhTrangPhong(), p.getMoTa() });
@@ -456,7 +456,7 @@ public class PanelPhong extends JPanel implements MouseListener {
 		xoaToanBoPhong();
 		String lc = cbLoaiPhong.getSelectedItem().toString();
 		dsPhong = daoPhong.getCBLP(lc);
-		for (entity.Phong p : dsPhong) {
+		for (entity.Room p : dsPhong) {
 			tableModel.addRow(new Object[] { p.getMaPhong(), p.getTenPhong(), p.getLoaiPhong().getMaLoaiPhong(),
 					p.getLoaiPhong().getTenLoaiPhong(), p.getLoaiPhong().getSucChua(),
 					formatter.format(p.getLoaiPhong().getGiaLoaiPhong()), p.getTinhTrangPhong(), p.getMoTa() });

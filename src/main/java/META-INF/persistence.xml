@@ -14,7 +14,7 @@
 				value="jdbc:sqlserver://localhost:1433;databaseName=KaraokeOneDB;trustServerCertificate=true" />
 			<property name="jakarta.persistence.jdbc.user" value="sa" />
 			<property name="jakarta.persistence.jdbc.password"
-				value="sapassword" />
+				value="12345678" />
 			<property name="jakarta.persistence.jdbc.driver"
 				value="com.microsoft.sqlserver.jdbc.SQLServerDriver" />
 

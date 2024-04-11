@@ -57,7 +57,7 @@ import org.jfree.data.category.DefaultCategoryDataset;
 import com.toedter.calendar.JDateChooser;
 
 import dao.DAOHoaDon;
-import entity.HoaDon;
+import entity.Bill;
 
 public class PanelThongKe extends JPanel {
 	private JTable tableTG, tableKH, tableP, tableDV;
@@ -77,7 +77,7 @@ public class PanelThongKe extends JPanel {
 	private JComboBox<String> cbLuaChonTG;
 	private JComboBox<Integer> cbChonNam;
 	private DAOHoaDon daoHD = new DAOHoaDon();
-	private ArrayList<entity.HoaDon> dsHD = new ArrayList<>();
+	private ArrayList<entity.Bill> dsHD = new ArrayList<>();
 	private DecimalFormat formatter = new DecimalFormat("###,###,### VNĐ");
 	private SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 	private CategoryDataset dataset;
@@ -483,10 +483,10 @@ public class PanelThongKe extends JPanel {
 		}
 	}
 
-	private void loadData(ArrayList<HoaDon> ds, JTable table, DefaultTableModel tableModel) {
+	private void loadData(ArrayList<Bill> ds, JTable table, DefaultTableModel tableModel) {
 		deleteAllDataJtable(table);
-		Collections.sort(ds, Comparator.comparing(HoaDon::getTongHoaDon, Comparator.reverseOrder()));
-		for (entity.HoaDon hd : ds) {
+		Collections.sort(ds, Comparator.comparing(Bill::getTongHoaDon, Comparator.reverseOrder()));
+		for (entity.Bill hd : ds) {
 			tableModel.addRow(new Object[] { hd.getMaHoaDon(), hd.getKh().getTenKH(), hd.getNv().getTenNV(),
 					dateFormat.format(hd.getNgayThanhToan()), formatter.format(hd.getTongHoaDon()) });
 		}

@@ -2,19 +2,19 @@ package service;
 
 import java.util.ArrayList;
 
-import entity.KhachHang;
+import entity.Customer;
 
 public interface KhachHangService {
-	public ArrayList<KhachHang> getAllCustomers();
+	public ArrayList<Customer> getAllCustomers();
 
-	public ArrayList<KhachHang> getCustomersByType(Boolean loaiKhachHang);
+	public ArrayList<Customer> getCustomersByType(Boolean loaiKhachHang);
 
-	public boolean addCustomer(KhachHang khachHang);
+	public boolean addCustomer(Customer khachHang);
 
-	public boolean updateCustomer(KhachHang khachHang);
+	public boolean updateCustomer(Customer khachHang);
 
 	public void deleteCustomer(String tenKhachHang);
 
-	public ArrayList<KhachHang> searchCustomersByPhoneNumber(String SDT);
+	public ArrayList<Customer> searchCustomersByPhoneNumber(String SDT);
 
 }

@@ -2,22 +2,22 @@ package service;
 
 import java.util.ArrayList;
 
-import entity.NhanVien;
+import entity.Employee;
 
 public interface NhanVienService {
-	public ArrayList<NhanVien> getAllEmployees();
+	public ArrayList<Employee> getAllEmployees();
 
-	public ArrayList<NhanVien> searchEmployeesByID(String maNV);
+	public ArrayList<Employee> searchEmployeesByID(String maNV);
 
-	public ArrayList<NhanVien> getEmployeesByPosition(String chucVu);
+	public ArrayList<Employee> getEmployeesByPosition(String chucVu);
 
-	public ArrayList<NhanVien> getEmployeesByStatus(Boolean tinhTrangNV);
+	public ArrayList<Employee> getEmployeesByStatus(Boolean tinhTrangNV);
 
-	public boolean addEmployee(NhanVien nv);
+	public boolean addEmployee(Employee nv);
 
-	public boolean updateEmployee(NhanVien nv);
+	public boolean updateEmployee(Employee nv);
 
-	public NhanVien checkAccount(String maNV, String matKhau);
+	public Employee checkAccount(String maNV, String matKhau);
 
 	public void updatePassword(String matKhau, String soDienThoai);
 

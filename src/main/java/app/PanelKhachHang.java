@@ -34,7 +34,7 @@ public class PanelKhachHang extends JPanel implements MouseListener {
 	private JTable table;
 	private DefaultTableModel tableModel;
 	private DAOKhachHang daoKH = new DAOKhachHang();
-	private ArrayList<entity.KhachHang> dsKH = new ArrayList<>();
+	private ArrayList<entity.Customer> dsKH = new ArrayList<>();
 	private MaTuDong maKhachHang = new MaTuDong();
 	private Boolean gt;
 
@@ -205,7 +205,7 @@ public class PanelKhachHang extends JPanel implements MouseListener {
 				String ghichu = txaGhiChu.getText();
 				String maKH = txtMaKH.getText();
 				String[] row = { maKH, tenKH, "Thường", gioiTinh, sdt, email, "0", ghichu };
-				if (daoKH.add(new entity.KhachHang(maKH, tenKH, false, gt, sdt, email, 0, ghichu))) {
+				if (daoKH.add(new entity.Customer(maKH, tenKH, false, gt, sdt, email, 0, ghichu))) {
 					tableModel.addRow(row);
 					JOptionPane.showMessageDialog(null, "Thêm mới khách hàng thành công!");
 				} else
@@ -228,9 +228,9 @@ public class PanelKhachHang extends JPanel implements MouseListener {
 	}
 
 	// Lay toan bo khach hang
-	private void layDanhSachKH(ArrayList<entity.KhachHang> dsKH) {
+	private void layDanhSachKH(ArrayList<entity.Customer> dsKH) {
 		xoaToanBoKH();
-		for (entity.KhachHang kh : dsKH) {
+		for (entity.Customer kh : dsKH) {
 			String gioiTinh = kh.getGioiTinh() ? "Nữ" : "Nam";
 			String loaikh = kh.getLoaiKH() ? "VIP" : "Thường";
 			tableModel.addRow(new Object[] { kh.getMaKH(), kh.getTenKH(), loaikh, gioiTinh, kh.getSdthoai(),
@@ -299,7 +299,7 @@ public class PanelKhachHang extends JPanel implements MouseListener {
 				String maKH = (String) table.getValueAt(table.getSelectedRow(), 0);
 				tableModel.removeRow(viTri);
 				String[] row = { maKH, tenKH, "Thường", gioiTinh, sdt, email, "2", ghichu };
-				daoKH.updateKhachHang(new entity.KhachHang(maKH, tenKH, false, false, sdt, email, 0, ghichu));
+				daoKH.updateKhachHang(new entity.Customer(maKH, tenKH, false, false, sdt, email, 0, ghichu));
 				tableModel.insertRow(viTri, row);
 				JOptionPane.showMessageDialog(null, "Cập nhật khách hàng thành công!");
 			} else {

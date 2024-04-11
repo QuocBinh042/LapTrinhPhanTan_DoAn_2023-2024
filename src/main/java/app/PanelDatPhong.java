@@ -53,15 +53,15 @@ import dao.DAODichVu;
 import dao.DAOKhachHang;
 import dao.DAONhanVien;
 import dao.DAOPhong;
-import entity.CTDVPhong;
-import entity.ChiTietHoaDon;
-import entity.DichVu;
-import entity.HoaDon;
-import entity.KhachHang;
+import entity.DetailServiceRoom;
+import entity.DetailBill;
+import entity.Service;
+import entity.Bill;
+import entity.Customer;
 import entity.KhuyenMai;
-import entity.NhanVien;
-import entity.PhieuDatPhong;
-import entity.Phong;
+import entity.Employee;
+import entity.Booking;
+import entity.Room;
 
 public class PanelDatPhong extends JPanel {
 	private JButton thuePBtn, phieuDatPhongBtn, datPBtn, chuyenPBtn, chiTietPBtn, dichVuPBtn, tinhTienPBtn, timKiemPBtn,
@@ -393,9 +393,9 @@ public class PanelDatPhong extends JPanel {
 
 	private void readAllDateToTablePhong() {
 		phongModel.setRowCount(0);
-		List<entity.Phong> dsP = phongDao.getAllDataForTableDatPhong().stream()
+		List<entity.Room> dsP = phongDao.getAllDataForTableDatPhong().stream()
 				.sorted((p1, p2) -> p1.getTenPhong().compareTo(p2.getTenPhong())).collect(Collectors.toList());
-		for (Phong p : dsP) {
+		for (Room p : dsP) {
 			if (!p.getTinhTrangPhong().trim().equalsIgnoreCase("Đã xóa"))
 				phongModel.addRow(new Object[] { p.getTenPhong(), p.getLoaiPhong().getTenLoaiPhong(),
 						p.getLoaiPhong().getSucChua(), p.getTinhTrangPhong(),
@@ -405,9 +405,9 @@ public class PanelDatPhong extends JPanel {
 
 	private void readAllDateToTablePhong2() {
 		phongModel.setRowCount(0);
-		List<entity.Phong> dsP = phongDao.getAllDataForTableDatPhong().stream()
+		List<entity.Room> dsP = phongDao.getAllDataForTableDatPhong().stream()
 				.sorted((p1, p2) -> p1.getTenPhong().compareTo(p2.getTenPhong())).collect(Collectors.toList());
-		for (Phong p : dsP) {
+		for (Room p : dsP) {
 			if (p.getTinhTrangPhong().trim().equalsIgnoreCase("Còn trống"))
 				phongModel.addRow(new Object[] { p.getTenPhong(), p.getLoaiPhong().getTenLoaiPhong(),
 						p.getLoaiPhong().getSucChua(), p.getTinhTrangPhong(),
@@ -417,9 +417,9 @@ public class PanelDatPhong extends JPanel {
 
 	private void readAllDateToTablePhong3() {
 		phongModel.setRowCount(0);
-		List<entity.Phong> dsP = phongDao.getAllDataForTableDatPhong().stream()
+		List<entity.Room> dsP = phongDao.getAllDataForTableDatPhong().stream()
 				.sorted((p1, p2) -> p1.getTenPhong().compareTo(p2.getTenPhong())).collect(Collectors.toList());
-		for (Phong p : dsP) {
+		for (Room p : dsP) {
 			if (p.getTinhTrangPhong().trim().equalsIgnoreCase("Đang thuê"))
 				phongModel.addRow(new Object[] { p.getTenPhong(), p.getLoaiPhong().getTenLoaiPhong(),
 						p.getLoaiPhong().getSucChua(), p.getTinhTrangPhong(),
@@ -429,11 +429,11 @@ public class PanelDatPhong extends JPanel {
 
 	private void xuLyLocTheoLoaiPhong() {
 		phongModel.setRowCount(0);
-		List<Phong> dsP = phongDao.timKiemPhongTheoLoaiPhong((String) loaiPhongB.getSelectedItem());
+		List<Room> dsP = phongDao.timKiemPhongTheoLoaiPhong((String) loaiPhongB.getSelectedItem());
 		if (((String) loaiPhongB.getSelectedItem()).equalsIgnoreCase("Tất cả")) {
 			readAllDateToTablePhong();
 		}
-		for (Phong p : dsP) {
+		for (Room p : dsP) {
 			phongModel.addRow(
 					new Object[] { p.getTenPhong(), p.getLoaiPhong().getTenLoaiPhong(), p.getLoaiPhong().getSucChua(),
 							p.getTinhTrangPhong(), formatter.format(p.getLoaiPhong().getGiaLoaiPhong()) });
@@ -442,11 +442,11 @@ public class PanelDatPhong extends JPanel {
 
 	private void xuLyLocTheoSoNguoi() {
 		phongModel.setRowCount(0);
-		List<Phong> dsP = phongDao.timKiemPhongTheoSoNguoi(Integer.valueOf((String) soNguoiB.getSelectedItem()));
+		List<Room> dsP = phongDao.timKiemPhongTheoSoNguoi(Integer.valueOf((String) soNguoiB.getSelectedItem()));
 		if (((String) soNguoiB.getSelectedItem()).equalsIgnoreCase("Tất cả")) {
 			readAllDateToTablePhong();
 		}
-		for (Phong p : dsP) {
+		for (Room p : dsP) {
 			phongModel.addRow(
 					new Object[] { p.getTenPhong(), p.getLoaiPhong().getTenLoaiPhong(), p.getLoaiPhong().getSucChua(),
 							p.getTinhTrangPhong(), formatter.format(p.getLoaiPhong().getGiaLoaiPhong()) });
@@ -455,11 +455,11 @@ public class PanelDatPhong extends JPanel {
 
 	public void xuLyLocTheoTinhTrangPhong() {
 		phongModel.setRowCount(0);
-		List<Phong> dsP = phongDao.timKiemPhongTheoTinhTrangPhong((String) tinhTrangB.getSelectedItem());
+		List<Room> dsP = phongDao.timKiemPhongTheoTinhTrangPhong((String) tinhTrangB.getSelectedItem());
 		if (((String) tinhTrangB.getSelectedItem()).equalsIgnoreCase("Tất cả")) {
 			readAllDateToTablePhong();
 		}
-		for (Phong p : dsP) {
+		for (Room p : dsP) {
 			phongModel.addRow(
 					new Object[] { p.getTenPhong(), p.getLoaiPhong().getTenLoaiPhong(), p.getLoaiPhong().getSucChua(),
 							p.getTinhTrangPhong(), formatter.format(p.getLoaiPhong().getGiaLoaiPhong()) });
@@ -471,7 +471,7 @@ public class PanelDatPhong extends JPanel {
 
 		} else {
 			phongModel.setRowCount(0);
-			List<Phong> dsP = phongDao.getAllDataForTableDatPhong();
+			List<Room> dsP = phongDao.getAllDataForTableDatPhong();
 			if (!phongF.getText().trim().equals("")) {
 				dsP = phongDao.timKiemPhongTheoTenPhong(phongF.getText().trim());
 			}
@@ -482,7 +482,7 @@ public class PanelDatPhong extends JPanel {
 						.collect(Collectors.toList());
 			}
 
-			for (Phong p : dsP) {
+			for (Room p : dsP) {
 				System.out.println();
 				phongModel.addRow(new Object[] { p.getTenPhong(), p.getLoaiPhong().getTenLoaiPhong(),
 						p.getLoaiPhong().getSucChua(), p.getTinhTrangPhong(),
@@ -566,7 +566,7 @@ public class PanelDatPhong extends JPanel {
 	}
 
 	private void readDataToTablePhong() {
-		List<entity.Phong> dsP = phongDao.getAllDataForTableDatPhong().stream()
+		List<entity.Room> dsP = phongDao.getAllDataForTableDatPhong().stream()
 				.sorted((p1, p2) -> p1.getTenPhong().compareTo(p2.getTenPhong())).collect(Collectors.toList());
 
 		long soPhongCho = dsP.stream().filter(p -> p.getTinhTrangPhong().equalsIgnoreCase("Đã đặt trước")).count();
@@ -579,7 +579,7 @@ public class PanelDatPhong extends JPanel {
 		lbPhongCho.setFont(new Font("sanserif", Font.BOLD, 14));
 		lbPhongDangThue.setFont(new Font("sanserif", Font.BOLD, 14));
 
-		for (Phong p : dsP) {
+		for (Room p : dsP) {
 			if (p.getTinhTrangPhong().equalsIgnoreCase("Còn Trống"))
 				phongModel.addRow(new Object[] { p.getTenPhong(), p.getLoaiPhong().getTenLoaiPhong(),
 						p.getLoaiPhong().getSucChua(), p.getTinhTrangPhong(), formatter.format(p.getLoaiPhong().getGiaLoaiPhong()) });
@@ -838,7 +838,7 @@ public class PanelDatPhong extends JPanel {
 		}
 
 		private void readDataToFieldsTTPhong() {
-			Phong phong = pdao.timKiemPhongTheoTenPhong((String) phongModel.getValueAt(phongTable.getSelectedRow(), 0))
+			Room phong = pdao.timKiemPhongTheoTenPhong((String) phongModel.getValueAt(phongTable.getSelectedRow(), 0))
 					.get(0);
 			tenPhongF.setText(phong.getTenPhong());
 			loaiPhongF.setText(phong.getLoaiPhong().getTenLoaiPhong());
@@ -862,13 +862,13 @@ public class PanelDatPhong extends JPanel {
 			if(matcher.matches()) {
 				tenKH = tenKhachF.getText().trim();
 				sdtKH = sdtKhachF.getText().trim();
-				List<KhachHang> dsKH = kdao.timKiemKHTheoSDT(sdtKhachF.getText());
+				List<Customer> dsKH = kdao.timKiemKHTheoSDT(sdtKhachF.getText());
 				if (dsKH.size() > 0) {
 					tenKhachF.setText(dsKH.get(0).getTenKH());
 					maKH = kdao.timKiemKHTheoSDT(sdtKH).get(0).getMaKH();
 				} else {
 					JOptionPane.showMessageDialog(this, "Khách hàng mới");
-					List<KhachHang> dsKH2 = kdao.getAllDataKH().stream()
+					List<Customer> dsKH2 = kdao.getAllDataKH().stream()
 							.sorted((kh1, kh2) -> kh1.getMaKH().compareTo(kh2.getMaKH())).toList();
 					String str = dsKH2.get(dsKH2.size() - 1).getMaKH();
 					maKH = maTuDong.formatMa(str);
@@ -894,7 +894,7 @@ public class PanelDatPhong extends JPanel {
 		}
 		
 		private boolean matchSoNguoi() {
-			Phong phong = pdao.timKiemPhongTheoTenPhong((String) phongModel.getValueAt(phongTable.getSelectedRow(), 0))
+			Room phong = pdao.timKiemPhongTheoTenPhong((String) phongModel.getValueAt(phongTable.getSelectedRow(), 0))
 					.get(0);
 			Pattern p = Pattern.compile("^\\d+$");
 		    Matcher matcher = p.matcher(soLuongF.getText().trim());
@@ -964,18 +964,18 @@ public class PanelDatPhong extends JPanel {
 				tenKH = tenKhachF.getText().trim();
 				sdtKH = sdtKhachF.getText().trim();
 
-				List<KhachHang> dsKH = kdao.timKiemKHTheoSDT(sdtKhachF.getText());
+				List<Customer> dsKH = kdao.timKiemKHTheoSDT(sdtKhachF.getText());
 				if (dsKH.size() == 0) {
-					KhachHang kh = new KhachHang(maKH, sdtKH, tenKH);
+					Customer kh = new Customer(maKH, sdtKH, tenKH);
 					kdao.createKhach(kh);
 				}
 				if (((String) cbLuaChon.getSelectedItem()).equalsIgnoreCase("Đặt trước")) {
-					List<PhieuDatPhong> dsPDP = pdpDao.getAllDataPDP().stream()
+					List<Booking> dsPDP = pdpDao.getAllDataPDP().stream()
 							.sorted((pdp1, pdp2) -> pdp1.getMaPDP().compareTo(pdp2.getMaPDP())).toList();
 					String s = dsPDP.get(dsPDP.size() - 1).getMaPDP();
 					String maKM = maTuDong.formatMa(s);
-					Phong phong = pdao.timKiemPhongChinhXacTheoTenPhong(tenPhongF.getText().trim()).get(0);
-					PhieuDatPhong pdp = new PhieuDatPhong(maKM, new KhachHang(maKH, sdtKH, tenKH),
+					Room phong = pdao.timKiemPhongChinhXacTheoTenPhong(tenPhongF.getText().trim()).get(0);
+					Booking pdp = new Booking(maKM, new Customer(maKH, sdtKH, tenKH),
 							nvDAO.timKiemNhanVienTheoMa(manNV).get(0), phong, dateFormat.parse(date + " " + time),
 							dateFormat.parse(date + " " + time), Integer.valueOf(soLuongF.getText()), 1, ghiChuA.getText());
 					try {
@@ -991,7 +991,7 @@ public class PanelDatPhong extends JPanel {
 				}
 
 				else {
-					List<HoaDon> dsHD = hdDao.getAllDataHD().stream()
+					List<Bill> dsHD = hdDao.getAllDataHD().stream()
 							.sorted((hd1, hd2) -> hd1.getMaHoaDon().compareTo(hd2.getMaHoaDon())).toList();
 					String s = "";
 					if (dsHD.size() != 0) {
@@ -1000,11 +1000,11 @@ public class PanelDatPhong extends JPanel {
 						s = "HD0001";
 					}
 					String maHD = maTuDong.formatMa(s);
-					HoaDon hd = new HoaDon(maHD, gioNhanTP.getTime(), dateFormat.parse(date + " " + time),
-							nvDAO.timKiemNhanVienTheoMa(manNV).get(0), new KhachHang(maKH, sdtKH, tenKH),
+					Bill hd = new Bill(maHD, gioNhanTP.getTime(), dateFormat.parse(date + " " + time),
+							nvDAO.timKiemNhanVienTheoMa(manNV).get(0), new Customer(maKH, sdtKH, tenKH),
 							new KhuyenMai("KM0001"));
-					Phong phong = pdao.timKiemPhongChinhXacTheoTenPhong(tenPhongF.getText().trim()).get(0);
-					ChiTietHoaDon cthd = new ChiTietHoaDon(phong, hd, new Date(), new Date());
+					Room phong = pdao.timKiemPhongChinhXacTheoTenPhong(tenPhongF.getText().trim()).get(0);
+					DetailBill cthd = new DetailBill(phong, hd, new Date(), new Date());
 					try {
 						if (hdDao.createHD(hd) && cthdDao.createCTPhong(cthd)
 								&& pdao.capNhatPhongTheoTinhTrang("Đang thuê", phong.getMaPhong())) {
@@ -1311,10 +1311,10 @@ public class PanelDatPhong extends JPanel {
 		}
 
 		private void xuLyChuyenPhong() {
-			Phong p = pdao.timKiemPhongChinhXacTheoTenPhong(
+			Room p = pdao.timKiemPhongChinhXacTheoTenPhong(
 					(String) modelPhongTrong.getValueAt(tablePhongTrong.getSelectedRow(), 1)).get(0);
-			ChiTietHoaDon cthd = cthdDao.timKiemCTHDTheoTenPhong(tenPhong).get(0);
-			ChiTietHoaDon chiTietHD = new ChiTietHoaDon(p, new HoaDon(cthd.getHd().getMaHoaDon()), new Date(),
+			DetailBill cthd = cthdDao.timKiemCTHDTheoTenPhong(tenPhong).get(0);
+			DetailBill chiTietHD = new DetailBill(p, new Bill(cthd.getHd().getMaHoaDon()), new Date(),
 					new Date());
 			cthd.setThoiGianTraPhong(new Date());
 			try {
@@ -1339,7 +1339,7 @@ public class PanelDatPhong extends JPanel {
 		}
 
 		private void readDataToFieldsTTPhongDangThue() {
-			Phong phong = pdao.timKiemPhongTheoTenPhong(tenPhong).get(0);
+			Room phong = pdao.timKiemPhongTheoTenPhong(tenPhong).get(0);
 			String s = cthdDao.timKiemCTHDTheoMaPhong(phong.getMaPhong());
 			String[] str = s.split(",");
 			String tenKH = str[1];
@@ -1361,16 +1361,16 @@ public class PanelDatPhong extends JPanel {
 			tfGioThue.setText(tgNhanPhong.format(formatter));
 			tfGioHienTai.setText(tgHienTai.format(formatter));
 
-			ChiTietHoaDon cthd = cthdDao.timKiemCTHDTheoTenPhong(tenPhong).get(0);
+			DetailBill cthd = cthdDao.timKiemCTHDTheoTenPhong(tenPhong).get(0);
 			cthd.setThoiGianTraPhong(new Date());
 			cthdDao.capNhatGioTraPhong(cthd);
 			tfThoiGianSuDung.setText(cthd.tinhThoiLuong() + " Phút");
 		}
 
 		private void readDataToTablePhong() {
-			List<Phong> dsP = pdao.getAllDataForTableDatPhong().stream()
+			List<Room> dsP = pdao.getAllDataForTableDatPhong().stream()
 					.sorted((p1, p2) -> p1.getTenPhong().compareTo(p2.getTenPhong())).collect(Collectors.toList());
-			for (Phong p : dsP) {
+			for (Room p : dsP) {
 				if (p.getTinhTrangPhong().equalsIgnoreCase("Còn Trống"))
 					modelPhongTrong
 							.addRow(new Object[] { p.getMaPhong(), p.getTenPhong(), p.getLoaiPhong().getTenLoaiPhong(),
@@ -1523,8 +1523,8 @@ public class PanelDatPhong extends JPanel {
 
 		private void readDateToTablePhongCho() {
 			phieuDatPModel.setRowCount(0);
-			List<PhieuDatPhong> dsPDP = pdpDao.getAllDataPDP();
-			for (PhieuDatPhong pdp : dsPDP) {
+			List<Booking> dsPDP = pdpDao.getAllDataPDP();
+			for (Booking pdp : dsPDP) {
 				String date = formatDate.format(pdp.getThoiGianDatPhong());
 				String time = formatTime.format(pdp.getThoiGianDatPhong());
 				String tinhTrang = "";
@@ -1554,17 +1554,17 @@ public class PanelDatPhong extends JPanel {
 
 		private void xuLyNhanPhong() {
 			try {
-				PhieuDatPhong pdp = pdpDao
+				Booking pdp = pdpDao
 						.timKiemPDPTheoMa((String) phieuDatPModel.getValueAt(phieuDatPTable.getSelectedRow(), 0))
 						.get(0);
 				System.out.println(pdp.getPhong().getTenPhong());
-				List<HoaDon> dsHD = hdDao.getAllDataHD().stream()
+				List<Bill> dsHD = hdDao.getAllDataHD().stream()
 						.sorted((hd1, hd2) -> hd1.getMaHoaDon().compareTo(hd2.getMaHoaDon())).toList();
 				String s = dsHD.get(dsHD.size() - 1).getMaHoaDon();
 				String maHD = maTuDong.formatMa(s);
-				HoaDon hd = new HoaDon(maHD, LocalTime.now(), new Date(), pdp.getNhanVien(), pdp.getKhachHang(),
+				Bill hd = new Bill(maHD, LocalTime.now(), new Date(), pdp.getNhanVien(), pdp.getKhachHang(),
 						new KhuyenMai("KM0001"));
-				ChiTietHoaDon chiTietHoaDon = new ChiTietHoaDon(pdp.getPhong(), hd, new Date(), new Date());
+				DetailBill chiTietHoaDon = new DetailBill(pdp.getPhong(), hd, new Date(), new Date());
 				if (hdDao.createHD(hd) && cthdDao.createCTPhong(chiTietHoaDon)
 						&& pdpDao.capNhatTinhTrangPDP(0, pdp.getMaPDP())
 						&& pdao.capNhatTinhTrangPhongTheoTenPhong("Đang thuê", pdp.getPhong().getTenPhong())) {
@@ -1805,12 +1805,12 @@ public class PanelDatPhong extends JPanel {
 
 		private void xuLyThemDVPhong() {
 			if (tableDVKho.getSelectedRow() != -1) {
-				DichVu dv = dvDAO.timKiemDichVuTheoTenDV((String) model1.getValueAt(tableDVKho.getSelectedRow(), 1))
+				Service dv = dvDAO.timKiemDichVuTheoTenDV((String) model1.getValueAt(tableDVKho.getSelectedRow(), 1))
 						.get(0);
 				ctdvPhongDAO.capNhatSoLuongDichVu(dv.getSoLuong() - 1,
 						(String) model1.getValueAt(tableDVKho.getSelectedRow(), 1));
 				try {
-					if (ctdvPhongDAO.createCTDVPhong(new CTDVPhong(new HoaDon(tfMaPDP.getText()), dv, 1))) {
+					if (ctdvPhongDAO.createCTDVPhong(new DetailServiceRoom(new Bill(tfMaPDP.getText()), dv, 1))) {
 						readDataToTableDichVuPhong();
 						readDataToTableDichVu();
 						JOptionPane.showMessageDialog(this, "Thêm dịch vụ thành công!!!");
@@ -1826,9 +1826,9 @@ public class PanelDatPhong extends JPanel {
 
 		private void xuLyXoaDVPhong() {
 			if (tableDVPhong.getSelectedRow() != -1) {
-				DichVu dv = dvDAO.timKiemDichVuTheoTenDV((String) model2.getValueAt(tableDVPhong.getSelectedRow(), 1))
+				Service dv = dvDAO.timKiemDichVuTheoTenDV((String) model2.getValueAt(tableDVPhong.getSelectedRow(), 1))
 						.get(0);
-				CTDVPhong ctdvPhong = ctdvPhongDAO.timKiemCTDVPhongTheoTenDV(tfMaPDP.getText(), dv.getMaDichVu())
+				DetailServiceRoom ctdvPhong = ctdvPhongDAO.timKiemCTDVPhongTheoTenDV(tfMaPDP.getText(), dv.getMaDichVu())
 						.get(0);
 				try {
 					int soLuong = (int) model2.getValueAt(tableDVPhong.getSelectedRow(), 3);
@@ -1850,14 +1850,14 @@ public class PanelDatPhong extends JPanel {
 		}
 
 		private void readDataToFieldThongTin() {
-			Phong p = phongDao
+			Room p = phongDao
 					.timKiemPhongChinhXacTheoTenPhong((String) phongModel.getValueAt(phongTable.getSelectedRow(), 0))
 					.get(0);
-			List<ChiTietHoaDon> dsCTHD = cthdDao
+			List<DetailBill> dsCTHD = cthdDao
 					.timKiemCTHDTheoTenPhong((String) phongModel.getValueAt(phongTable.getSelectedRow(), 0));
-			ChiTietHoaDon cthd = dsCTHD.get(dsCTHD.size() - 1);
-			List<HoaDon> dsHD = hdDAO.timKiemHoaDonTheoMaHD(cthd.getHd().getMaHoaDon());
-			HoaDon hd = dsHD.get(dsHD.size() - 1);
+			DetailBill cthd = dsCTHD.get(dsCTHD.size() - 1);
+			List<Bill> dsHD = hdDAO.timKiemHoaDonTheoMaHD(cthd.getHd().getMaHoaDon());
+			Bill hd = dsHD.get(dsHD.size() - 1);
 			tfMaPDP.setText(cthd.getHd().getMaHoaDon());
 			tfTenPhong.setText(p.getTenPhong());
 			tfTenKH.setText(hd.getKh().getTenKH());
@@ -1866,9 +1866,9 @@ public class PanelDatPhong extends JPanel {
 
 		private void readDataToTableDichVu() {
 			model1.setRowCount(0);
-			List<entity.DichVu> dsDV = dvDAO.getAllDichVu();
+			List<entity.Service> dsDV = dvDAO.getAllDichVu();
 			int i = 0;
-			for (entity.DichVu dv : dsDV) {
+			for (entity.Service dv : dsDV) {
 				if (dv.getSoLuong() > 0)
 					model1.addRow(
 							new Object[] { ++i, dv.getTenDichVu(), dv.getDonGia(), dv.getDonVi(), dv.getSoLuong() });
@@ -1877,18 +1877,18 @@ public class PanelDatPhong extends JPanel {
 
 		private void readDataToTableDichVuPhong() {
 			model2.setRowCount(0);
-			List<CTDVPhong> dsCTDVPhong = ctdvPhongDAO.timKiemCTDVPhongTheoMaHD(tfMaPDP.getText());
+			List<DetailServiceRoom> dsCTDVPhong = ctdvPhongDAO.timKiemCTDVPhongTheoMaHD(tfMaPDP.getText());
 			int i = 0;
-			for (CTDVPhong ct : dsCTDVPhong) {
+			for (DetailServiceRoom ct : dsCTDVPhong) {
 				model2.addRow(new Object[] { ++i, ct.getDichVu().getTenDichVu(), ct.getDichVu().getDonGia(),
 						ct.getSoLuong(), ct.tinhTienDV() });
 			}
 		}
 
 		private void xuLyTangGiamSoLuongDichVuKho() {
-			DichVu dv = dvDAO.timKiemDichVuTheoTenDV((String) model2.getValueAt(tableDVPhong.getSelectedRow(), 1))
+			Service dv = dvDAO.timKiemDichVuTheoTenDV((String) model2.getValueAt(tableDVPhong.getSelectedRow(), 1))
 					.get(0);
-			CTDVPhong ctdvPhong = ctdvPhongDAO.timKiemCTDVPhongTheoTenDV(tfMaPDP.getText().trim(), dv.getMaDichVu())
+			DetailServiceRoom ctdvPhong = ctdvPhongDAO.timKiemCTDVPhongTheoTenDV(tfMaPDP.getText().trim(), dv.getMaDichVu())
 					.get(0);
 			int soLuongBanDau = ctdvPhong.getSoLuong();
 			int soLuongCapNhat = (int) model2.getValueAt(tableDVPhong.getSelectedRow(), 3);
@@ -2253,14 +2253,14 @@ public class PanelDatPhong extends JPanel {
 		}
 
 		private void xuLyThanhToan() {
-			Phong p = phongDao
+			Room p = phongDao
 					.timKiemPhongChinhXacTheoTenPhong((String) phongModel.getValueAt(phongTable.getSelectedRow(), 0))
 					.get(0);
-			List<ChiTietHoaDon> dsCTHD = cthdDao
+			List<DetailBill> dsCTHD = cthdDao
 					.timKiemCTHDTheoTenPhong((String) phongModel.getValueAt(phongTable.getSelectedRow(), 0));
-			ChiTietHoaDon cthd = dsCTHD.get(dsCTHD.size() - 1);
-			List<HoaDon> dsHD = hdDAO.timKiemHoaDonTheoMaHD(cthd.getHd().getMaHoaDon());
-			HoaDon hd = dsHD.get(dsHD.size() - 1);
+			DetailBill cthd = dsCTHD.get(dsCTHD.size() - 1);
+			List<Bill> dsHD = hdDAO.timKiemHoaDonTheoMaHD(cthd.getHd().getMaHoaDon());
+			Bill hd = dsHD.get(dsHD.size() - 1);
 			hd.setGioThanhToan(LocalTime.now());
 			hd.setTongHoaDon(Double.valueOf(tfThanhTien.getText()));
 			try {
@@ -2284,11 +2284,11 @@ public class PanelDatPhong extends JPanel {
 		}
 
 		private void readDataToFieldThongTin() {
-			List<ChiTietHoaDon> dsCTHD = cthdDao
+			List<DetailBill> dsCTHD = cthdDao
 					.timKiemCTHDTheoTenPhong((String) phongModel.getValueAt(phongTable.getSelectedRow(), 0));
-			ChiTietHoaDon cthd = dsCTHD.get(dsCTHD.size() - 1);
-			List<HoaDon> dsHD = hdDAO.timKiemHoaDonTheoMaHD(cthd.getHd().getMaHoaDon());
-			HoaDon hd = dsHD.get(dsHD.size() - 1);
+			DetailBill cthd = dsCTHD.get(dsCTHD.size() - 1);
+			List<Bill> dsHD = hdDAO.timKiemHoaDonTheoMaHD(cthd.getHd().getMaHoaDon());
+			Bill hd = dsHD.get(dsHD.size() - 1);
 			tfMaHD.setText(hd.getMaHoaDon());
 			tfTenNhanVien.setText(hd.getNv().getTenNV());
 			tfTenKH.setText(hd.getKh().getTenKH());
@@ -2299,16 +2299,16 @@ public class PanelDatPhong extends JPanel {
 
 		private void readDataToTablePhong() {
 			modelDichVu.setRowCount(0);
-			List<ChiTietHoaDon> dsCTHD = cthdDao.timKiemCTHDTheoMaHD(tfMaHD.getText().trim()).stream()
+			List<DetailBill> dsCTHD = cthdDao.timKiemCTHDTheoMaHD(tfMaHD.getText().trim()).stream()
 					.sorted((cthd1, cthd2) -> cthd1.getThoiGianNhanPhong().compareTo(cthd2.getThoiGianNhanPhong()))
 					.toList();
-			ChiTietHoaDon cthdSetDate = dsCTHD.get(dsCTHD.size() - 1);
+			DetailBill cthdSetDate = dsCTHD.get(dsCTHD.size() - 1);
 			cthdSetDate.setThoiGianTraPhong(new Date());
 			System.out.println(cthdSetDate.getThoiGianTraPhong());
 			cthdDao.capNhatGioTraPhong(cthdSetDate);
 			try {
-				for (ChiTietHoaDon cthd : dsCTHD) {
-					Phong phong = phongDao.timKiemPhongTheoTenPhong(cthd.getPhong().getTenPhong()).get(0);
+				for (DetailBill cthd : dsCTHD) {
+					Room phong = phongDao.timKiemPhongTheoTenPhong(cthd.getPhong().getTenPhong()).get(0);
 					String s = cthdDao.timKiemCTHDTheoMaPhong(phong.getMaPhong());
 					String[] str = s.split(",");
 					String thoiGian = str[2];
@@ -2335,10 +2335,10 @@ public class PanelDatPhong extends JPanel {
 
 		private void xuLyTinhTienDienVaoThongTin() {
 			tfThue.setText("10%");
-			List<ChiTietHoaDon> dsCTHD = cthdDao.timKiemCTHDTheoMaHD(tfMaHD.getText().trim());
+			List<DetailBill> dsCTHD = cthdDao.timKiemCTHDTheoMaHD(tfMaHD.getText().trim());
 			double tongTienPhong = dsCTHD.stream().mapToDouble(cthd -> cthd.tinhTienPhong()).sum();
 			tfTienPhong.setText(formatter.format(tongTienPhong) + "");
-			List<CTDVPhong> dsCTDVP = ctdvPhongDAO.timKiemCTDVPhongTheoMaHD(tfMaHD.getText().trim());
+			List<DetailServiceRoom> dsCTDVP = ctdvPhongDAO.timKiemCTDVPhongTheoMaHD(tfMaHD.getText().trim());
 			double tongTienDV = dsCTDVP.stream().mapToDouble(ctdv -> ctdv.tinhTienDV()).sum();
 			tfTienDichVu.setText(formatter.format(tongTienDV) + "");
 			double tong = tongTienPhong + tongTienDV;
@@ -2349,9 +2349,9 @@ public class PanelDatPhong extends JPanel {
 
 		private void readDataToTableDichVu() {
 			modelDichVu.setRowCount(0);
-			List<CTDVPhong> dsCTDVPhong = ctdvPhongDAO.timKiemCTDVPhongTheoMaHD(tfMaHD.getText());
+			List<DetailServiceRoom> dsCTDVPhong = ctdvPhongDAO.timKiemCTDVPhongTheoMaHD(tfMaHD.getText());
 			int i = 0;
-			for (CTDVPhong ct : dsCTDVPhong) {
+			for (DetailServiceRoom ct : dsCTDVPhong) {
 				modelDichVu.addRow(new Object[] { ++i, ct.getDichVu().getTenDichVu(), ct.getDichVu().getDonVi(),
 						ct.getSoLuong(), ct.getDichVu().getDonGia(), formatter.format(ct.tinhTienDV()) });
 			}
@@ -2769,18 +2769,18 @@ public class PanelDatPhong extends JPanel {
 		}
 
 		private void readDataToFieldThongTin() {
-			List<ChiTietHoaDon> dsCTHD = cthdDao
+			List<DetailBill> dsCTHD = cthdDao
 					.timKiemCTHDTheoTenPhong((String) phongModel.getValueAt(phongTable.getSelectedRow(), 0));
-			ChiTietHoaDon cthd = dsCTHD.get(dsCTHD.size() - 1);
-			List<HoaDon> dsHD = hdDAO.timKiemHoaDonTheoMaHD(cthd.getHd().getMaHoaDon());
-			HoaDon hd = dsHD.get(dsHD.size() - 1);
+			DetailBill cthd = dsCTHD.get(dsCTHD.size() - 1);
+			List<Bill> dsHD = hdDAO.timKiemHoaDonTheoMaHD(cthd.getHd().getMaHoaDon());
+			Bill hd = dsHD.get(dsHD.size() - 1);
 			tfTenNhanVien.setText(hd.getNv().getTenNV());
 			tfMaPDP.setText(hd.getMaHoaDon());
 			tfTenKhach.setText(hd.getKh().getTenKH());
 			tfSDT.setText(hd.getKh().getSdthoai());
 			tfNgayNhanP.setText(hd.getNgayThanhToan().toString());
 
-			Phong phong = phongDao.timKiemPhongTheoTenPhong(cthd.getPhong().getTenPhong()).get(0);
+			Room phong = phongDao.timKiemPhongTheoTenPhong(cthd.getPhong().getTenPhong()).get(0);
 			String s = cthdDao.timKiemCTHDTheoMaPhong(phong.getMaPhong());
 			String[] str = s.split(",");
 			String thoiGian = str[2];
@@ -2806,9 +2806,9 @@ public class PanelDatPhong extends JPanel {
 
 		private void readDataToTableDichVu() {
 			model.setRowCount(0);
-			List<CTDVPhong> dsCTDVPhong = ctdvPhongDAO.timKiemCTDVPhongTheoMaHD(tfMaPDP.getText());
+			List<DetailServiceRoom> dsCTDVPhong = ctdvPhongDAO.timKiemCTDVPhongTheoMaHD(tfMaPDP.getText());
 			int i = 0;
-			for (CTDVPhong ct : dsCTDVPhong) {
+			for (DetailServiceRoom ct : dsCTDVPhong) {
 				model.addRow(new Object[] { ++i, ct.getDichVu().getTenDichVu(), ct.getDichVu().getDonVi(),
 						ct.getSoLuong(), ct.getDichVu().getDonGia(), formatter.format(ct.tinhTienDV()) });
 			}
@@ -2816,14 +2816,14 @@ public class PanelDatPhong extends JPanel {
 
 		private void readDataToFieldThanhToan() {
 			tfThueVAT.setText("10%");
-			List<ChiTietHoaDon> dsCTHD = cthdDao.timKiemCTHDTheoMaHD(tfMaPDP.getText().trim());
+			List<DetailBill> dsCTHD = cthdDao.timKiemCTHDTheoMaHD(tfMaPDP.getText().trim());
 			double tongTienPhong = dsCTHD.stream().mapToDouble(cthd -> cthd.tinhTienPhong()).sum();
 			double tienPhongHienTai = dsCTHD.get(dsCTHD.size() - 1).tinhTienPhong();
 			double tienPhongCu = 0;
 			if(dsCTHD.size() > 1)
 				tienPhongCu = dsCTHD.get(dsCTHD.size() - 2).tinhTienPhong();
 			tfTongTienPhong.setText(formatter.format(tongTienPhong) + "");
-			List<CTDVPhong> dsCTDVP = ctdvPhongDAO.timKiemCTDVPhongTheoMaHD(tfMaPDP.getText().trim());
+			List<DetailServiceRoom> dsCTDVP = ctdvPhongDAO.timKiemCTDVPhongTheoMaHD(tfMaPDP.getText().trim());
 			double tongTienDV = dsCTDVP.stream().mapToDouble(ctdv -> ctdv.tinhTienDV()).sum();
 			tfTongTienDich.setText(formatter.format(tongTienDV) + "");
 			double tong = tongTienPhong + tongTienDV;

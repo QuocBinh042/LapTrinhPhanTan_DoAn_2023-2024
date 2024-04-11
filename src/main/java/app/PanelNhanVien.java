@@ -39,7 +39,7 @@ public class PanelNhanVien extends JPanel implements MouseListener {
 	private DefaultTableModel tableModel;
 	private SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 	private DAONhanVien daoNV = new DAONhanVien();
-	private ArrayList<entity.NhanVien> dsNV = new ArrayList<>();
+	private ArrayList<entity.Employee> dsNV = new ArrayList<>();
 	private MaTuDong maNhanVien = new MaTuDong();
 
 	public PanelNhanVien() {
@@ -247,11 +247,11 @@ public class PanelNhanVien extends JPanel implements MouseListener {
 				
 				try {
 					if (gioiTinh.equalsIgnoreCase("Nam")) {
-						daoNV.add(new entity.NhanVien(maNV, tenNV, dateFormat.parse(namSinh), false, sdt, cccd, chucVu,
+						daoNV.add(new entity.Employee(maNV, tenNV, dateFormat.parse(namSinh), false, sdt, cccd, chucVu,
 								matKhau, false));
 					}
 					else {
-						daoNV.add(new entity.NhanVien(maNV, tenNV, dateFormat.parse(namSinh), true, sdt, cccd, chucVu,
+						daoNV.add(new entity.Employee(maNV, tenNV, dateFormat.parse(namSinh), true, sdt, cccd, chucVu,
 								matKhau, false));
 					}
 				} catch (NumberFormatException e) {
@@ -344,11 +344,11 @@ public class PanelNhanVien extends JPanel implements MouseListener {
 			String[] row = { maNV, tenNV, namSinh, gioiTinh, sdt, cccd, chucVu, matKhau, tt };
 			try {
 				if (gioiTinh.equalsIgnoreCase("Nam")) {
-					daoNV.updateNhanVien(new entity.NhanVien(maNV, tenNV, dateFormat.parse(namSinh), false, sdt, cccd, chucVu,
+					daoNV.updateNhanVien(new entity.Employee(maNV, tenNV, dateFormat.parse(namSinh), false, sdt, cccd, chucVu,
 							matKhau, tinhTrang));
 				}
 				else {
-					daoNV.updateNhanVien(new entity.NhanVien(maNV, tenNV, dateFormat.parse(namSinh), true, sdt, cccd, chucVu,
+					daoNV.updateNhanVien(new entity.Employee(maNV, tenNV, dateFormat.parse(namSinh), true, sdt, cccd, chucVu,
 							matKhau, tinhTrang));
 				}
 			} catch (NumberFormatException e) {
@@ -402,7 +402,7 @@ public class PanelNhanVien extends JPanel implements MouseListener {
 	// Lay toan bo nhan vien
 	private void layToanBoNV() {
 		dsNV = daoNV.getAll();
-		for (entity.NhanVien nv : dsNV) {
+		for (entity.Employee nv : dsNV) {
 			String gioiTinh = nv.getGioiTinh() ? "Nữ" : "Nam";
 			String tinhTrang = nv.getTinhTrangNV() ? "Đang làm" : "Nghỉ việc";
 			tableModel.addRow(new Object[] { nv.getMaNV(), nv.getTenNV(), dateFormat.format(nv.getNamSinh()), gioiTinh,
