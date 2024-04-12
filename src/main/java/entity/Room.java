@@ -22,7 +22,7 @@ public class Room implements Serializable {
 	@Column(name = "RoomID")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
-	@Column(name = "Name", columnDefinition = "nvarchar(250)", nullable = false)
+	@Column(name = "RoomName", columnDefinition = "nvarchar(250)", nullable = false)
 	private String Name;
 	@Column(name = "RoomStatus", columnDefinition = "nvarchar(250)", nullable = false)
 	private String roomStatus;

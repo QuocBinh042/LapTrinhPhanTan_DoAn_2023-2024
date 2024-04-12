@@ -21,7 +21,7 @@ public class Service implements Serializable {
 	@Column(name = "ServiceID")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
-	@Column(name = "Name", columnDefinition = "Nvarchar(250)", nullable = false)
+	@Column(name = "ServiceName", columnDefinition = "Nvarchar(250)", nullable = false)
 	private String name;
 	@Column(name = "Price", nullable = false)
 	private double price;

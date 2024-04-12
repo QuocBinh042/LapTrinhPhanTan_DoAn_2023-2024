@@ -23,19 +23,19 @@ public class Employee implements Serializable {
 	@Column(name = "EmployeeID")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
-	@Column(name = "Name", columnDefinition = "nvarchar(250)", nullable = false)
+	@Column(name = "EmployeeName", columnDefinition = "nvarchar(250)", nullable = false)
 	private String name;
 	@Column(name = "BirthDate", nullable = false)
 	private LocalDate birth;
 	@Column(name = "Gender", nullable = false)
 	private boolean gender;
-	@Column(name = "PhoneNumer", columnDefinition = "varchar(50)", nullable = false)
+	@Column(name = "PhoneNumer", columnDefinition = "varchar(10)", nullable = false)
 	private String phoneNumber;
-	@Column(name = "CI", columnDefinition = "varchar(50)", nullable = false)
+	@Column(name = "CI", columnDefinition = "varchar(15)", nullable = false)
 	private String CI; //citizen identification
-	@Column(name = "Position", columnDefinition = "varchar(50)", nullable = false)
+	@Column(name = "Position", columnDefinition = "Nvarchar(50)", nullable = false)
 	private String position;
-	@Column(name = "Password", columnDefinition = "varchar(50)", nullable = false)
+	@Column(name = "Password", columnDefinition = "Nvarchar(50)", nullable = false)
 	private String password;
 	@Column(name = "EmployeeStatus")
 	private boolean employeeStatus;

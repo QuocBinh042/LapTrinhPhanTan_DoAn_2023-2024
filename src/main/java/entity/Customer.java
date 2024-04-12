@@ -21,7 +21,7 @@ public class Customer implements Serializable {
 	@Column(name = "CustomerID")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
-	@Column(name = "Name", columnDefinition = "nvarchar(250)", nullable = false)
+	@Column(name = "CustomerName", columnDefinition = "nvarchar(250)", nullable = false)
 	private String name;
 	@Column(name = "PhoneNumber", columnDefinition = "varchar(50)", nullable = false)
 	private String phoneNumber;
