@@ -289,7 +289,7 @@ VALUES  (20, 15, '2023-11-21 10:00', '2023-11-21 12:30');
 go
 SET IDENTITY_INSERT [dbo].[DetailBill] OFF
 go
-SET IDENTITY_INSERT [dbo].[DetailServiceBill] OFF
+SET IDENTITY_INSERT [dbo].[DetailServiceBill] ON
 go
 INSERT INTO [dbo].[DetailServiceBill] ([BillID], [ServiceID], [Quantity])
 VALUES  (1, 1, 2)
@@ -327,3 +327,7 @@ INSERT INTO [dbo].[DetailServiceBill] ([BillID], [ServiceID], [Quantity])
 VALUES  (9, 2, 15)
 INSERT INTO [dbo].[DetailServiceBill] ([BillID], [ServiceID], [Quantity]) 
 VALUES  (9, 5, 1)
+go
+SET IDENTITY_INSERT [dbo].[DetailServiceBill] OFF
+go
+select * from Room
