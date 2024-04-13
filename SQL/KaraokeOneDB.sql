@@ -1,4 +1,6 @@
-﻿go
+﻿--drop database KaraokeOneDB
+--create database KaraokeOneDB
+go
 SET IDENTITY_INSERT [dbo].[Room] ON
 INSERT INTO [dbo].[Room] ([RoomID], [RoomName], [TypeRoom], [Capacity], [Price], [RoomStatus], [Describe])
 VALUES (1, N'101', N'THƯỜNG', 15, 150000, N'Đã đặt trước', N'')
@@ -287,7 +289,8 @@ VALUES  (20, 15, '2023-11-21 10:00', '2023-11-21 12:30');
 go
 SET IDENTITY_INSERT [dbo].[DetailBill] OFF
 go
-
+SET IDENTITY_INSERT [dbo].[DetailServiceBill] OFF
+go
 INSERT INTO [dbo].[DetailServiceBill] ([BillID], [ServiceID], [Quantity])
 VALUES  (1, 1, 2)
 INSERT INTO [dbo].[DetailServiceBill] ([BillID], [ServiceID], [Quantity]) 
