@@ -2,7 +2,9 @@ package Test;
 
 import java.rmi.RemoteException;
 
+import dao.CustomerDAO;
 import dao.RoomDAO;
+import entity.Customer;
 import entity.Room;
 import entity.RoomType;
 import jakarta.persistence.EntityManagerFactory;
@@ -21,7 +23,15 @@ public class Main {
 //		System.out.println(roomDAO.getRoomsByCapacity(15));
 
 //		System.out.println(roomDAO.updateRoomStatusByRoomID("Trong", 1));
-		System.out.println(roomDAO.updateRoomStatusByRoomName("Da dat", "101"));
+//		System.out.println(roomDAO.updateRoomStatusByRoomName("Da dat", "101"));
 //		System.out.println(roomDAO.getRoomsByRoomName("101"));
+		
+		CustomerDAO cDAO = new CustomerDAO();
+		Customer c = new Customer(22, "acb", "1234567", " ");
+//		System.out.println(cDAO.addCustomer(c));		
+//		System.out.println(cDAO.updateCustomer(c));
+		System.out.println(cDAO.getAllCustomers());
+//		System.out.println(cDAO.deleteCustomer(22));
+		System.out.println(cDAO.findCustomersByPhoneNumber("1234"));
 	}
 }

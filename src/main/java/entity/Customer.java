@@ -22,53 +22,70 @@ public class Customer implements Serializable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 	@Column(name = "CustomerName", columnDefinition = "nvarchar(250)", nullable = false)
-	private String name;
+	private String customerName;
 	@Column(name = "PhoneNumber", columnDefinition = "varchar(50)", nullable = false)
 	private String phoneNumber;
 	@Column(name = "Note", columnDefinition = "nvarchar(250)", nullable = true)
 	private String note;
-	public Customer(int id, String name, String phoneNumber, String note) {
-		super();
+
+	public Customer(int id, String customerName, String phoneNumber, String note) {
 		this.id = id;
-		this.name = name;
+		this.customerName = customerName;
 		this.phoneNumber = phoneNumber;
 		this.note = note;
 	}
+
 	public Customer() {
 		super();
 	}
-	@Override
-	public String toString() {
-		return "Customer [id=" + id + ", name=" + name + ", phoneNumber=" + phoneNumber + ", note=" + note + "]";
-	}
+
 	public int getId() {
 		return id;
 	}
+
 	public void setId(int id) {
 		this.id = id;
 	}
-	public String getName() {
-		return name;
+
+	public String getCustomerName() {
+		return customerName;
 	}
-	public void setName(String name) {
-		this.name = name;
+
+	public void setCustomerName(String customerName) {
+		this.customerName = customerName;
 	}
+
 	public String getPhoneNumber() {
 		return phoneNumber;
 	}
+
 	public void setPhoneNumber(String phoneNumber) {
 		this.phoneNumber = phoneNumber;
 	}
+
 	public String getNote() {
 		return note;
 	}
+
 	public void setNote(String note) {
 		this.note = note;
 	}
+
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
+
+	@Override
+	public String toString() {
+		return "Customer [id=" + id + ", customerName=" + customerName + ", phoneNumber=" + phoneNumber + ", note="
+				+ note + "]";
+	}
+
 	@Override
 	public int hashCode() {
 		return Objects.hash(id);
 	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
