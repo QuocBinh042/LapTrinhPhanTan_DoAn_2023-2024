@@ -391,6 +391,10 @@ public class PanelDatPhong extends JPanel {
 
 	}
 
+	public PanelDatPhong(int employeeID) {
+		// TODO Auto-generated constructor stub
+	}
+
 	private void readAllDateToTablePhong() {
 		phongModel.setRowCount(0);
 		List<entity.Room> dsP = phongDao.getAllDataForTableDatPhong().stream()

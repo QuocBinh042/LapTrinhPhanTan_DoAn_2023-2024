@@ -3,10 +3,11 @@ package app;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.HeadlessException;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
+import java.rmi.RemoteException;
 import java.sql.SQLException;
 
 import javax.swing.ImageIcon;
@@ -20,29 +21,23 @@ import javax.swing.JTextField;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
-import connectDB.ConnectDB;
-import dao.DAONhanVien;
+import dao.EmployeeDAO;
 
-public class FrameDangNhap extends JFrame implements ActionListener {
+public class FrameLogin extends JFrame implements ActionListener {
 	private JLabel lblUser, lblPass, lblPicture;
 	private JTextField txtUser;
 	private JPasswordField txtPass;
 	private JButton btnLogin, btnExit, btnShowPass, btnHidePass, btnForgetPass;
-	private DAONhanVien daoNV = new DAONhanVien();
-	private DialogQuenMatKhau forgotPassword;
+	private EmployeeDAO eDAO = new EmployeeDAO();
+//	private DialogQuenMatKhau forgotPassword;
 
-	public FrameDangNhap() {
-		try {
-			ConnectDB.getInstance().connect();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	public FrameLogin() {
+
 		createGUI();
 	}
 
 	public static void main(String[] args) {
-		new FrameDangNhap().setVisible(true);
+		new FrameLogin().setVisible(true);
 	}
 
 	public void createGUI() {
@@ -145,8 +140,8 @@ public class FrameDangNhap extends JFrame implements ActionListener {
 		btnHidePass.addActionListener(this);
 		btnForgetPass.addActionListener(this);
 
-		txtUser.setText("NV0001");
-		txtPass.setText("123456789");
+		txtUser.setText("0386076296");
+		txtPass.setText("123");
 		txtUser.setFont(new Font("Sanserif", Font.PLAIN, 15));
 		txtPass.setFont(new Font("Sanserif", Font.PLAIN, 15));
 	}
@@ -165,11 +160,20 @@ public class FrameDangNhap extends JFrame implements ActionListener {
 			String pass = new String(txtPass.getPassword());
 			if (username.equals("") || pass.equals("")) {
 				JOptionPane.showMessageDialog(null, "Vui lòng nhập thông tin đăng nhập!");
-			} else if (daoNV.kiemTraTK(username, pass) != null) {
-				JOptionPane.showMessageDialog(null, "Đăng nhập thành công!");
-				new Card(username).setVisible(true);
-				dispose();
-			}
+			} else
+				try {
+					if (eDAO.checkAccount(username, pass) != null) {
+						JOptionPane.showMessageDialog(null, "Đăng nhập thành công!");
+						new Card(eDAO.checkAccount(username, pass).getId()).setVisible(true);
+						dispose();
+					}
+				} catch (HeadlessException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (RemoteException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 
 		}
 		// Event show pass
@@ -185,9 +189,9 @@ public class FrameDangNhap extends JFrame implements ActionListener {
 			txtPass.setEchoChar('*');
 		}
 		if (o.equals(btnForgetPass)) {
-			forgotPassword = new DialogQuenMatKhau();
-			forgotPassword.setVisible(true);
-			forgotPassword.setLocationRelativeTo(null);
+//			forgotPassword = new DialogQuenMatKhau();
+//			forgotPassword.setVisible(true);
+//			forgotPassword.setLocationRelativeTo(null);
 		}
 	}
 

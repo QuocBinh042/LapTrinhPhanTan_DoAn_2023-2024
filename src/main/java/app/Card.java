@@ -3,11 +3,13 @@ package app;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.rmi.RemoteException;
 import java.util.Arrays;
 import java.util.List;
 import javax.swing.*;
 
-import dao.DAONhanVien;
+import dao.EmployeeDAO;
+import entity.Employee;
 
 public class Card extends JFrame {
 	private JButton btnTrangChu, btnPhongHat, btnPhong, btnDichVu, btnKhachHang, btnNhanVien, btnHoaDon, btnKhuyenMai,
@@ -21,24 +23,23 @@ public class Card extends JFrame {
 	private PanelNhanVien nv = new PanelNhanVien();
 	private PanelKhachHang kh = new PanelKhachHang();
 	private PanelHoaDon hd = new PanelHoaDon();
-	private PanelKhuyenMai km = new PanelKhuyenMai();
 	private PanelThongKe tk = new PanelThongKe();
 	private TroGiup tg = new TroGiup();
 	private JPanel pnlButton = new JPanel();
-	private String maNV;
-	private DAONhanVien daoNV = new DAONhanVien();
+	private int employeeID;
+	private EmployeeDAO eDAO = new EmployeeDAO();
 
-	public String getMaNV() {
-		return maNV;
+	public int getEmployeeID() {
+		return employeeID;
 	}
 
-	public void setMaNV(String maNV) {
-		this.maNV = maNV;
+	public void setEmployeeID(int employeeID) {
+		this.employeeID = employeeID;
 	}
 
-	public Card(String maNV) {
-		this.maNV = maNV;
-		dp = new PanelDatPhong(maNV);
+	public Card(int employeeID) throws RemoteException {
+		this.employeeID = employeeID;
+		dp = new PanelDatPhong(employeeID);
 		try {
 			UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
 		} catch (ClassNotFoundException e1) {
@@ -58,7 +59,7 @@ public class Card extends JFrame {
 		addEventListeners();
 	}
 
-	private void createUI() {
+	private void createUI() throws RemoteException {
 		// Set frame properties
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setSize(1400, 720);
@@ -89,9 +90,7 @@ public class Card extends JFrame {
 		ImageIcon icon = new ImageIcon(iconPath);
 		JButton button = new JButton(text, icon);
 		button.setFont(new Font("Arial", Font.BOLD, 12));
-//		button.setHorizontalAlignment(SwingConstants.LEFT);
 		button.setBackground(Color.decode("#e6dbd1"));
-		
 		button.setForeground(Color.BLACK);
 		button.setFocusPainted(false);
 		button.setBorderPainted(false);
@@ -103,19 +102,18 @@ public class Card extends JFrame {
 
 	private void createPanelLayout() {
 		pnl.add(tc, "tc");
-		pnl.add(dp, "dp");
-		pnl.add(dv, "dv");
-		pnl.add(phong, "phong");
-		pnl.add(nv, "nv");
-		pnl.add(kh, "kh");
-		pnl.add(hd, "hd");
-		pnl.add(km, "km");
-		pnl.add(tk, "tk");
-		pnl.add(tg, "tg");
-		pnl.add(tg, "dx");
+//		pnl.add(dp, "dp");
+//		pnl.add(dv, "dv");
+//		pnl.add(phong, "phong");
+//		pnl.add(nv, "nv");
+//		pnl.add(kh, "kh");
+//		pnl.add(hd, "hd");
+//		pnl.add(tk, "tk");
+//		pnl.add(tg, "tg");
+//		pnl.add(tg, "dx");
 	}
 
-	private JPanel createLeftPanel() {
+	private JPanel createLeftPanel() throws RemoteException {
 		JPanel pnlLeft = new JPanel(new BorderLayout());
 		pnlLeft.add(createLogoPanel(), BorderLayout.NORTH);
 		pnlLeft.add(pnlButton, BorderLayout.CENTER);
@@ -135,11 +133,11 @@ public class Card extends JFrame {
 		return pnlLogo;
 	}
 
-	private JPanel createNVPanel() {
-		entity.Employee nv = daoNV.timKiemNhanVienTheoMa(maNV).get(0);
+	private JPanel createNVPanel() throws RemoteException {
+		Employee employee = eDAO.getEmployeeByID(employeeID);
 		JPanel pnlNV = new JPanel();
 		lbTenNV = new JLabel();
-		lbTenNV.setText(nv.getTenNV().trim());
+		lbTenNV.setText(employee.getName().trim());
 		JPanel pnlMain = new JPanel();
 		ImageIcon icon = new ImageIcon("src/img/logo2.png");
 		JLabel label = new JLabel(icon);
@@ -248,7 +246,7 @@ public class Card extends JFrame {
 				"Chú ý", JOptionPane.YES_NO_OPTION);
 		if (result == JOptionPane.YES_OPTION) {
 			dispose();
-			new app.FrameDangNhap().setVisible(true);
+			new app.FrameLogin().setVisible(true);
 		}
 	}
 }
