@@ -10,20 +10,19 @@ import entity.Employee;
 public interface EmployeeService extends Remote {
 	public List<Employee> getAllEmployees() throws RemoteException;
 
-	public List<Employee> searchEmployeesByID(int employeeID) throws RemoteException;
-
-	public List<Employee> getEmployeesByPosition(String position) throws RemoteException;
-
-	public List<Employee> getEmployeesByStatus(Boolean EmployeeStatus) throws RemoteException;
-
 	public boolean addEmployee(Employee employee) throws RemoteException;
 
 	public boolean updateEmployee(Employee employee) throws RemoteException;
 
+	public boolean updatePassword(String password, String phoneNumber) throws RemoteException;
+
+	public boolean deleteEmployeeByID(int employeeID) throws RemoteException;
+
 	public Employee checkAccount(String phoneNumber, String password) throws RemoteException;
 
-	public void updatePassword(String password, String phoneNumber) throws RemoteException;
+	public Employee getEmployeeByID(int employeeID) throws RemoteException;
 
-	public void deleteEmployeeByName(String EmployeeName) throws RemoteException;
+	public List<Employee> getEmployeesByPosition(String position) throws RemoteException;
 
+	public List<Employee> getEmployeesByStatus(Boolean EmployeeStatus) throws RemoteException;
 }
