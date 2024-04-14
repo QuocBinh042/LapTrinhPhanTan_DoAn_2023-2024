@@ -6,10 +6,12 @@ import java.time.LocalDate;
 import dao.CustomerDAO;
 import dao.EmployeeDAO;
 import dao.RoomDAO;
+import dao.ServiceDAO;
 import entity.Customer;
 import entity.Employee;
 import entity.Room;
 import entity.RoomType;
+import entity.Service;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 
@@ -37,8 +39,8 @@ public class Main {
 //		System.out.println(cDAO.deleteCustomer(22));
 //		System.out.println(cDAO.findCustomersByPhoneNumber("1234"));
 
-		Employee e = new Employee(21, "abcdc", LocalDate.now(), false, "1234577777", "123", "Le Tan", "1213", true);
-		EmployeeDAO eDAO = new EmployeeDAO();
+//		Employee e = new Employee(21, "abcdc", LocalDate.now(), false, "1234577777", "123", "Le Tan", "1213", true);
+//		EmployeeDAO eDAO = new EmployeeDAO();
 //		System.out.println(eDAO.addEmployee(e));
 //		System.out.println(eDAO.updateEmployee(e));//		
 //		System.out.println(eDAO.deleteEmployeeByID(21));
@@ -48,6 +50,15 @@ public class Main {
 //		System.out.println(eDAO.checkAccount("0386076296", "123456789"));
 //		System.out.println(eDAO.updatePassword("0386076296", "123"));
 //		System.out.println(eDAO.getAllEmployees());
+
+		Service s = new Service(1, "acb", 50000.0, "Goi", 12, "Con");
+		ServiceDAO sDAO = new ServiceDAO();
+//		System.out.println(sDAO.addService(s));
+		System.out.println(sDAO.updateService(s));
+//		System.out.println(sDAO.deleteService(21));
+//		System.out.println(sDAO.getActiveServices("Còn hàng"));
+//		System.out.println(sDAO.getServiceByName("Khăn giấy"));
+		System.out.println(sDAO.getAllServices());
 
 	}
 }
