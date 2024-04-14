@@ -8,11 +8,6 @@ import java.util.List;
 import entity.Room;
 
 public interface RoomService extends Remote {
-	public List<Room> getAllRooms() throws RemoteException;
-
-	public List<Room> getRoomsByStatus(String status) throws RemoteException;
-
-	public List<Room> getRoomsByType(String type) throws RemoteException;
 
 	public boolean addRoom(Room room) throws RemoteException;
 
@@ -24,12 +19,14 @@ public interface RoomService extends Remote {
 
 	public boolean updateRoomStatusByRoomName(String status, String nameRoom) throws RemoteException;
 
-	public ArrayList<Room> searchRoomsByRoomType(String typeRoom) throws RemoteException;
+	public List<Room> getAllRooms() throws RemoteException;
 
-	public ArrayList<Room> searchRoomsByRoomStatus(String status) throws RemoteException;
+	public List<Room> getRoomsByStatus(String status) throws RemoteException;
 
-	public ArrayList<Room> searchRoomsByCapacity(int capacity) throws RemoteException;
+	public List<Room> getRoomsByType(String type) throws RemoteException;
 
-	public ArrayList<Room> searchRoomsByRoomName(String nameRoom) throws RemoteException;
+	public List<Room> getRoomsByCapacity(int capacity) throws RemoteException;
+
+	public List<Room> getRoomsByRoomName(String nameRoom) throws RemoteException;
 
 }

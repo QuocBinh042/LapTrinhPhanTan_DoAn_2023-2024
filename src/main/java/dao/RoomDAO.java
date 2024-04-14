@@ -2,7 +2,6 @@ package dao;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.ArrayList;
 import java.util.List;
 
 import entity.Room;
@@ -21,29 +20,6 @@ public class RoomDAO extends UnicastRemoteObject implements RoomService {
 
 	public RoomDAO() throws RemoteException {
 		em = Persistence.createEntityManagerFactory("KaraokeOneDB").createEntityManager();
-	}
-
-	@Override
-	public List<Room> getAllRooms() {
-		// TODO Auto-generated method stub
-		TypedQuery<Room> query = em.createQuery("SELECT r FROM Room r", Room.class);
-		return query.getResultList();
-	}
-
-	@Override
-	public List<Room> getRoomsByStatus(String status) {
-		// TODO Auto-generated method stub
-		TypedQuery<Room> query = em.createQuery("SELECT r FROM Room r WHERE r.roomStatus = :status", Room.class);
-		query.setParameter("status", status);
-		return query.getResultList();
-	}
-
-	@Override
-	public List<Room> getRoomsByType(String type) {
-		// TODO Auto-generated method stub
-		TypedQuery<Room> query = em.createQuery("SELECT r FROM Room r WHERE r.roomType.typeRoom = :type", Room.class);
-		query.setParameter("type", type);
-		return query.getResultList();
 	}
 
 	@Override
@@ -87,7 +63,6 @@ public class RoomDAO extends UnicastRemoteObject implements RoomService {
 	public boolean deleteRoom(int roomID) {
 		// TODO Auto-generated method stub
 		EntityTransaction tx = em.getTransaction();
-
 		try {
 			tx.begin();
 			Room room = em.find(Room.class, roomID);
@@ -105,37 +80,77 @@ public class RoomDAO extends UnicastRemoteObject implements RoomService {
 	@Override
 	public boolean updateRoomStatusByRoomID(String status, int roomID) {
 		// TODO Auto-generated method stub
+		EntityTransaction tx = em.getTransaction();
+		try {
+			tx.begin();
+			Room room = em.find(Room.class, roomID);
+			if (room != null) {
+				room.setRoomStatus(status);
+				tx.commit();
+				return true;
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		}
 		return false;
 	}
 
 	@Override
 	public boolean updateRoomStatusByRoomName(String status, String nameRoom) {
-		// TODO Auto-generated method stub
+		EntityTransaction tx = em.getTransaction();
+		try {
+			tx.begin(); // Start the transaction
+
+			Room room = em.createQuery("SELECT r FROM Room r WHERE r.roomName = :nameRoom", Room.class)
+					.setParameter("nameRoom", nameRoom).getSingleResult();
+			if (room != null) {
+				room.setRoomStatus(status);
+				tx.commit(); // Commit the transaction after updating the room status
+				return true;
+			}
+		} catch (Exception e) {
+			// Handle exception
+			if (tx != null && tx.isActive()) {
+				tx.rollback();
+			}
+			e.printStackTrace();
+		}
 		return false;
 	}
 
 	@Override
-	public ArrayList<Room> searchRoomsByRoomType(String typeRoom) {
+	public List<Room> getAllRooms() {
 		// TODO Auto-generated method stub
-		return null;
+		return em.createQuery("SELECT r FROM Room r", Room.class).getResultList();
 	}
 
 	@Override
-	public ArrayList<Room> searchRoomsByRoomStatus(String status) {
+	public List<Room> getRoomsByStatus(String status) {
 		// TODO Auto-generated method stub
-		return null;
+		return em.createQuery("SELECT r FROM Room r WHERE r.roomStatus = :status", Room.class)
+				.setParameter("status", status).getResultList();
 	}
 
 	@Override
-	public ArrayList<Room> searchRoomsByCapacity(int capacity) {
+	public List<Room> getRoomsByType(String type) {
 		// TODO Auto-generated method stub
-		return null;
+		return em.createQuery("SELECT r FROM Room r WHERE r.roomType.typeRoom = :type", Room.class)
+				.setParameter("type", type).getResultList();
 	}
 
 	@Override
-	public ArrayList<Room> searchRoomsByRoomName(String nameRoom) {
+	public List<Room> getRoomsByCapacity(int capacity) {
 		// TODO Auto-generated method stub
-		return null;
+		return em.createQuery("SELECT r FROM Room r WHERE r.roomType.capacity = :capacity", Room.class)
+				.setParameter("capacity", capacity).getResultList();
+	}
+
+	@Override
+	public List<Room> getRoomsByRoomName(String nameRoom) {
+		// TODO Auto-generated method stub
+		return em.createQuery("SELECT r FROM Room r WHERE r.roomName = :nameRoom", Room.class)
+				.setParameter("nameRoom", nameRoom).getResultList();
 	}
 
 }

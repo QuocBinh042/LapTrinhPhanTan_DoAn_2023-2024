@@ -17,6 +17,11 @@ public class Main {
 //		System.out.println(roomDAO.getRoomsByStatus("trong"));
 //		System.out.println(roomDAO.getRoomsByType("VIP"));
 //		System.out.println(roomDAO.updateRoom(room));
-		System.out.println(roomDAO.deleteRoom(21));
+//		System.out.println(roomDAO.deleteRoom(21));
+//		System.out.println(roomDAO.getRoomsByCapacity(15));
+
+//		System.out.println(roomDAO.updateRoomStatusByRoomID("Trong", 1));
+		System.out.println(roomDAO.updateRoomStatusByRoomName("Da dat", "101"));
+//		System.out.println(roomDAO.getRoomsByRoomName("101"));
 	}
 }

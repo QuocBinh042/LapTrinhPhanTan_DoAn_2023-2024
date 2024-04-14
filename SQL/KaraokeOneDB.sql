@@ -1,5 +1,5 @@
-﻿--drop database KaraokeOneDB
---create database KaraokeOneDB
+﻿--DROP DATABASE KaraokeOneDB
+--CREATE DATABASE KaraokeOneDB
 go
 SET IDENTITY_INSERT [dbo].[Room] ON
 INSERT INTO [dbo].[Room] ([RoomID], [RoomName], [TypeRoom], [Capacity], [Price], [RoomStatus], [Describe])
@@ -253,9 +253,6 @@ INSERT INTO [dbo].[Bill] ([BillID], [PaymentTime], [PaymentDate], [CustomerID], 
 VALUES  (15, '12:30', '2023-11-21', 3, 10, 0);
 go
 SET IDENTITY_INSERT [dbo].[Bill] OFF
-go
-SET IDENTITY_INSERT [dbo].[DetailBill] ON
-go
 INSERT INTO [dbo].[DetailBill] ([RoomID], [BillID], [CheckinDate], [CheckoutDate])  
 VALUES  (1, 1, '2022-09-01 12:00:00', '2022-09-01 15:30:00')
 INSERT INTO [dbo].[DetailBill] ([RoomID], [BillID], [CheckinDate], [CheckoutDate]) 
@@ -286,11 +283,7 @@ INSERT INTO [dbo].[DetailBill] ([RoomID], [BillID], [CheckinDate], [CheckoutDate
 VALUES  (17, 14, '2023-11-16 16:00', '2023-11-16 18:30');
 INSERT INTO [dbo].[DetailBill] ([RoomID], [BillID], [CheckinDate], [CheckoutDate]) 
 VALUES  (20, 15, '2023-11-21 10:00', '2023-11-21 12:30');
-go
-SET IDENTITY_INSERT [dbo].[DetailBill] OFF
-go
-SET IDENTITY_INSERT [dbo].[DetailServiceBill] ON
-go
+
 INSERT INTO [dbo].[DetailServiceBill] ([BillID], [ServiceID], [Quantity])
 VALUES  (1, 1, 2)
 INSERT INTO [dbo].[DetailServiceBill] ([BillID], [ServiceID], [Quantity]) 
@@ -327,7 +320,12 @@ INSERT INTO [dbo].[DetailServiceBill] ([BillID], [ServiceID], [Quantity])
 VALUES  (9, 2, 15)
 INSERT INTO [dbo].[DetailServiceBill] ([BillID], [ServiceID], [Quantity]) 
 VALUES  (9, 5, 1)
-go
-SET IDENTITY_INSERT [dbo].[DetailServiceBill] OFF
-go
-select * from Room
+
+select * from [dbo].[Room]
+select * from [dbo].[Employee]
+select * from [dbo].[Customer]
+select * from [dbo].[Service]
+select * from [dbo].[Booking]
+select * from [dbo].[DetailBill]
+select * from [dbo].[DetailServiceBill]
+select * from [dbo].[Bill]

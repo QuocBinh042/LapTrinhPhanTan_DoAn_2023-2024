@@ -23,69 +23,86 @@ public class Room implements Serializable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 	@Column(name = "RoomName", columnDefinition = "nvarchar(250)", nullable = false)
-	private String Name;
+	private String roomName;
 	@Column(name = "RoomStatus", columnDefinition = "nvarchar(250)", nullable = false)
 	private String roomStatus;
 	@Column(name = "Describe", columnDefinition = "nvarchar(250)", nullable = false)
 	private String describe;
 	@Embedded
 	private RoomType roomType;
+
 	public int getId() {
 		return id;
 	}
+
 	public void setId(int id) {
 		this.id = id;
 	}
+
 	public String getName() {
-		return Name;
+		return roomName;
 	}
-	public void setName(String name) {
-		Name = name;
+
+	public void setName(String roomName) {
+		this.roomName = roomName;
 	}
+
 	public String getRoomStatus() {
 		return roomStatus;
 	}
+
 	public void setRoomStatus(String roomStatus) {
 		this.roomStatus = roomStatus;
 	}
+
 	public String getDescribe() {
 		return describe;
 	}
+
 	public void setDescribe(String describe) {
 		this.describe = describe;
 	}
+
 	public RoomType getRoomType() {
 		return roomType;
 	}
+
 	public void setRoomType(RoomType roomType) {
 		this.roomType = roomType;
 	}
-	public Room(int id, String name, String roomStatus, String describe, RoomType roomType) {
+
+	public Room(int id, String roomName, String roomStatus, String describe, RoomType roomType) {
 		super();
 		this.id = id;
-		Name = name;
+		this.roomName = roomName;
 		this.roomStatus = roomStatus;
 		this.describe = describe;
 		this.roomType = roomType;
 	}
-	public Room(int id, String name, String roomStatus, String describe) {
+
+	public Room(int id, String roomName, String roomStatus, String describe) {
 		super();
 		this.id = id;
-		Name = name;
+		this.roomName = roomName;
 		this.roomStatus = roomStatus;
 		this.describe = describe;
 	}
+
 	public Room() {
 		super();
 	}
+
 	@Override
 	public String toString() {
-		return "Room [id=" + id + ", Name=" + Name + ", roomStatus=" + roomStatus + ", describe=" + describe + "]";
+		return "Room [id=" + id + ", roomName=" + roomName + ", roomStatus=" + roomStatus + ", describe=" + describe
+				+ ", roomType=" + roomType + "]";
 	}
+
 	@Override
 	public int hashCode() {
 		return Objects.hash(id);
 	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
