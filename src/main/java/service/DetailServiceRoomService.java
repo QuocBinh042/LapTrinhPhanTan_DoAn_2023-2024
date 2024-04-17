@@ -11,14 +11,12 @@ public interface DetailServiceRoomService extends Remote {
 
 	public ArrayList<DetailServiceRoom> getAllCTDVPhong() throws RemoteException;
 
-	public ArrayList<DetailServiceRoom> timKiemCTDVPhongTheoMaHD(String maHD) throws RemoteException;
+	public ArrayList<DetailServiceRoom> searchDetailServiceRoomByBillID(String billID) throws RemoteException;
 
-	public ArrayList<DetailServiceRoom> timKiemCTDVPhongTheoTenDV(String maHD, String maDV) throws RemoteException;
+	public ArrayList<DetailServiceRoom> searchDetailServiceRoomByServiceName(String billID, String serviceID) throws RemoteException;
 
-	public boolean capNhatSoLuongCTDVPhong(int soLuong, String maDV, String maHD) throws RemoteException;
+	public boolean updateAmountService(int quantity, String billID, String serviceID) throws RemoteException;
 
-	public boolean capNhatSoLuongDichVu(int soLuong, String tenDV) throws RemoteException;
-
-	public boolean delete(String maDV) throws RemoteException;
+	public boolean delete(String billID, String serviceID) throws RemoteException;
 
 }

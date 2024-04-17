@@ -16,10 +16,13 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.NamedQueries;
+import jakarta.persistence.NamedQuery;
 import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "Bill")
+@NamedQueries(@NamedQuery(name = "getAllBills", query = "select b from Bill b"))
 public class Bill implements Serializable{
 	@Id
 	@Column(name = "BillID")
@@ -40,6 +43,17 @@ public class Bill implements Serializable{
 	
 	private transient ArrayList<DetailBill> CTHD;
 	private transient ArrayList<DetailServiceRoom> CTDVP;
+	
+	public Bill(int id, LocalDate paymentDate, LocalTime paymentTime, Employee employee, Customer customer,
+			Double total) {
+		super();
+		this.id = id;
+		this.paymentDate = paymentDate;
+		this.paymentTime = paymentTime;
+		this.employee = employee;
+		this.customer = customer;
+		this.total = total;
+	}
 	public Bill(int id, LocalDate paymentDate, LocalTime paymentTime, Employee employee, Customer customer,
 			Double total, ArrayList<DetailBill> cTHD, ArrayList<DetailServiceRoom> cTDVP) {
 		super();

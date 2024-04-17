@@ -27,7 +27,7 @@ public class DetailBill implements Serializable {
 	private Bill bill;
 	@Column(name = "CheckinDate", nullable = false)
 	private LocalDate checkinDate;
-	@Column(name = "CheckoutDate", nullable = false)
+	@Column(name = "CheckoutDate", nullable = true)
 	private LocalDate checkoutDate;
 	public DetailBill(Room room, Bill bill, LocalDate checkinDate, LocalDate checkoutDate) {
 		super();

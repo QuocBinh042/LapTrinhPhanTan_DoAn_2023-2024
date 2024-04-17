@@ -10,7 +10,7 @@ import entity.DetailBill;
 public interface DetailBillService extends Remote{
 	public boolean createDetailBill(DetailBill detailBill) throws RemoteException;
 
-	public String findDetailBillByRoomID(int roomID) throws RemoteException;
+	public List<DetailBill> findDetailBillByRoomID(int roomID) throws RemoteException;
 
 	public List<DetailBill> findDetailBillByRoomName(String roomName) throws RemoteException;
 

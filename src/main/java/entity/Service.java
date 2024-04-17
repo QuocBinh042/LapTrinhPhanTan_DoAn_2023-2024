@@ -28,16 +28,16 @@ public class Service implements Serializable {
 	@Column(name = "Unit", columnDefinition = "Nvarchar(50)", nullable = false)
 	private String unit;
 	@Column(name = "Quantity", nullable = false)
-	private int quantity;
+	private int inventoryNumber;
 	@Column(name = "Status", columnDefinition = "Nvarchar(250)", nullable = false)
 	private String status;
-	public Service(int id, String name, double price, String unit, int quantity, String status) {
+	public Service(int id, String name, double price, String unit, int inventoryNumber, String status) {
 		super();
 		this.id = id;
 		this.name = name;
 		this.price = price;
 		this.unit = unit;
-		this.quantity = quantity;
+		this.inventoryNumber = inventoryNumber;
 		this.status = status;
 	}
 	public Service() {
@@ -68,10 +68,10 @@ public class Service implements Serializable {
 		this.unit = unit;
 	}
 	public int getQuantity() {
-		return quantity;
+		return inventoryNumber;
 	}
-	public void setQuantity(int quantity) {
-		this.quantity = quantity;
+	public void setQuantity(int inventoryNumber) {
+		this.inventoryNumber = inventoryNumber;
 	}
 	public String getStatus() {
 		return status;
@@ -81,7 +81,7 @@ public class Service implements Serializable {
 	}
 	@Override
 	public String toString() {
-		return "Service [id=" + id + ", name=" + name + ", price=" + price + ", unit=" + unit + ", quantity=" + quantity
+		return "Service [id=" + id + ", name=" + name + ", price=" + price + ", unit=" + unit + ", quantity=" + inventoryNumber
 				+ ", status=" + status + "]";
 	}
 }
