@@ -33,7 +33,7 @@ public interface BillService extends Remote{
 
 	public ArrayList<Bill> getBillsByYear() throws RemoteException;
 
-	public ArrayList<Bill> searchBills(String maHD, String tenNV, String sdtKhach) throws RemoteException;
+	public ArrayList<Bill> searchBills(String billID, String employeeName, String phoneNumber) throws RemoteException;
 
 	public ArrayList<Bill> searchBillsByBillID(String id) throws RemoteException;
 
@@ -47,13 +47,13 @@ public interface BillService extends Remote{
 
 	public Double calculateTotalRevenue(LocalDate startDate, LocalDate endDate) throws RemoteException;
 
-	public int calculateNumberOfBills(LocalDate startDate, LocalDate endDate) throws RemoteException;
+	public long calculateNumberOfBills(LocalDate startDate, LocalDate endDate) throws RemoteException;
 
-	public int calculateNumberOfBillsByDate(LocalDate date) throws RemoteException;
+	public long calculateNumberOfBillsByDate(LocalDate date) throws RemoteException;
 
-	public int calculateNumberOfBillsByMonth(LocalDate date) throws RemoteException;
+	public long calculateNumberOfBillsByMonth(String month) throws RemoteException;
 
-	public int calculateNumberOfBillsByYear(String year) throws RemoteException;
+	public long calculateNumberOfBillsByYear(String year) throws RemoteException;
 
 	public List<Integer> getBillYears() throws RemoteException;
 
