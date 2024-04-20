@@ -12,6 +12,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import entity.Bill;
+import entity.Customer;
+import entity.Employee;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.Persistence;
@@ -28,10 +30,12 @@ public class BillDAO extends UnicastRemoteObject implements BillService{
 	
 	public static void main(String[] args) throws RemoteException{
 		BillDAO billDAO = new BillDAO();
-		Bill bill = new Bill(3, LocalDate.now(), LocalTime.now(), null, null, 0.0);
+		Employee employee = new Employee(0, "Tung", LocalDate.of(2003, 10, 10), true, "1234567890", "058203001143", "", "", true);
+		Customer customer = new Customer(0, "Tung", "2234567890", "AAAA");
+		Bill bill = new Bill(3, LocalDate.now(), LocalTime.now(), employee, customer, 0.0);
 		
 		try {
-//			billDAO.createBill(bill);
+			billDAO.createBill(bill);
 //			billDAO.getAllBills().forEach(e -> System.out.println(e));
 //			billDAO.updateBillAfterPayment(bill);
 //			billDAO.getBillsByYear(2023).forEach(e -> System.out.println(e));
@@ -48,7 +52,7 @@ public class BillDAO extends UnicastRemoteObject implements BillService{
 //			System.out.println(billDAO.calculateNumberOfBillsByMonth("9"));
 //			billDAO.getMonthlyRevenueInRange(LocalDate.of(2023, 1, 1), LocalDate.of(2023, 12, 12)).forEach((k, v) -> System.out.println(k + " " + v));
 //			billDAO.getYearlyRevenueTotal(2023).forEach((k, v) -> System.out.println(k + " " + v));
-			billDAO.getDailyRevenueForMonth(LocalDate.of(2023, 11, 1)).forEach((k, v) -> System.out.println(k + " " + v));
+//			billDAO.getDailyRevenueForMonth(LocalDate.of(2023, 11, 1)).forEach((k, v) -> System.out.println(k + " " + v));
 		} catch (RemoteException e) {
 			// TODO: handle exception
 			e.printStackTrace();

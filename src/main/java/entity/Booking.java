@@ -6,6 +6,7 @@ import java.util.Objects;
 
 import org.hibernate.annotations.ManyToAny;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -33,13 +34,13 @@ public class Booking {
 	private String describe;
 	
 	
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@JoinColumn(name = "RoomID", referencedColumnName = "RoomID")
 	private Room room;
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@JoinColumn(name = "CustomerID", referencedColumnName = "CustomerID")
 	private Customer customer;
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@JoinColumn(name = "EmployeeID", referencedColumnName = "EmployeeID")
 	private Employee employee;
 	public Booking(int id, LocalDate bookingTime, LocalDate checkinTime, int bookingStatus, String describe, Room room,

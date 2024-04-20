@@ -149,6 +149,13 @@ public class RoomDAO extends UnicastRemoteObject implements RoomService {
 	@Override
 	public List<Room> getRoomsByRoomName(String nameRoom) {
 		// TODO Auto-generated method stub
+		return em.createQuery("SELECT r FROM Room r WHERE r.roomName like :nameRoom", Room.class)
+				.setParameter("nameRoom", "%"+nameRoom+"%").getResultList();
+	}
+	
+	@Override
+	public List<Room> getRoomsByRoomName2(String nameRoom) {
+		// TODO Auto-generated method stub
 		return em.createQuery("SELECT r FROM Room r WHERE r.roomName = :nameRoom", Room.class)
 				.setParameter("nameRoom", nameRoom).getResultList();
 	}

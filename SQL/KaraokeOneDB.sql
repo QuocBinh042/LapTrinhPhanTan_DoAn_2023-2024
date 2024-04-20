@@ -253,36 +253,40 @@ INSERT INTO [dbo].[Bill] ([BillID], [PaymentTime], [PaymentDate], [CustomerID], 
 VALUES  (15, '12:30', '2023-11-21', 3, 10, 0);
 go
 SET IDENTITY_INSERT [dbo].[Bill] OFF
-INSERT INTO [dbo].[DetailBill] ([RoomID], [BillID], [CheckinDate], [CheckoutDate])  
-VALUES  (1, 1, '2022-09-01 12:00:00', '2022-09-01 15:30:00')
-INSERT INTO [dbo].[DetailBill] ([RoomID], [BillID], [CheckinDate], [CheckoutDate]) 
-VALUES  (2, 2, '2023-09-03 12:00:00', '2023-09-02 15:45:00')
-INSERT INTO [dbo].[DetailBill] ([RoomID], [BillID], [CheckinDate], [CheckoutDate]) 
-VALUES  (3, 3, '2023-10-03 20:30:00', '2023-10-03 21:30:00')
-INSERT INTO [dbo].[DetailBill] ([RoomID], [BillID], [CheckinDate], [CheckoutDate]) 
-VALUES  (4, 4, '2023-10-05 12:00:00', '2023-10-04 13:30:00')
-INSERT INTO [dbo].[DetailBill] ([RoomID], [BillID], [CheckinDate], [CheckoutDate]) 
-VALUES  (5, 5, '2023-10-05 17:00:00', '2023-10-05 13:30:00')
-INSERT INTO [dbo].[DetailBill] ([RoomID], [BillID], [CheckinDate], [CheckoutDate]) 
-VALUES  (6, 6, '2023-10-07 10:00:00', '2023-10-06 15:30:00')
-INSERT INTO [dbo].[DetailBill] ([RoomID], [BillID], [CheckinDate], [CheckoutDate]) 
-VALUES  (7, 7, '2023-10-07 12:00:00', '2023-10-07 13:30:00')
-INSERT INTO [dbo].[DetailBill] ([RoomID], [BillID], [CheckinDate], [CheckoutDate]) 
-VALUES  (8, 8, '2023-11-02 12:00:00', '2023-11-01 13:30:00')
-INSERT INTO [dbo].[DetailBill] ([RoomID], [BillID], [CheckinDate], [CheckoutDate]) 
-VALUES  (9, 9, '2023-11-02 18:00:00', '2023-11-02 19:30:00')
-INSERT INTO [dbo].[DetailBill] ([RoomID], [BillID], [CheckinDate], [CheckoutDate]) 
-VALUES  (1, 10, '2023-11-03 12:00', '2023-11-02 16:00');
-INSERT INTO [dbo].[DetailBill] ([RoomID], [BillID], [CheckinDate], [CheckoutDate]) 
-VALUES  (2, 11, '2023-11-04 20:00', '2023-11-04 21:00');
-INSERT INTO [dbo].[DetailBill] ([RoomID], [BillID], [CheckinDate], [CheckoutDate]) 
-VALUES  (11, 12, '2023-11-10 18:00', '2023-11-10 19:30');
-INSERT INTO [dbo].[DetailBill] ([RoomID], [BillID], [CheckinDate], [CheckoutDate]) 
-VALUES  (12, 13, '2023-11-12 10:00', '2023-11-12 15:00');
-INSERT INTO [dbo].[DetailBill] ([RoomID], [BillID], [CheckinDate], [CheckoutDate]) 
-VALUES  (17, 14, '2023-11-16 16:00', '2023-11-16 18:30');
-INSERT INTO [dbo].[DetailBill] ([RoomID], [BillID], [CheckinDate], [CheckoutDate]) 
-VALUES  (20, 15, '2023-11-21 10:00', '2023-11-21 12:30');
+SET IDENTITY_INSERT [dbo].[DetailBill] ON
+go
+INSERT INTO [dbo].[DetailBill] ([DetailBillID], [RoomID], [BillID], [CheckinDate], [CheckoutDate])  
+VALUES  (1,1, 1, '2022-09-01 12:00:00', '2022-09-01 15:30:00')
+INSERT INTO [dbo].[DetailBill] ([DetailBillID],[RoomID], [BillID], [CheckinDate], [CheckoutDate]) 
+VALUES  (2,2, 2, '2023-09-03 12:00:00', '2023-09-02 15:45:00')
+INSERT INTO [dbo].[DetailBill] ([DetailBillID],[RoomID], [BillID], [CheckinDate], [CheckoutDate]) 
+VALUES  (3,3, 3, '2023-10-03 20:30:00', '2023-10-03 21:30:00')
+INSERT INTO [dbo].[DetailBill] ([DetailBillID],[RoomID], [BillID], [CheckinDate], [CheckoutDate]) 
+VALUES  (4,4, 4, '2023-10-05 12:00:00', '2023-10-04 13:30:00')
+INSERT INTO [dbo].[DetailBill] ([DetailBillID],[RoomID], [BillID], [CheckinDate], [CheckoutDate]) 
+VALUES  (5,5, 5, '2023-10-05 17:00:00', '2023-10-05 13:30:00')
+INSERT INTO [dbo].[DetailBill] ([DetailBillID],[RoomID], [BillID], [CheckinDate], [CheckoutDate]) 
+VALUES  (6,6, 6, '2023-10-07 10:00:00', '2023-10-06 15:30:00')
+INSERT INTO [dbo].[DetailBill] ([DetailBillID],[RoomID], [BillID], [CheckinDate], [CheckoutDate]) 
+VALUES  (7,7, 7, '2023-10-07 12:00:00', '2023-10-07 13:30:00')
+INSERT INTO [dbo].[DetailBill] ([DetailBillID],[RoomID], [BillID], [CheckinDate], [CheckoutDate]) 
+VALUES  (8,8, 8, '2023-11-02 12:00:00', '2023-11-01 13:30:00')
+INSERT INTO [dbo].[DetailBill] ([DetailBillID],[RoomID], [BillID], [CheckinDate], [CheckoutDate]) 
+VALUES  (9,9, 9, '2023-11-02 18:00:00', '2023-11-02 19:30:00')
+INSERT INTO [dbo].[DetailBill] ([DetailBillID],[RoomID], [BillID], [CheckinDate], [CheckoutDate]) 
+VALUES  (10,1, 10, '2023-11-03 12:00', '2023-11-02 16:00');
+INSERT INTO [dbo].[DetailBill] ([DetailBillID],[RoomID], [BillID], [CheckinDate], [CheckoutDate]) 
+VALUES  (11,2, 11, '2023-11-04 20:00', '2023-11-04 21:00');
+INSERT INTO [dbo].[DetailBill] ([DetailBillID],[RoomID], [BillID], [CheckinDate], [CheckoutDate]) 
+VALUES  (12,11, 12, '2023-11-10 18:00', '2023-11-10 19:30');
+INSERT INTO [dbo].[DetailBill] ([DetailBillID],[RoomID], [BillID], [CheckinDate], [CheckoutDate]) 
+VALUES  (13,12, 13, '2023-11-12 10:00', '2023-11-12 15:00');
+INSERT INTO [dbo].[DetailBill] ([DetailBillID],[RoomID], [BillID], [CheckinDate], [CheckoutDate]) 
+VALUES  (14,17, 14, '2023-11-16 16:00', '2023-11-16 18:30');
+INSERT INTO [dbo].[DetailBill] ([DetailBillID],[RoomID], [BillID], [CheckinDate], [CheckoutDate]) 
+VALUES  (15,20, 15, '2023-11-21 10:00', '2023-11-21 12:30');
+go
+SET IDENTITY_INSERT [dbo].[DetailBill] OFF
 
 INSERT INTO [dbo].[DetailServiceBill] ([BillID], [ServiceID], [Quantity])
 VALUES  (1, 1, 2)

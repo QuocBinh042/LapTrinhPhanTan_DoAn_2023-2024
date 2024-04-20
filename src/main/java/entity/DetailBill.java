@@ -6,9 +6,12 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Date;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -17,32 +20,51 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "DetailBill")
 public class DetailBill implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 648789103374928020L;
+	
 	@Id
-	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "RoomID", referencedColumnName = "RoomID")
+	@Column(name = "DetailBillID")
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private int id;
+	
+	@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@JoinColumn(name = "RoomID")
 	private Room room;
-	@Id
-	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "BillID", referencedColumnName = "BillID")
+	@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@JoinColumn(name = "BillID")
 	private Bill bill;
 	@Column(name = "CheckinDate", nullable = false)
 	private LocalDate checkinDate;
 	@Column(name = "CheckoutDate", nullable = true)
 	private LocalDate checkoutDate;
-	public DetailBill(Room room, Bill bill, LocalDate checkinDate, LocalDate checkoutDate) {
+	
+	public DetailBill(int id, Room room, Bill bill, LocalDate checkinDate, LocalDate checkoutDate) {
 		super();
+		this.id = id;
 		this.room = room;
 		this.bill = bill;
 		this.checkinDate = checkinDate;
 		this.checkoutDate = checkoutDate;
 	}
+	
 	public DetailBill() {
 		super();
 	}
+	
+	public int getId() {
+		return id;
+	}
+	public void setId(int id) {
+		this.id = id;
+	}
+	
 	@Override
 	public String toString() {
-		return "DetailBill [room=" + room + ", bill=" + bill + ", checkinDate=" + checkinDate + ", checkoutDate="
-				+ checkoutDate + "]";
+		return "DetailBill [id=" + id + ", room=" + room + ", bill=" + bill + ", checkinDate=" + checkinDate
+				+ ", checkoutDate=" + checkoutDate + "]";
 	}
 	public Room getRoom() {
 		return room;

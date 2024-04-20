@@ -114,7 +114,13 @@ public class EmployeeDAO implements EmployeeService {
 	@Override
 	public Employee getEmployeeByID(int employeeID) throws RemoteException {
 		// TODO Auto-generated method stub
-		return em.getReference(Employee.class, employeeID);
+		try {
+			return em.find(Employee.class, employeeID);
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	@Override

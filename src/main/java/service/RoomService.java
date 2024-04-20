@@ -28,5 +28,7 @@ public interface RoomService extends Remote {
 	public List<Room> getRoomsByCapacity(int capacity) throws RemoteException;
 
 	public List<Room> getRoomsByRoomName(String nameRoom) throws RemoteException;
+	
+	public List<Room> getRoomsByRoomName2(String nameRoom) throws RemoteException;
 
 }

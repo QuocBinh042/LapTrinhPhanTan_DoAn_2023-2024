@@ -35,6 +35,13 @@ public class Customer implements Serializable {
 		this.note = note;
 	}
 
+	public Customer(int id, String customerName, String phoneNumber) {
+		super();
+		this.id = id;
+		this.customerName = customerName;
+		this.phoneNumber = phoneNumber;
+	}
+
 	public Customer() {
 		super();
 	}

@@ -2,6 +2,7 @@ package entity;
 
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.Set;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
@@ -9,6 +10,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 @Entity
@@ -30,6 +32,9 @@ public class Room implements Serializable {
 	private String describe;
 	@Embedded
 	private RoomType roomType;
+	
+	@OneToMany(mappedBy =  "room")
+	Set<DetailBill> detailBills;
 
 	public int getId() {
 		return id;
