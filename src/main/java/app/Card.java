@@ -17,7 +17,7 @@ public class Card extends JFrame {
 	private JLabel lbTenNV;
 	private JPanel pnl = new JPanel(new CardLayout());
 	private PanelTrangChu tc = new PanelTrangChu();
-	private PanelDatPhong dp;
+	private PanelBooking dp;
 	private PanelRoom phong = new PanelRoom();
 	private PanelService dv = new PanelService();
 	private PanelEmployee nv = new PanelEmployee();
@@ -39,7 +39,7 @@ public class Card extends JFrame {
 
 	public Card(int employeeID) throws RemoteException {
 		this.employeeID = employeeID;
-		dp = new PanelDatPhong(1234);
+		dp = new PanelBooking("1234");
 		try {
 			UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
 		} catch (ClassNotFoundException e1) {
