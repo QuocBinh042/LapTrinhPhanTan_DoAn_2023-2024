@@ -106,14 +106,14 @@ public class PanelBooking extends JFrame  {
 		detailBillDAO = new DetailBillDAO();
 		setManNV(maNV);
 
-		Icon imgAdd = new ImageIcon("src/img/add2.png");
-		Icon imgDel = new ImageIcon("src/img/del.png");
-		Icon imgReset = new ImageIcon("src/img/refresh16.png");
-		Icon imgEdit = new ImageIcon("src/img/edit.png");
-		Icon imgOut = new ImageIcon("src/img/out.png");
-		Icon imgSearch = new ImageIcon("src/img/search.png");
-		Icon imgCheck = new ImageIcon("src/img/check16.png");
-		Icon imgCancel = new ImageIcon("src/img/cancel16.png");
+		Icon imgAdd = new ImageIcon("src/main/java/img/add2.png");
+		Icon imgDel = new ImageIcon("src/main/java/img/del.png");
+		Icon imgReset = new ImageIcon("src/main/java/img/refresh16.png");
+		Icon imgEdit = new ImageIcon("src/main/java/img/edit.png");
+		Icon imgOut = new ImageIcon("src/main/java/img/out.png");
+		Icon imgSearch = new ImageIcon("src/main/java/img/search.png");
+		Icon imgCheck = new ImageIcon("src/main/java/img/check16.png");
+		Icon imgCancel = new ImageIcon("src/main/java/img/cancel16.png");
 
 		JLabel tinhTrangLb, soNguoiLb, loaiPLb, phongLb, giaPLb, locTinhTrangLb, sdtLb;
 		JPanel mainPane, leftPane, rightPane, timePane, btnPane, panePhong, panePDP, paneBtnPhong, paneBtnPDP,
@@ -483,15 +483,15 @@ public class PanelBooking extends JFrame  {
 		public ThuePhong() {
 			setSize(700, 550);
 
-			Icon imgDel = new ImageIcon("src/img/del.png");
-			Icon imgReset = new ImageIcon("src/img/refresh16.png");
-			Icon imgEdit = new ImageIcon("src/img/edit.png");
-			Icon imgOut = new ImageIcon("src/img/out.png");
-			Icon imgSearch = new ImageIcon("src/img/search.png");
-			Icon imgCheck = new ImageIcon("src/img/check16.png");
-			Icon imgCancel = new ImageIcon("src/img/cancel16.png");
-			Icon imgBack = new ImageIcon("src/img/back16.png");
-			Icon imgAdd = new ImageIcon("src/img/add16.png");
+			Icon imgDel = new ImageIcon("src/main/java/img/del.png");
+			Icon imgReset = new ImageIcon("src/main/java/img/refresh16.png");
+			Icon imgEdit = new ImageIcon("src/main/java/img/edit.png");
+			Icon imgOut = new ImageIcon("src/main/java/img/out.png");
+			Icon imgSearch = new ImageIcon("src/main/java/img/search.png");
+			Icon imgCheck = new ImageIcon("src/main/java/img/check16.png");
+			Icon imgCancel = new ImageIcon("src/main/java/img/cancel16.png");
+			Icon imgBack = new ImageIcon("src/main/java/img/back16.png");
+			Icon imgAdd = new ImageIcon("src/main/java/img/add16.png");
 
 			JLabel luaChonLb, soLuongLb, tenPhongLb, loaiPhongLb, giaPhongLb, sucChuaLb, tinhTrangLb, sdtKhachLb,
 					tenKhachLb, ngayNhanPhongLb, gioNhanPhongLb, ghiChuLb, tieuDeLb;

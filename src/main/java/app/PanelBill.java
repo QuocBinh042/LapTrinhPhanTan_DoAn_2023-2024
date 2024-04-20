@@ -90,9 +90,9 @@ public class PanelBill extends JPanel {
 	}
 
 	public void createUI() {
-		Icon img_search = new ImageIcon("src/img/search.png");
-		Icon img_refresh = new ImageIcon("src/img/refresh16.png");
-		Icon img_detail = new ImageIcon("src/img/detail16.png");
+		Icon img_search = new ImageIcon("src/main/java/img/search.png");
+		Icon img_refresh = new ImageIcon("src/main/java/img/refresh16.png");
+		Icon img_detail = new ImageIcon("src/main/java/img/detail16.png");
 		Box bThoiGian, bNgayBD, bNgayKT, bMaHD, bTenNV, bSDT, bb;
 		Border line = BorderFactory.createLineBorder(Color.BLACK);
 		Dimension dimension = new Dimension(180, 30);

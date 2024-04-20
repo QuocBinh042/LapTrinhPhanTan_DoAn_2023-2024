@@ -67,16 +67,16 @@ public class Card extends JFrame {
 		setLayout(new BorderLayout());
 
 		// Create components
-		btnTrangChu = createButton(" TRANG CHỦ ", "src/img/home.png");
-		btnPhongHat = createButton(" PHÒNG HÁT ", "src/img/karaoke.png");
-		btnPhong = createButton(" PHÒNG          ", "src/img/room.png");
-		btnDichVu = createButton(" DỊCH VỤ         ", "src/img/service.png");
-		btnKhachHang = createButton(" KHÁCH HÀNG", "src/img/client.png");
-		btnNhanVien = createButton(" NHÂN VIÊN ", "src/img/staff.png");
-		btnHoaDon = createButton(" HÓA ĐƠN   ", "src/img/invoice.png");
-		btnThongKe = createButton(" THỐNG KÊ  ", "src/img/statistical.png");
-		btnTroGiup = createButton(" TRỢ GIÚP  ", "src/img/help.png");
-		btnDangXuat = createButton(" ĐĂNG XUẤT ", "src/img/out.png");
+		btnTrangChu = createButton(" TRANG CHỦ ", "src/main/java/img/home.png");
+		btnPhongHat = createButton(" PHÒNG HÁT ", "src/main/java/img/karaoke.png");
+		btnPhong = createButton(" PHÒNG          ", "src/main/java/img/room.png");
+		btnDichVu = createButton(" DỊCH VỤ         ", "src/main/java/img/service.png");
+		btnKhachHang = createButton(" KHÁCH HÀNG", "src/main/java/img/client.png");
+		btnNhanVien = createButton(" NHÂN VIÊN ", "src/main/java/img/staff.png");
+		btnHoaDon = createButton(" HÓA ĐƠN   ", "src/main/java/img/invoice.png");
+		btnThongKe = createButton(" THỐNG KÊ  ", "src/main/java/img/statistical.png");
+		btnTroGiup = createButton(" TRỢ GIÚP  ", "src/main/java/img/help.png");
+		btnDangXuat = createButton(" ĐĂNG XUẤT ", "src/main/java/img/out.png");
 		createPanelLayout();
 
 		// Add components to the frame
@@ -124,7 +124,7 @@ public class Card extends JFrame {
 
 	private JPanel createLogoPanel() {
 		JPanel pnlLogo = new JPanel();
-		ImageIcon icon = new ImageIcon("src/img/Logo.png");
+		ImageIcon icon = new ImageIcon("src/main/java/img/Logo.png");
 		JLabel label = new JLabel(icon);
 		pnlLogo.add(label);
 		pnlLogo.setBackground(Color.decode("#990447"));
@@ -138,7 +138,7 @@ public class Card extends JFrame {
 		lbTenNV = new JLabel();
 		lbTenNV.setText(employee.getName().trim());
 		JPanel pnlMain = new JPanel();
-		ImageIcon icon = new ImageIcon("src/img/logo2.png");
+		ImageIcon icon = new ImageIcon("src/main/java/img/logo2.png");
 		JLabel label = new JLabel(icon);
 		lbTenNV.setFont(new Font("Sanserif", Font.BOLD, 14));
 		lbTenNV.setForeground(Color.white);

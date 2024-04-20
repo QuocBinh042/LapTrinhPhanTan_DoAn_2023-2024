@@ -10,7 +10,7 @@ import java.awt.Toolkit;
 
 public class PanelTrangChu extends JPanel {
 	public PanelTrangChu() {
-		ImageIcon icon = new ImageIcon("src/img/trangChu.jpg");
+		ImageIcon icon = new ImageIcon("src/main/java/img/trangChu.jpg");
 		Image image = icon.getImage();
 		JLabel label = new JLabel(icon);
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();

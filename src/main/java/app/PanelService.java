@@ -50,13 +50,13 @@ public class PanelService extends JPanel implements MouseListener {
 	}
 
 	private void createUI() {
-		Icon img_add = new ImageIcon("src/img/add16.png");
-		Icon img_del = new ImageIcon("src/img/bin.png");
-		Icon img_reset = new ImageIcon("src/img/refresh16.png");
-		Icon img_edit = new ImageIcon("src/img/edit16.png");
-		Icon img_out = new ImageIcon("src/img/out.png");
-		Icon img_search = new ImageIcon("src/img/search.png");
-		Icon img_refresh = new ImageIcon("src/img/refresh16.png");
+		Icon img_add = new ImageIcon("src/main/java/img/add16.png");
+		Icon img_del = new ImageIcon("src/main/java/img/bin.png");
+		Icon img_reset = new ImageIcon("src/main/java/img/refresh16.png");
+		Icon img_edit = new ImageIcon("src/main/java/img/edit16.png");
+		Icon img_out = new ImageIcon("src/main/java/img/out.png");
+		Icon img_search = new ImageIcon("src/main/java/img/search.png");
+		Icon img_refresh = new ImageIcon("src/main/java/img/refresh16.png");
 		Border line = BorderFactory.createLineBorder(Color.BLACK);
 
 		// Thông tin khuyến mãi
