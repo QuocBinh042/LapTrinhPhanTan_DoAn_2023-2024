@@ -8,9 +8,7 @@ import javax.swing.table.DefaultTableModel;
 
 import com.toedter.calendar.JDateChooser;
 
-import connectDB.ConnectDB;
-import dao.MaTuDong;
-import dao.DAONhanVien;
+import dao.EmployeeDAO;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -24,7 +22,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.regex.Pattern;
 
-public class PanelNhanVien extends JPanel implements MouseListener {
+public class PanelEmployee extends JPanel implements MouseListener {
 
 	private JLabel lblMaNhanVien, lblTenNhanVien, lblNamSinh, lblGioiTinh, lblSoDienThoai, lblCCCD, lblChucVu,
 			lblMatKhau, lblTinhTrang;
@@ -38,17 +36,11 @@ public class PanelNhanVien extends JPanel implements MouseListener {
 	private JTable table;
 	private DefaultTableModel tableModel;
 	private SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-	private DAONhanVien daoNV = new DAONhanVien();
+	private EmployeeDAO daoEmployee = new EmployeeDAO();
 	private ArrayList<entity.Employee> dsNV = new ArrayList<>();
-	private MaTuDong maNhanVien = new MaTuDong();
+//	private MaTuDong maNhanVien = new MaTuDong();
 
-	public PanelNhanVien() {
-
-		try {
-			ConnectDB.getInstance().connect();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+	public PanelEmployee() {
 
 		try {
 			UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
@@ -66,7 +58,6 @@ public class PanelNhanVien extends JPanel implements MouseListener {
 			e1.printStackTrace();
 		}
 
-		daoNV = new DAONhanVien();
 		createUI();
 
 		layToanBoNV();
@@ -191,7 +182,7 @@ public class PanelNhanVien extends JPanel implements MouseListener {
 
 		// Table
 		JPanel pnlTable = new JPanel();
-		pnlTable.setBorder(BorderFactory.createTitledBorder(line,"Danh sách nhân viên"));
+		pnlTable.setBorder(BorderFactory.createTitledBorder(line, "Danh sách nhân viên"));
 		table = new JTable();
 		tableModel = new DefaultTableModel(headers, 0);
 		table.setModel(tableModel);
@@ -232,40 +223,39 @@ public class PanelNhanVien extends JPanel implements MouseListener {
 	}
 
 	private void xuLyLuu() {
-		int luaChon = JOptionPane.showConfirmDialog(null, "Có chắc chắn thêm thông tin nhân viên không?", "Chú ý",
-				JOptionPane.YES_NO_OPTION);
-		if (luaChon == JOptionPane.YES_OPTION) {
-			if (validData() == true) {
-				String tenNV = txtTenNhanVien.getText();
-				String namSinh = dateFormat.format(dateNamSinh.getDate());
-				String gioiTinh = cbGioiTinh.getSelectedItem().toString();
-				String sdt = txtSoDienThoai.getText();
-				String cccd = txtCCCD.getText();
-				String chucVu = cbChucVu.getSelectedItem().toString();
-				String matKhau = txtMatKhau.getText();
-				String maNV = txtMaNV.getText();
-				
-				try {
-					if (gioiTinh.equalsIgnoreCase("Nam")) {
-						daoNV.add(new entity.Employee(maNV, tenNV, dateFormat.parse(namSinh), false, sdt, cccd, chucVu,
-								matKhau, false));
-					}
-					else {
-						daoNV.add(new entity.Employee(maNV, tenNV, dateFormat.parse(namSinh), true, sdt, cccd, chucVu,
-								matKhau, false));
-					}
-				} catch (NumberFormatException e) {
-					e.printStackTrace();
-				} catch (ParseException e) {
-					e.printStackTrace();
-				}
-				String[] row = { maNV, tenNV, namSinh, gioiTinh, sdt, cccd, chucVu, matKhau, "Đang làm" };
-				tableModel.addRow(row);
-				JOptionPane.showMessageDialog(null, "Thêm mới nhân viên thành công!");
-			}
-		} else {
-			JOptionPane.showMessageDialog(null, "Vui lòng nhập đầy đủ thông tin nhân viên!");
-		}
+//		int luaChon = JOptionPane.showConfirmDialog(null, "Có chắc chắn thêm thông tin nhân viên không?", "Chú ý",
+//				JOptionPane.YES_NO_OPTION);
+//		if (luaChon == JOptionPane.YES_OPTION) {
+//			if (validData() == true) {
+//				String tenNV = txtTenNhanVien.getText();
+//				String namSinh = dateFormat.format(dateNamSinh.getDate());
+//				String gioiTinh = cbGioiTinh.getSelectedItem().toString();
+//				String sdt = txtSoDienThoai.getText();
+//				String cccd = txtCCCD.getText();
+//				String chucVu = cbChucVu.getSelectedItem().toString();
+//				String matKhau = txtMatKhau.getText();
+//				String maNV = txtMaNV.getText();
+//
+//				try {
+//					if (gioiTinh.equalsIgnoreCase("Nam")) {
+//						daoNV.add(new entity.Employee(maNV, tenNV, dateFormat.parse(namSinh), false, sdt, cccd, chucVu,
+//								matKhau, false));
+//					} else {
+//						daoNV.add(new entity.Employee(maNV, tenNV, dateFormat.parse(namSinh), true, sdt, cccd, chucVu,
+//								matKhau, false));
+//					}
+//				} catch (NumberFormatException e) {
+//					e.printStackTrace();
+//				} catch (ParseException e) {
+//					e.printStackTrace();
+//				}
+//				String[] row = { maNV, tenNV, namSinh, gioiTinh, sdt, cccd, chucVu, matKhau, "Đang làm" };
+//				tableModel.addRow(row);
+//				JOptionPane.showMessageDialog(null, "Thêm mới nhân viên thành công!");
+//			}
+//		} else {
+//			JOptionPane.showMessageDialog(null, "Vui lòng nhập đầy đủ thông tin nhân viên!");
+//		}
 	}
 
 	// Kiem tra rang buoc
@@ -303,8 +293,8 @@ public class PanelNhanVien extends JPanel implements MouseListener {
 
 	// Xu ly them moi
 	private void xuLyThemMoi() throws ParseException {
-		String maNV = maNhanVien.formatMa(dsNV.get(dsNV.size() - 1).getMaNV());
-		txtMaNV.setText(maNV);
+//		String maNV = maNhanVien.formatMa(dsNV.get(dsNV.size() - 1).getMaNV());
+//		txtMaNV.setText(maNV);
 	}
 
 	private Object xuLyXoa() {
@@ -322,45 +312,44 @@ public class PanelNhanVien extends JPanel implements MouseListener {
 
 	private Object xuLyCapNhat() throws ParseException {
 		// TODO Auto-generated method stub
-		int luaChon = JOptionPane.showConfirmDialog(null, "Có chắc chắn muốn cập nhật thông tin nhân viên không?",
-				"Chú ý", JOptionPane.YES_NO_OPTION);
-		if (luaChon == JOptionPane.YES_OPTION) {
-			String tenNV = txtTenNhanVien.getText();
-			String namSinh = dateFormat.format(dateNamSinh.getDate());
-			String gioiTinh = cbGioiTinh.getSelectedItem().toString();
-			String sdt = txtSoDienThoai.getText();
-			String cccd = txtCCCD.getText();
-			String chucVu = cbChucVu.getSelectedItem().toString();
-			String matKhau = txtMatKhau.getText();
-			String maNV = table.getValueAt(table.getSelectedRow(), 0).toString();
-			String tt = table.getValueAt(table.getSelectedRow(), 8).toString();
-			Boolean tinhTrang;
-			if (tt.equals("Đang làm")){
-				tinhTrang = true;
-			}
-			else tinhTrang = false;
-			int viTri = table.getSelectedRow();
-			tableModel.removeRow(viTri);
-			String[] row = { maNV, tenNV, namSinh, gioiTinh, sdt, cccd, chucVu, matKhau, tt };
-			try {
-				if (gioiTinh.equalsIgnoreCase("Nam")) {
-					daoNV.updateNhanVien(new entity.Employee(maNV, tenNV, dateFormat.parse(namSinh), false, sdt, cccd, chucVu,
-							matKhau, tinhTrang));
-				}
-				else {
-					daoNV.updateNhanVien(new entity.Employee(maNV, tenNV, dateFormat.parse(namSinh), true, sdt, cccd, chucVu,
-							matKhau, tinhTrang));
-				}
-			} catch (NumberFormatException e) {
-				e.printStackTrace();
-			} catch (ParseException e) {
-				e.printStackTrace();
-			}
-			tableModel.insertRow(viTri, row);
-			JOptionPane.showMessageDialog(null, "Cập nhật nhân viên thành công!");
-		} else {
-			JOptionPane.showMessageDialog(null, "Vui lòng nhập đầy đủ thông tin nhân viên!");
-		}
+//		int luaChon = JOptionPane.showConfirmDialog(null, "Có chắc chắn muốn cập nhật thông tin nhân viên không?",
+//				"Chú ý", JOptionPane.YES_NO_OPTION);
+//		if (luaChon == JOptionPane.YES_OPTION) {
+//			String tenNV = txtTenNhanVien.getText();
+//			String namSinh = dateFormat.format(dateNamSinh.getDate());
+//			String gioiTinh = cbGioiTinh.getSelectedItem().toString();
+//			String sdt = txtSoDienThoai.getText();
+//			String cccd = txtCCCD.getText();
+//			String chucVu = cbChucVu.getSelectedItem().toString();
+//			String matKhau = txtMatKhau.getText();
+//			String maNV = table.getValueAt(table.getSelectedRow(), 0).toString();
+//			String tt = table.getValueAt(table.getSelectedRow(), 8).toString();
+//			Boolean tinhTrang;
+//			if (tt.equals("Đang làm")) {
+//				tinhTrang = true;
+//			} else
+//				tinhTrang = false;
+//			int viTri = table.getSelectedRow();
+//			tableModel.removeRow(viTri);
+//			String[] row = { maNV, tenNV, namSinh, gioiTinh, sdt, cccd, chucVu, matKhau, tt };
+//			try {
+//				if (gioiTinh.equalsIgnoreCase("Nam")) {
+//					daoNV.updateNhanVien(new entity.Employee(maNV, tenNV, dateFormat.parse(namSinh), false, sdt, cccd,
+//							chucVu, matKhau, tinhTrang));
+//				} else {
+//					daoNV.updateNhanVien(new entity.Employee(maNV, tenNV, dateFormat.parse(namSinh), true, sdt, cccd,
+//							chucVu, matKhau, tinhTrang));
+//				}
+//			} catch (NumberFormatException e) {
+//				e.printStackTrace();
+//			} catch (ParseException e) {
+//				e.printStackTrace();
+//			}
+//			tableModel.insertRow(viTri, row);
+//			JOptionPane.showMessageDialog(null, "Cập nhật nhân viên thành công!");
+//		} else {
+//			JOptionPane.showMessageDialog(null, "Vui lòng nhập đầy đủ thông tin nhân viên!");
+//		}
 		return null;
 	}
 
@@ -401,14 +390,14 @@ public class PanelNhanVien extends JPanel implements MouseListener {
 
 	// Lay toan bo nhan vien
 	private void layToanBoNV() {
-		dsNV = daoNV.getAll();
-		for (entity.Employee nv : dsNV) {
-			String gioiTinh = nv.getGioiTinh() ? "Nữ" : "Nam";
-			String tinhTrang = nv.getTinhTrangNV() ? "Đang làm" : "Nghỉ việc";
-			tableModel.addRow(new Object[] { nv.getMaNV(), nv.getTenNV(), dateFormat.format(nv.getNamSinh()), gioiTinh,
-					nv.getSdthoai(), nv.getCccd(), nv.getChucVu(), nv.getMatKhau(), tinhTrang });
-
-		}
+//		dsNV = daoNV.getAll();
+//		for (entity.Employee nv : dsNV) {
+//			String gioiTinh = nv.getGioiTinh() ? "Nữ" : "Nam";
+//			String tinhTrang = nv.getTinhTrangNV() ? "Đang làm" : "Nghỉ việc";
+//			tableModel.addRow(new Object[] { nv.getMaNV(), nv.getTenNV(), dateFormat.format(nv.getNamSinh()), gioiTinh,
+//					nv.getSdthoai(), nv.getCccd(), nv.getChucVu(), nv.getMatKhau(), tinhTrang });
+//
+//		}
 	}
 
 	// Xu ly mouseclick

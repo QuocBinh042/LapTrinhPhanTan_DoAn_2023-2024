@@ -63,7 +63,7 @@ import entity.Employee;
 import entity.Booking;
 import entity.Room;
 
-public class BookingPnl extends JFrame  {
+public class PanelBooking extends JFrame  {
 	private JButton thuePBtn, phieuDatPhongBtn, datPBtn, chuyenPBtn, chiTietPBtn, dichVuPBtn, tinhTienPBtn, timKiemPBtn,
 			lamMoiBtn;
 	private JComboBox<String> tinhTrangB, soNguoiB, loaiPhongB;
@@ -83,7 +83,7 @@ public class BookingPnl extends JFrame  {
 	private DetailBillDAO detailBillDAO;
 	
 	public static void main(String[] args) throws RemoteException {
-		new BookingPnl("1").setVisible(true);
+		new PanelBooking("1").setVisible(true);
 	}
 
 	public String getManNV() {
@@ -94,7 +94,7 @@ public class BookingPnl extends JFrame  {
 		this.manNV = manNV;
 	}
 
-	public BookingPnl(String maNV) throws RemoteException {
+	public PanelBooking(String maNV) throws RemoteException {
 		setSize(1400, 720);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setLocationRelativeTo(null);

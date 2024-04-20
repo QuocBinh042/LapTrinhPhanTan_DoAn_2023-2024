@@ -32,7 +32,6 @@ public class FrameLogin extends JFrame implements ActionListener {
 //	private DialogQuenMatKhau forgotPassword;
 
 	public FrameLogin() {
-
 		createGUI();
 	}
 

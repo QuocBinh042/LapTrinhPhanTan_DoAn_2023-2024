@@ -18,12 +18,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.regex.Pattern;
 
-import connectDB.ConnectDB;
-import dao.DAOKhachHang;
-import dao.MaTuDong;
-import dao.DAODichVu;
+import dao.CustomerDAO;
 
-public class PanelKhachHang extends JPanel implements MouseListener {
+public class PanelCustomer extends JPanel implements MouseListener {
 	private JLabel lblTenKhachHang, lblGioiTinh, lblSoDienThoai, lblEmail, lblGhiChu, lblLoaiKhachHang, lblMaKH;
 	private JTextField txtTenKhachHang, txtSoDienThoai, txtEmail, txtTimSDT, txtTimTenKH, txtMaKH;
 	private JTextArea txaGhiChu;
@@ -33,18 +30,11 @@ public class PanelKhachHang extends JPanel implements MouseListener {
 			"Email", "Số giờ đã thuê", "Ghi chú" };
 	private JTable table;
 	private DefaultTableModel tableModel;
-	private DAOKhachHang daoKH = new DAOKhachHang();
+	private CustomerDAO daoCustomer = new CustomerDAO();
 	private ArrayList<entity.Customer> dsKH = new ArrayList<>();
-	private MaTuDong maKhachHang = new MaTuDong();
 	private Boolean gt;
 
-	public PanelKhachHang() {
-		try {
-			ConnectDB.getInstance().connect();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-
+	public PanelCustomer() {
 		try {
 			UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
 		} catch (ClassNotFoundException e1) {
@@ -60,10 +50,8 @@ public class PanelKhachHang extends JPanel implements MouseListener {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		daoKH = new DAOKhachHang();
 
 		createUI();
-		dsKH = daoKH.getAll();
 		layDanhSachKH(dsKH);
 		// sự kiện
 		cbLoaiKhachHang.addActionListener(e -> xuLyCBLoaiKH());
@@ -190,32 +178,32 @@ public class PanelKhachHang extends JPanel implements MouseListener {
 	}
 
 	private void xuLyLuu() {
-		int luaChon = JOptionPane.showConfirmDialog(null, "Có chắc chắn thêm thông tin khách hàng không?", "Chú ý",
-				JOptionPane.YES_NO_OPTION);
-		if (luaChon == JOptionPane.YES_OPTION) {
-			if (validData() == true) {
-				String tenKH = txtTenKhachHang.getText();
-				String gioiTinh = cbGioiTinh.getSelectedItem().toString();
-				if (gioiTinh == "Nam") {
-					gt = false;
-				} else
-					gt = true;
-				String sdt = txtSoDienThoai.getText();
-				String email = txtEmail.getText();
-				String ghichu = txaGhiChu.getText();
-				String maKH = txtMaKH.getText();
-				String[] row = { maKH, tenKH, "Thường", gioiTinh, sdt, email, "0", ghichu };
-				if (daoKH.add(new entity.Customer(maKH, tenKH, false, gt, sdt, email, 0, ghichu))) {
-					tableModel.addRow(row);
-					JOptionPane.showMessageDialog(null, "Thêm mới khách hàng thành công!");
-				} else
-					JOptionPane.showMessageDialog(null, "Thêm mới khách hàng không thành công!");
-
-			}
-
-		} else {
-			JOptionPane.showMessageDialog(null, "Vui lòng nhập đầy đủ thông tin khách hàng!");
-		}
+//		int luaChon = JOptionPane.showConfirmDialog(null, "Có chắc chắn thêm thông tin khách hàng không?", "Chú ý",
+//				JOptionPane.YES_NO_OPTION);
+//		if (luaChon == JOptionPane.YES_OPTION) {
+//			if (validData() == true) {
+//				String tenKH = txtTenKhachHang.getText();
+//				String gioiTinh = cbGioiTinh.getSelectedItem().toString();
+//				if (gioiTinh == "Nam") {
+//					gt = false;
+//				} else
+//					gt = true;
+//				String sdt = txtSoDienThoai.getText();
+//				String email = txtEmail.getText();
+//				String ghichu = txaGhiChu.getText();
+//				String maKH = txtMaKH.getText();
+//				String[] row = { maKH, tenKH, "Thường", gioiTinh, sdt, email, "0", ghichu };
+//				if (daoKH.add(new entity.Customer(maKH, tenKH, false, gt, sdt, email, 0, ghichu))) {
+//					tableModel.addRow(row);
+//					JOptionPane.showMessageDialog(null, "Thêm mới khách hàng thành công!");
+//				} else
+//					JOptionPane.showMessageDialog(null, "Thêm mới khách hàng không thành công!");
+//
+//			}
+//
+//		} else {
+//			JOptionPane.showMessageDialog(null, "Vui lòng nhập đầy đủ thông tin khách hàng!");
+//		}
 	}
 
 	// Xoa toan bo dich vu
@@ -229,25 +217,25 @@ public class PanelKhachHang extends JPanel implements MouseListener {
 
 	// Lay toan bo khach hang
 	private void layDanhSachKH(ArrayList<entity.Customer> dsKH) {
-		xoaToanBoKH();
-		for (entity.Customer kh : dsKH) {
-			String gioiTinh = kh.getGioiTinh() ? "Nữ" : "Nam";
-			String loaikh = kh.getLoaiKH() ? "VIP" : "Thường";
-			tableModel.addRow(new Object[] { kh.getMaKH(), kh.getTenKH(), loaikh, gioiTinh, kh.getSdthoai(),
-					kh.getEmail(), kh.getSoGioDaThue(), kh.getGhiChu() });
-
-		}
+//		xoaToanBoKH();
+//		for (entity.Customer kh : dsKH) {
+////			String gioiTinh = kh.getGioiTinh() ? "Nữ" : "Nam";
+//			String loaikh = kh.getLoaiKH() ? "VIP" : "Thường";
+//			tableModel.addRow(new Object[] { kh.getMaKH(), kh.getTenKH(), loaikh, gioiTinh, kh.getSdthoai(),
+//					kh.getEmail(), kh.getSoGioDaThue(), kh.getGhiChu() });
+//
+//		}
 	}
 
 	// Xu ly combobox loai khach hang
 	private void xuLyCBLoaiKH() {
-		if (cbLoaiKhachHang.getSelectedItem().toString().equalsIgnoreCase("VIP")) {
-			dsKH = DAOKhachHang.getKhachHangCB(true);
-		} else if (cbLoaiKhachHang.getSelectedItem().toString().equalsIgnoreCase("Thường")) {
-			dsKH = DAOKhachHang.getKhachHangCB(false);
-		} else
-			dsKH = daoKH.getAll();
-		layDanhSachKH(dsKH);
+//		if (cbLoaiKhachHang.getSelectedItem().toString().equalsIgnoreCase("VIP")) {
+//			dsKH = DAOKhachHang.getKhachHangCB(true);
+//		} else if (cbLoaiKhachHang.getSelectedItem().toString().equalsIgnoreCase("Thường")) {
+//			dsKH = DAOKhachHang.getKhachHangCB(false);
+//		} else
+//			dsKH = daoKH.getAll();
+//		layDanhSachKH(dsKH);
 	}
 
 	// Kiem tra rang buoc
@@ -280,32 +268,32 @@ public class PanelKhachHang extends JPanel implements MouseListener {
 
 	// Xu ly them moi
 	private void xuLyThemMoi() {
-		String maKH = maKhachHang.formatMa(dsKH.get(dsKH.size() - 1).getMaKH());
-		txtMaKH.setText(maKH);
+//		String maKH = maKhachHang.formatMa(dsKH.get(dsKH.size() - 1).getMaKH());
+//		txtMaKH.setText(maKH);
 	}
 
 	private Object xuLyCapNhat() {
 		// TODO Auto-generated method stub
-		int luaChon = JOptionPane.showConfirmDialog(null, "Có chắc chắn muốn cập nhật thông tin khách hàng không?",
-				"Chú ý", JOptionPane.YES_NO_OPTION);
-		if (luaChon == JOptionPane.YES_OPTION) {
-			if (validData() == true) {
-				String tenKH = txtTenKhachHang.getText();
-				String gioiTinh = cbGioiTinh.getSelectedItem().toString();
-				String sdt = txtSoDienThoai.getText();
-				String email = txtEmail.getText();
-				String ghichu = txaGhiChu.getText();
-				int viTri = table.getSelectedRow();
-				String maKH = (String) table.getValueAt(table.getSelectedRow(), 0);
-				tableModel.removeRow(viTri);
-				String[] row = { maKH, tenKH, "Thường", gioiTinh, sdt, email, "2", ghichu };
-				daoKH.updateKhachHang(new entity.Customer(maKH, tenKH, false, false, sdt, email, 0, ghichu));
-				tableModel.insertRow(viTri, row);
-				JOptionPane.showMessageDialog(null, "Cập nhật khách hàng thành công!");
-			} else {
-				JOptionPane.showMessageDialog(null, "Vui lòng nhập đầy đủ thông tin khách hàng!");
-			}
-		}
+//		int luaChon = JOptionPane.showConfirmDialog(null, "Có chắc chắn muốn cập nhật thông tin khách hàng không?",
+//				"Chú ý", JOptionPane.YES_NO_OPTION);
+//		if (luaChon == JOptionPane.YES_OPTION) {
+//			if (validData() == true) {
+//				String tenKH = txtTenKhachHang.getText();
+//				String gioiTinh = cbGioiTinh.getSelectedItem().toString();
+//				String sdt = txtSoDienThoai.getText();
+//				String email = txtEmail.getText();
+//				String ghichu = txaGhiChu.getText();
+//				int viTri = table.getSelectedRow();
+//				String maKH = (String) table.getValueAt(table.getSelectedRow(), 0);
+//				tableModel.removeRow(viTri);
+//				String[] row = { maKH, tenKH, "Thường", gioiTinh, sdt, email, "2", ghichu };
+//				daoKH.updateKhachHang(new entity.Customer(maKH, tenKH, false, false, sdt, email, 0, ghichu));
+//				tableModel.insertRow(viTri, row);
+//				JOptionPane.showMessageDialog(null, "Cập nhật khách hàng thành công!");
+//			} else {
+//				JOptionPane.showMessageDialog(null, "Vui lòng nhập đầy đủ thông tin khách hàng!");
+//			}
+//		}
 		return null;
 
 	}

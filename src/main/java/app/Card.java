@@ -12,17 +12,17 @@ import dao.EmployeeDAO;
 import entity.Employee;
 
 public class Card extends JFrame {
-	private JButton btnTrangChu, btnPhongHat, btnPhong, btnDichVu, btnKhachHang, btnNhanVien, btnHoaDon, btnKhuyenMai,
-			btnThongKe, btnTroGiup, btnDangXuat;
+	private JButton btnTrangChu, btnPhongHat, btnPhong, btnDichVu, btnKhachHang, btnNhanVien, btnHoaDon, btnThongKe,
+			btnTroGiup, btnDangXuat;
 	private JLabel lbTenNV;
 	private JPanel pnl = new JPanel(new CardLayout());
 	private PanelTrangChu tc = new PanelTrangChu();
 	private PanelDatPhong dp;
-	private PanelPhong phong = new PanelPhong();
-	private PanelDichVu dv = new PanelDichVu();
-	private PanelNhanVien nv = new PanelNhanVien();
-	private PanelKhachHang kh = new PanelKhachHang();
-	private PanelHoaDon hd = new PanelHoaDon();
+	private PanelRoom phong = new PanelRoom();
+	private PanelService dv = new PanelService();
+	private PanelEmployee nv = new PanelEmployee();
+	private PanelCustomer kh = new PanelCustomer();
+	private PanelBill hd = new PanelBill();
 	private PanelThongKe tk = new PanelThongKe();
 	private TroGiup tg = new TroGiup();
 	private JPanel pnlButton = new JPanel();
@@ -39,7 +39,7 @@ public class Card extends JFrame {
 
 	public Card(int employeeID) throws RemoteException {
 		this.employeeID = employeeID;
-		dp = new PanelDatPhong(employeeID);
+		dp = new PanelDatPhong(1234);
 		try {
 			UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
 		} catch (ClassNotFoundException e1) {
@@ -74,7 +74,6 @@ public class Card extends JFrame {
 		btnKhachHang = createButton(" KHÁCH HÀNG", "src/img/client.png");
 		btnNhanVien = createButton(" NHÂN VIÊN ", "src/img/staff.png");
 		btnHoaDon = createButton(" HÓA ĐƠN   ", "src/img/invoice.png");
-		btnKhuyenMai = createButton(" KHUYẾN MÃI", "src/img/discount.png");
 		btnThongKe = createButton(" THỐNG KÊ  ", "src/img/statistical.png");
 		btnTroGiup = createButton(" TRỢ GIÚP  ", "src/img/help.png");
 		btnDangXuat = createButton(" ĐĂNG XUẤT ", "src/img/out.png");
@@ -103,14 +102,14 @@ public class Card extends JFrame {
 	private void createPanelLayout() {
 		pnl.add(tc, "tc");
 //		pnl.add(dp, "dp");
-//		pnl.add(dv, "dv");
-//		pnl.add(phong, "phong");
-//		pnl.add(nv, "nv");
-//		pnl.add(kh, "kh");
-//		pnl.add(hd, "hd");
-//		pnl.add(tk, "tk");
-//		pnl.add(tg, "tg");
-//		pnl.add(tg, "dx");
+		pnl.add(dv, "dv");
+		pnl.add(phong, "phong");
+		pnl.add(nv, "nv");
+		pnl.add(kh, "kh");
+		pnl.add(hd, "hd");
+		pnl.add(tk, "tk");
+		pnl.add(tg, "tg");
+		pnl.add(tg, "dx");
 	}
 
 	private JPanel createLeftPanel() throws RemoteException {
@@ -154,7 +153,7 @@ public class Card extends JFrame {
 
 	private void addEventListeners() {
 		List<JButton> buttons = Arrays.asList(btnTrangChu, btnPhongHat, btnPhong, btnDichVu, btnKhachHang, btnNhanVien,
-				btnHoaDon, btnKhuyenMai, btnThongKe, btnTroGiup, btnDangXuat);
+				btnHoaDon, btnThongKe, btnTroGiup, btnDangXuat);
 		buttons.forEach(button -> button.addMouseListener(new MouseListener() {
 			@Override
 			public void mouseReleased(MouseEvent e) {
@@ -182,7 +181,6 @@ public class Card extends JFrame {
 		btnPhongHat.addActionListener(e -> xuLyPhongHat());
 		btnKhachHang.addActionListener(e -> xuLyKhachHang());
 		btnNhanVien.addActionListener(e -> xuLyNhanVien());
-		btnKhuyenMai.addActionListener(e -> xuLyKhuyenMai());
 		btnHoaDon.addActionListener(e -> xuLyHoaDon());
 		btnDichVu.addActionListener(e -> xuLyDichVu());
 		btnThongKe.addActionListener(e -> xuLyThongKe());
@@ -229,11 +227,6 @@ public class Card extends JFrame {
 	private void xuLyTroGiup() {
 		CardLayout card = (CardLayout) pnl.getLayout();
 		card.show(pnl, "tg");
-	}
-
-	private void xuLyKhuyenMai() {
-		CardLayout card = (CardLayout) pnl.getLayout();
-		card.show(pnl, "km");
 	}
 
 	private void xuLyTrangChu() {

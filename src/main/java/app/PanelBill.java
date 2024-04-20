@@ -29,9 +29,10 @@ import javax.swing.table.DefaultTableModel;
 
 import com.toedter.calendar.JDateChooser;
 
-import dao.DAOHoaDon;
+import dao.BillDAO;
 
-public class PanelHoaDon extends JPanel {
+
+public class PanelBill extends JPanel {
 	private JTable table;
 	private DefaultTableModel tableModel;
 	private String[] headers = { "Mã hoá đơn", "Ngày thanh toán", "Giờ thanh toán", "Tên nhân viên",
@@ -40,12 +41,12 @@ public class PanelHoaDon extends JPanel {
 	private JTextField txtTimNV, txtTimKH, txtTimMaHD;
 	private ButtonGradient btnTim, btnLamMoi, btnXemCT;
 	private JDateChooser dateBDTim, dateKTTim;
-	private DAOHoaDon daoHD = new DAOHoaDon();
+//	private BillDAO daoBill = new BillDAO();
 	private JComboBox<String> cbLuaChon;
 	private SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 	private DecimalFormat formatter = new DecimalFormat("###,###,### VNĐ");
 
-	public PanelHoaDon() {
+	public PanelBill() {
 		try {
 			UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
 		} catch (ClassNotFoundException e1) {
@@ -64,26 +65,26 @@ public class PanelHoaDon extends JPanel {
 
 		createUI();
 		// Load data
-		loadData(daoHD.getAllDataHD());
+//		loadData(daoHD.getAllDataHD());
 
 		// Sự kiện
 		btnTim.addActionListener(e -> xuLyTimKiem());
 		btnLamMoi.addActionListener(e -> xuLyLamMoi());
 		cbLuaChon.addActionListener(e -> xuLyCBLuaChon());
-		dateBDTim.getDateEditor().addPropertyChangeListener(new PropertyChangeListener() {
-			@Override
-			public void propertyChange(PropertyChangeEvent evt) {
-				if (dateKTTim.getDate() != null)
-					loadData(daoHD.layDSHoaDonTrongKhoangThoiGian(dateBDTim.getDate(), dateKTTim.getDate()));
-			}
-		});
-		dateKTTim.getDateEditor().addPropertyChangeListener(new PropertyChangeListener() {
-			@Override
-			public void propertyChange(PropertyChangeEvent evt) {
-				if (dateBDTim.getDate() != null)
-					loadData(daoHD.layDSHoaDonTrongKhoangThoiGian(dateBDTim.getDate(), dateKTTim.getDate()));
-			}
-		});
+//		dateBDTim.getDateEditor().addPropertyChangeListener(new PropertyChangeListener() {
+//			@Override
+//			public void propertyChange(PropertyChangeEvent evt) {
+//				if (dateKTTim.getDate() != null)
+//					loadData(daoHD.layDSHoaDonTrongKhoangThoiGian(dateBDTim.getDate(), dateKTTim.getDate()));
+//			}
+//		});
+//		dateKTTim.getDateEditor().addPropertyChangeListener(new PropertyChangeListener() {
+//			@Override
+//			public void propertyChange(PropertyChangeEvent evt) {
+//				if (dateBDTim.getDate() != null)
+//					loadData(daoHD.layDSHoaDonTrongKhoangThoiGian(dateBDTim.getDate(), dateKTTim.getDate()));
+//			}
+//		});
 		btnXemCT.addActionListener(e -> xuLyXemCT());
 
 	}
@@ -183,11 +184,11 @@ public class PanelHoaDon extends JPanel {
 		// delete all
 		deleteAllDataJtable();
 		// Load data
-		for (entity.Bill hd : dsHD) {
-			tableModel.addRow(new Object[] { hd.getMaHoaDon(), dateFormat.format(hd.getNgayThanhToan()),
-					hd.getGioThanhToan().toString(), hd.getKh().getTenKH(), hd.getNv().getTenNV(),
-					hd.getKh().getSdthoai(), formatter.format(hd.getTongHoaDon()) });
-		}
+//		for (entity.Bill hd : dsHD) {
+//			tableModel.addRow(new Object[] { hd.getMaHoaDon(), dateFormat.format(hd.getNgayThanhToan()),
+//					hd.getGioThanhToan().toString(), hd.getKh().getTenKH(), hd.getNv().getTenNV(),
+//					hd.getKh().getSdthoai(), formatter.format(hd.getTongHoaDon()) });
+//		}
 
 	}
 
@@ -200,27 +201,27 @@ public class PanelHoaDon extends JPanel {
 
 	private Object xuLyCBLuaChon() {
 		// TODO Auto-generated method stub
-		if (cbLuaChon.getSelectedItem().equals("Tất cả"))
-			loadData(daoHD.getAllDataHD());
-		else if (cbLuaChon.getSelectedItem().equals("Ngày hiện tại"))
-			loadData(daoHD.layDSHoaDonTrongNgay());
-		else if (cbLuaChon.getSelectedItem().equals("Tháng hiện tại"))
-			loadData(daoHD.layDSHoaDonTheoThang());
-		else if (cbLuaChon.getSelectedItem().equals("Năm hiện tại"))
-			loadData(daoHD.layDSHoaDonTheoNam());
+//		if (cbLuaChon.getSelectedItem().equals("Tất cả"))
+//			loadData(daoHD.getAllDataHD());
+//		else if (cbLuaChon.getSelectedItem().equals("Ngày hiện tại"))
+//			loadData(daoHD.layDSHoaDonTrongNgay());
+//		else if (cbLuaChon.getSelectedItem().equals("Tháng hiện tại"))
+//			loadData(daoHD.layDSHoaDonTheoThang());
+//		else if (cbLuaChon.getSelectedItem().equals("Năm hiện tại"))
+//			loadData(daoHD.layDSHoaDonTheoNam());
 		return null;
 	}
 
 	private Object xuLyTimKiem() {
 		// TODO Auto-generated method stub
 		deleteAllDataJtable();
-		ArrayList<entity.Bill> ds = daoHD.timKiemHoaDon(txtTimMaHD.getText(), txtTimNV.getText(), txtTimKH.getText());
-		// Load data
-		if (ds.size() > 0) {
-			loadData(ds);
-			JOptionPane.showMessageDialog(null, "Đã tìm thấy hoá đơn!");
-		} else
-			JOptionPane.showMessageDialog(null, "Không tìm thấy hoá đơn!");
+//		ArrayList<entity.Bill> ds = daoHD.timKiemHoaDon(txtTimMaHD.getText(), txtTimNV.getText(), txtTimKH.getText());
+//		// Load data
+//		if (ds.size() > 0) {
+//			loadData(ds);
+//			JOptionPane.showMessageDialog(null, "Đã tìm thấy hoá đơn!");
+//		} else
+//			JOptionPane.showMessageDialog(null, "Không tìm thấy hoá đơn!");
 
 		return null;
 	}

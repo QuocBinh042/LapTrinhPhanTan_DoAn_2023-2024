@@ -7,11 +7,7 @@ import javax.swing.table.DefaultTableModel;
 
 import com.toedter.calendar.JDateChooser;
 
-import app.DialogLoaiPhong;
-import connectDB.ConnectDB;
-import dao.DAOLoaiPhong;
-import dao.DAOPhong;
-import dao.MaTuDong;
+import dao.RoomDAO;
 import entity.*;
 
 import java.awt.*;
@@ -23,7 +19,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
 
-public class PanelPhong extends JPanel implements MouseListener {
+public class PanelRoom extends JPanel implements MouseListener {
 
 	private JLabel lblTenPhong, lblLoaiPhong, lblSucChua, lblGiaPhong, lblMoTa, lblTimMaPhong, lblTinhTrang,
 			lblMaLoaiPhong, lblMaPhong;
@@ -33,21 +29,12 @@ public class PanelPhong extends JPanel implements MouseListener {
 	private JComboBox cbLoaiPhong, cbTinhTrang, cbMaLoaiPhong;
 	private JTable table;
 	private DefaultTableModel tableModel;
-	private DialogLoaiPhong quanlyLP;
-	private DAOPhong daoPhong;
+	private RoomDAO daoPhong;
 	private ArrayList<entity.Room> dsPhong;
-	private ArrayList<entity.LoaiPhong> dsLP;
-	private DAOLoaiPhong daoLP;
-	private MaTuDong maPTD = new MaTuDong();
+//	private MaTuDong maPTD = new MaTuDong();
 	private DecimalFormat formatter = new DecimalFormat("###");
 
-	public PanelPhong() {
-		try {
-			ConnectDB.getInstance().connect();
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+	public PanelRoom() {
 
 		try {
 			UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
@@ -65,9 +52,6 @@ public class PanelPhong extends JPanel implements MouseListener {
 			e1.printStackTrace();
 		}
 
-		daoPhong = new DAOPhong();
-		daoLP = new DAOLoaiPhong();
-
 		createUI();
 //		// add event button
 		layToanBoPhong();
@@ -75,7 +59,6 @@ public class PanelPhong extends JPanel implements MouseListener {
 		cbTinhTrang.addActionListener(e -> xuLyLocCBTT());
 		cbLoaiPhong.addActionListener(e -> xuLyLocCBLP());
 		txtTimMaPhong.addActionListener(e -> xuLyGoiY());
-		btnQLLoaiPhong.addActionListener(e -> xuLyChuyen());
 		btnLamMoi.addActionListener(e -> xuLyLamMoi());
 		btnThemMoi.addActionListener(e -> xuLyThemMoi());
 		btnLuu.addActionListener(e -> xuLyLuu());
@@ -102,14 +85,7 @@ public class PanelPhong extends JPanel implements MouseListener {
 		pnlInput.setLayout(new GridLayout(4, 2, 30, 0));
 		pnlInput.add(createPanel(lblMaPhong = new JLabel("Mã phòng"), txtMaPhong = new JTextField()));
 
-//		 Lay danh sach MaLP do vao comboBox
-		String ds = "";
-		dsLP = daoLP.getAllLoaiPhong();
-		for (entity.LoaiPhong lp : dsLP) {
-			ds += lp.getMaLoaiPhong().toString() + ";";
-		}
-		String[] cb = ds.split(";");
-		pnlInput.add(createPanel(lblMaLoaiPhong = new JLabel("Mã loại phòng"), cbMaLoaiPhong = new JComboBox<>(cb)));
+		pnlInput.add(createPanel(lblMaLoaiPhong = new JLabel("Mã loại phòng"), cbMaLoaiPhong = new JComboBox<>()));
 		pnlInput.add(createPanel(lblTenPhong = new JLabel("Tên phòng"), txtTenPhong = new JTextField()));
 		pnlInput.add(createPanel(lblLoaiPhong = new JLabel("Loại phòng"), txtLoaiPhong = new JTextField()));
 		pnlInput.add(createPanel(lblMoTa = new JLabel("Mô tả"), txaMoTa = new JTextArea()));
@@ -237,86 +213,85 @@ public class PanelPhong extends JPanel implements MouseListener {
 
 	// Lay toan bo danh sach phong
 	private void layToanBoPhong() {
-		dsPhong = daoPhong.getAllPhong();
-		for (entity.Room p : dsPhong) {
-			tableModel.addRow(new Object[] { p.getMaPhong(), p.getTenPhong(), p.getLoaiPhong().getMaLoaiPhong(),
-					p.getLoaiPhong().getTenLoaiPhong(), p.getLoaiPhong().getSucChua(),
-					formatter.format(p.getLoaiPhong().getGiaLoaiPhong()), p.getTinhTrangPhong(), p.getMoTa() });
-		}
+//		dsPhong = daoPhong.getAllPhong();
+//		for (entity.Room p : dsPhong) {
+//			tableModel.addRow(new Object[] { p.getMaPhong(), p.getTenPhong(), p.getLoaiPhong().getMaLoaiPhong(),
+//					p.getLoaiPhong().getTenLoaiPhong(), p.getLoaiPhong().getSucChua(),
+//					formatter.format(p.getLoaiPhong().getGiaLoaiPhong()), p.getTinhTrangPhong(), p.getMoTa() });
+//		}
 		locPhongDaXoa();
 	}
 
 	// Xu ly them moi phong
 	private void xuLyThemMoi() {
-		String maP = maPTD.formatMa(daoPhong.getAllPhong().get(daoPhong.getAllPhong().size() - 1).getMaPhong());
-		txtMaPhong.setText(maP);
+//		String maP = maPTD.formatMa(daoPhong.getAllPhong().get(daoPhong.getAllPhong().size() - 1).getMaPhong());
+//		txtMaPhong.setText(maP);
 
 	}
 
 	private void xuLyLuu() {
-		if (kiemTraThongTin()) {
-			if (validData() == true) {
-				String maP = txtMaPhong.getText();
-				String tenP = txtTenPhong.getText();
-				String maLP = cbMaLoaiPhong.getSelectedItem().toString();
-				String loaiP = txtLoaiPhong.getText();
-				int sucChua = Integer.parseInt(txtSucChua.getText());
-				double giaP = Double.parseDouble(txtGiaPhong.getText());
-				String moTa = txaMoTa.getText();
-				entity.LoaiPhong lp = new entity.LoaiPhong(maLP, loaiP, sucChua, giaP);
-				entity.Room p = new entity.Room(maP, tenP, lp, "Còn trống", moTa);
-				int i = JOptionPane.showConfirmDialog(null, "Bạn có chắc chắn muốn thêm mới phòng không ?", "Chú ý!",
-						JOptionPane.YES_OPTION);
-				if (i == JOptionPane.YES_OPTION) {
-
-					if (daoPhong.add(p)) {
-						String[] row = { maP, tenP, maLP, loaiP, sucChua + "", formatter.format(giaP), "Còn trống",
-								moTa };
-						tableModel.addRow(row);
-						JOptionPane.showMessageDialog(null, "Thêm mới phòng thành công!");
-					}
-				}
-			}
-
-		} else {
-			JOptionPane.showMessageDialog(null, "Vui lòng nhập đầy đủ thông tin phòng!");
-		}
+//		if (kiemTraThongTin()) {
+//			if (validData() == true) {
+//				String maP = txtMaPhong.getText();
+//				String tenP = txtTenPhong.getText();
+//				String maLP = cbMaLoaiPhong.getSelectedItem().toString();
+//				String loaiP = txtLoaiPhong.getText();
+//				int sucChua = Integer.parseInt(txtSucChua.getText());
+//				double giaP = Double.parseDouble(txtGiaPhong.getText());
+//				String moTa = txaMoTa.getText();
+//				entity.Room p = new entity.Room(maP, tenP, lp, "Còn trống", moTa);
+//				int i = JOptionPane.showConfirmDialog(null, "Bạn có chắc chắn muốn thêm mới phòng không ?", "Chú ý!",
+//						JOptionPane.YES_OPTION);
+//				if (i == JOptionPane.YES_OPTION) {
+//
+//					if (daoPhong.add(p)) {
+//						String[] row = { maP, tenP, maLP, loaiP, sucChua + "", formatter.format(giaP), "Còn trống",
+//								moTa };
+//						tableModel.addRow(row);
+//						JOptionPane.showMessageDialog(null, "Thêm mới phòng thành công!");
+//					}
+//				}
+//			}
+//
+//		} else {
+//			JOptionPane.showMessageDialog(null, "Vui lòng nhập đầy đủ thông tin phòng!");
+//		}
 
 	}
 
 	// Xu ly cap nhat thong tin phong
 	private void xuLyCapNhat() {
-		int r = table.getSelectedRow();
-		if (r != -1) {
-			if (kiemTraThongTin()) {
-				int i = JOptionPane.showConfirmDialog(null, "Bạn có chắc chắn muốn cập nhật phòng?", "Chú ý!",
-						JOptionPane.YES_NO_OPTION);
-				if (i == JOptionPane.YES_OPTION) {
-					String tenP = txtTenPhong.getText();
-					String maLP = cbMaLoaiPhong.getSelectedItem().toString();
-					String loaiP = txtLoaiPhong.getText();
-					int sucChua = Integer.parseInt(txtSucChua.getText());
-					double giaP = Double.parseDouble(txtGiaPhong.getText());
-					String moTa = txaMoTa.getText();
-					String tinhTrang = table.getValueAt(r, 6).toString();
-					table.setValueAt(tenP, r, 1);
-					table.setValueAt(maLP, r, 2);
-					table.setValueAt(loaiP, r, 3);
-					table.setValueAt(sucChua, r, 4);
-					table.setValueAt(formatter.format(giaP), r, 5);
-					table.setValueAt(tinhTrang, r, 6);
-					table.setValueAt(moTa, r, 7);
-					entity.LoaiPhong lp = new entity.LoaiPhong(maLP, loaiP, sucChua, giaP);
-					entity.Room p = new entity.Room(table.getValueAt(r, 0).toString(), tenP, lp, tinhTrang, moTa);
-					daoPhong.update(p);
-					JOptionPane.showMessageDialog(null, "Cập nhật thông tin phòng thành công!");
-				}
-			} else {
-				JOptionPane.showMessageDialog(null, "Vui lòng nhập đầy đủ thông tin phòng!");
-			}
-		} else {
-			JOptionPane.showMessageDialog(null, "Vui lòng chọn phòng cần cập nhật!");
-		}
+//		int r = table.getSelectedRow();
+//		if (r != -1) {
+//			if (kiemTraThongTin()) {
+//				int i = JOptionPane.showConfirmDialog(null, "Bạn có chắc chắn muốn cập nhật phòng?", "Chú ý!",
+//						JOptionPane.YES_NO_OPTION);
+//				if (i == JOptionPane.YES_OPTION) {
+//					String tenP = txtTenPhong.getText();
+//					String maLP = cbMaLoaiPhong.getSelectedItem().toString();
+//					String loaiP = txtLoaiPhong.getText();
+//					int sucChua = Integer.parseInt(txtSucChua.getText());
+//					double giaP = Double.parseDouble(txtGiaPhong.getText());
+//					String moTa = txaMoTa.getText();
+//					String tinhTrang = table.getValueAt(r, 6).toString();
+//					table.setValueAt(tenP, r, 1);
+//					table.setValueAt(maLP, r, 2);
+//					table.setValueAt(loaiP, r, 3);
+//					table.setValueAt(sucChua, r, 4);
+//					table.setValueAt(formatter.format(giaP), r, 5);
+//					table.setValueAt(tinhTrang, r, 6);
+//					table.setValueAt(moTa, r, 7);
+//					entity.LoaiPhong lp = new entity.LoaiPhong(maLP, loaiP, sucChua, giaP);
+//					entity.Room p = new entity.Room(table.getValueAt(r, 0).toString(), tenP, lp, tinhTrang, moTa);
+//					daoPhong.update(p);
+//					JOptionPane.showMessageDialog(null, "Cập nhật thông tin phòng thành công!");
+//				}
+//			} else {
+//				JOptionPane.showMessageDialog(null, "Vui lòng nhập đầy đủ thông tin phòng!");
+//			}
+//		} else {
+//			JOptionPane.showMessageDialog(null, "Vui lòng chọn phòng cần cập nhật!");
+//		}
 	}
 
 	// Xu ly lam moi
@@ -335,18 +310,18 @@ public class PanelPhong extends JPanel implements MouseListener {
 
 	// Xu ly xoa phong
 	private void xuLyXoa() {
-		int row = table.getSelectedRow();
-		if (row != -1) {
-			int i = JOptionPane.showConfirmDialog(null, "Bạn có chắc chắn muốn xóa phòng không?", "Chú ý!",
-					JOptionPane.YES_NO_OPTION);
-			if (i == JOptionPane.YES_OPTION) {
-				daoPhong.delete(table.getValueAt(row, 0).toString());
-				tableModel.removeRow(row);
-				JOptionPane.showMessageDialog(null, "Xóa phòng thành công!");
-			}
-		} else {
-			JOptionPane.showMessageDialog(null, "Vui lòng chọn phòng cần xóa!");
-		}
+//		int row = table.getSelectedRow();
+//		if (row != -1) {
+//			int i = JOptionPane.showConfirmDialog(null, "Bạn có chắc chắn muốn xóa phòng không?", "Chú ý!",
+//					JOptionPane.YES_NO_OPTION);
+//			if (i == JOptionPane.YES_OPTION) {
+//				daoPhong.delete(table.getValueAt(row, 0).toString());
+//				tableModel.removeRow(row);
+//				JOptionPane.showMessageDialog(null, "Xóa phòng thành công!");
+//			}
+//		} else {
+//			JOptionPane.showMessageDialog(null, "Vui lòng chọn phòng cần xóa!");
+//		}
 	}
 
 	// Kiem tra du lieu nhap vao
@@ -365,14 +340,6 @@ public class PanelPhong extends JPanel implements MouseListener {
 //				return false;
 //			}
 		return true;
-	}
-
-	// Xu ly khi chuyen sang giao dien loai phong
-	private void xuLyChuyen() {
-		quanlyLP = new DialogLoaiPhong();
-		quanlyLP.setVisible(true);
-//			quanlyLP.setAlwaysOnTop(true);
-		quanlyLP.setLocationRelativeTo(null);
 	}
 
 	// Xu ly khi thoat
@@ -415,20 +382,20 @@ public class PanelPhong extends JPanel implements MouseListener {
 
 	// Xu ly goi y khi tim phong
 	private void xuLyGoiY() {
-		dsPhong = daoPhong.getAllPhong();
-		String maP = "";
-		for (entity.Room p : dsPhong) {
-			maP += p.getMaPhong().toString() + ";";
-		}
-		String[] data = maP.split(";");
-		String searchTerm = txtTimMaPhong.getText().toLowerCase();
-		txtTimMaPhong.setText(""); // Xóa gợi ý trước đó
-		for (String suggestion : data) {
-			if (suggestion.toLowerCase().contains(searchTerm)) {
-				txtTimMaPhong.setText(suggestion);
-				break; // Dừng sau khi tìm thấy một dòng gợi ý
-			}
-		}
+//		dsPhong = daoPhong.getAllPhong();
+//		String maP = "";
+//		for (entity.Room p : dsPhong) {
+//			maP += p.getMaPhong().toString() + ";";
+//		}
+//		String[] data = maP.split(";");
+//		String searchTerm = txtTimMaPhong.getText().toLowerCase();
+//		txtTimMaPhong.setText(""); // Xóa gợi ý trước đó
+//		for (String suggestion : data) {
+//			if (suggestion.toLowerCase().contains(searchTerm)) {
+//				txtTimMaPhong.setText(suggestion);
+//				break; // Dừng sau khi tìm thấy một dòng gợi ý
+//			}
+//		}
 	}
 
 	// Xoa toan bo loai phong
@@ -441,40 +408,40 @@ public class PanelPhong extends JPanel implements MouseListener {
 
 	// Xu ly combobox loc theo tinh trang
 	private void xuLyLocCBTT() {
-		xoaToanBoPhong();
-		String lc = cbTinhTrang.getSelectedItem().toString();
-		dsPhong = daoPhong.getCBTT(lc);
-		for (entity.Room p : dsPhong) {
-			tableModel.addRow(new Object[] { p.getMaPhong(), p.getTenPhong(), p.getLoaiPhong().getMaLoaiPhong(),
-					p.getLoaiPhong().getTenLoaiPhong(), p.getLoaiPhong().getSucChua(),
-					formatter.format(p.getLoaiPhong().getGiaLoaiPhong()), p.getTinhTrangPhong(), p.getMoTa() });
-		}
+//		xoaToanBoPhong();
+//		String lc = cbTinhTrang.getSelectedItem().toString();
+//		dsPhong = daoPhong.getCBTT(lc);
+//		for (entity.Room p : dsPhong) {
+//			tableModel.addRow(new Object[] { p.getMaPhong(), p.getTenPhong(), p.getLoaiPhong().getMaLoaiPhong(),
+//					p.getLoaiPhong().getTenLoaiPhong(), p.getLoaiPhong().getSucChua(),
+//					formatter.format(p.getLoaiPhong().getGiaLoaiPhong()), p.getTinhTrangPhong(), p.getMoTa() });
+//		}
 	}
 
 	// Xu ly combobox loc theo loai phong
 	private void xuLyLocCBLP() {
-		xoaToanBoPhong();
-		String lc = cbLoaiPhong.getSelectedItem().toString();
-		dsPhong = daoPhong.getCBLP(lc);
-		for (entity.Room p : dsPhong) {
-			tableModel.addRow(new Object[] { p.getMaPhong(), p.getTenPhong(), p.getLoaiPhong().getMaLoaiPhong(),
-					p.getLoaiPhong().getTenLoaiPhong(), p.getLoaiPhong().getSucChua(),
-					formatter.format(p.getLoaiPhong().getGiaLoaiPhong()), p.getTinhTrangPhong(), p.getMoTa() });
-		}
+//		xoaToanBoPhong();
+//		String lc = cbLoaiPhong.getSelectedItem().toString();
+//		dsPhong = daoPhong.getCBLP(lc);
+//		for (entity.Room p : dsPhong) {
+//			tableModel.addRow(new Object[] { p.getMaPhong(), p.getTenPhong(), p.getLoaiPhong().getMaLoaiPhong(),
+//					p.getLoaiPhong().getTenLoaiPhong(), p.getLoaiPhong().getSucChua(),
+//					formatter.format(p.getLoaiPhong().getGiaLoaiPhong()), p.getTinhTrangPhong(), p.getMoTa() });
+//		}
 	}
 
 	// xu ly cap nhat thong tin loai phong khi chon combobox maLP
 	private void capNhatTTLP() {
-		String maLP = cbMaLoaiPhong.getSelectedItem().toString();
-		dsLP = daoLP.getAllLoaiPhong();
-		for (entity.LoaiPhong lp : dsLP) {
-			if (lp.getMaLoaiPhong().equalsIgnoreCase(maLP)) {
-				txtLoaiPhong.setText(lp.getTenLoaiPhong());
-				txtSucChua.setText(formatter.format(lp.getSucChua()));
-				txtGiaPhong.setText(formatter.format(lp.getGiaLoaiPhong()));
-			}
-
-		}
+//		String maLP = cbMaLoaiPhong.getSelectedItem().toString();
+//		dsLP = daoLP.getAllLoaiPhong();
+//		for (entity.LoaiPhong lp : dsLP) {
+//			if (lp.getMaLoaiPhong().equalsIgnoreCase(maLP)) {
+//				txtLoaiPhong.setText(lp.getTenLoaiPhong());
+//				txtSucChua.setText(formatter.format(lp.getSucChua()));
+//				txtGiaPhong.setText(formatter.format(lp.getGiaLoaiPhong()));
+//			}
+//
+//		}
 	}
 
 	// Xu ly mouseclick

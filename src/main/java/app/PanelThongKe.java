@@ -56,7 +56,7 @@ import org.jfree.data.category.DefaultCategoryDataset;
 
 import com.toedter.calendar.JDateChooser;
 
-import dao.DAOHoaDon;
+import dao.BillDAO;
 import entity.Bill;
 
 public class PanelThongKe extends JPanel {
@@ -76,7 +76,7 @@ public class PanelThongKe extends JPanel {
 	private JDateChooser dateBD, dateKT, dcChonNgay, dcChonThang;
 	private JComboBox<String> cbLuaChonTG;
 	private JComboBox<Integer> cbChonNam;
-	private DAOHoaDon daoHD = new DAOHoaDon();
+//	private BillDAO daoBill = new BillDAO();
 	private ArrayList<entity.Bill> dsHD = new ArrayList<>();
 	private DecimalFormat formatter = new DecimalFormat("###,###,### VNĐ");
 	private SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
@@ -156,10 +156,10 @@ public class PanelThongKe extends JPanel {
 		dcChonThang = new JDateChooser((Date) null, "MM/yyyy");
 		dcChonThang.setDate(new Date());
 		cbChonNam = new JComboBox<Integer>();
-		List<Integer> dsNam = daoHD.layNamLapHoaDon();
-		for (Integer string : dsNam) {
-			cbChonNam.addItem(string);
-		}
+//		List<Integer> dsNam = daoHD.layNamLapHoaDon();
+//		for (Integer string : dsNam) {
+//			cbChonNam.addItem(string);
+//		}
 		pnlThoiGian.setBackground(Color.decode("#D0BAFB"));
 		pnlLuaChonTK.setBackground(Color.decode("#D0BAFB"));
 		dcChonNgay.setBackground(Color.decode("#D0BAFB"));
@@ -409,38 +409,38 @@ public class PanelThongKe extends JPanel {
 
 	private void thongKeTheoNgay() {
 		Date date = dcChonNgay.getDate();
-		Double dt = daoHD.ThongKeHoaDonTheoNgay(date);
-		Integer slhd = daoHD.ThongKeSoLuongHoaDonTheoNgay(date);
-		Double dttb = dt / slhd;
-		if (slhd == 0)
-			dttb = 0.0;
-		loadData(daoHD.layDSHoaDonTheoNgay(date), tableTG, tableModelTG);
-		addKetQua(dt, slhd, dttb);
+//		Double dt = daoHD.ThongKeHoaDonTheoNgay(date);
+//		Integer slhd = daoHD.ThongKeSoLuongHoaDonTheoNgay(date);
+//		Double dttb = dt / slhd;
+//		if (slhd == 0)
+//			dttb = 0.0;
+//		loadData(daoHD.layDSHoaDonTheoNgay(date), tableTG, tableModelTG);
+//		addKetQua(dt, slhd, dttb);
 		cardLayout.show(pnlCardTG, "TablePanel");
 	}
 
 	private void thongKeTheoThang() {
 		Date date = dcChonThang.getDate();
-		Double dt = daoHD.ThongKeHoaDonTheoThang(date);
-		Integer slhd = daoHD.ThongKeSoLuongHoaDonTheoThang(date);
-		Double dttb = dt / slhd;
-		if (slhd == 0)
-			dttb = 0.0;
-		loadData(daoHD.layDSHoaDonTheoThang(date), tableTG, tableModelTG);
-		addKetQua(dt, slhd, dttb);
+//		Double dt = daoHD.ThongKeHoaDonTheoThang(date);
+//		Integer slhd = daoHD.ThongKeSoLuongHoaDonTheoThang(date);
+//		Double dttb = dt / slhd;
+//		if (slhd == 0)
+//			dttb = 0.0;
+//		loadData(daoHD.layDSHoaDonTheoThang(date), tableTG, tableModelTG);
+//		addKetQua(dt, slhd, dttb);
 		pnlCardTG.add(createChartPanel(createDatasetMonth(date), "Ngày"), "ChartPanel");
 		cardLayout.show(pnlCardTG, "ChartPanel");
 	}
 
 	private void thongKeTheoNam() {
 		String year = cbChonNam.getSelectedItem().toString();
-		Double dt = daoHD.ThongKeHoaDonTheoNam(year);
-		Integer slhd = daoHD.ThongKeSoLuongHoaDonTheoNam(year);
-		Double dttb = dt / slhd;
-		if (slhd == 0)
-			dttb = 0.0;
-		loadData(dsHD = daoHD.layDSHoaDonTheoNam(Integer.valueOf(year)), tableTG, tableModelTG);
-		addKetQua(dt, slhd, dttb);
+//		Double dt = daoHD.ThongKeHoaDonTheoNam(year);
+//		Integer slhd = daoHD.ThongKeSoLuongHoaDonTheoNam(year);
+//		Double dttb = dt / slhd;
+//		if (slhd == 0)
+//			dttb = 0.0;
+//		loadData(dsHD = daoHD.layDSHoaDonTheoNam(Integer.valueOf(year)), tableTG, tableModelTG);
+//		addKetQua(dt, slhd, dttb);
 		pnlCardTG.add(createChartPanel(createDatasetYear(Integer.valueOf(year)), "Tháng"), "ChartPanel");
 		cardLayout.show(pnlCardTG, "ChartPanel");
 	}
@@ -449,7 +449,7 @@ public class PanelThongKe extends JPanel {
 		// TODO Auto-generated method stub
 		DefaultCategoryDataset dataset = new DefaultCategoryDataset();
 		Map<Integer, Double> dsThongKe = new HashMap<>();
-		dsThongKe = daoHD.ThongKeHoaDonThang(date);
+//		dsThongKe = daoHD.ThongKeHoaDonThang(date);
 		for (Entry<Integer, Double> entry : dsThongKe.entrySet()) {
 			Integer day = entry.getKey();
 			Double totalCount = entry.getValue();
@@ -466,13 +466,13 @@ public class PanelThongKe extends JPanel {
 
 	private CategoryDataset createDatasetYear(Integer year) {
 		DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-		Map<Integer, Double> dsThongKe = new HashMap<>();
-		dsThongKe = daoHD.ThongKeHoaDonNam(year);
-		for (Entry<Integer, Double> entry : dsThongKe.entrySet()) {
-			Integer month = entry.getKey();
-			Double totalCount = entry.getValue();
-			dataset.addValue(totalCount, "Doanh thu trong tháng", month);
-		}
+//		Map<Integer, Double> dsThongKe = new HashMap<>();
+//		dsThongKe = daoHD.ThongKeHoaDonNam(year);
+//		for (Entry<Integer, Double> entry : dsThongKe.entrySet()) {
+//			Integer month = entry.getKey();
+//			Double totalCount = entry.getValue();
+//			dataset.addValue(totalCount, "Doanh thu trong tháng", month);
+//		}
 		return dataset;
 	}
 
@@ -484,12 +484,12 @@ public class PanelThongKe extends JPanel {
 	}
 
 	private void loadData(ArrayList<Bill> ds, JTable table, DefaultTableModel tableModel) {
-		deleteAllDataJtable(table);
-		Collections.sort(ds, Comparator.comparing(Bill::getTongHoaDon, Comparator.reverseOrder()));
-		for (entity.Bill hd : ds) {
-			tableModel.addRow(new Object[] { hd.getMaHoaDon(), hd.getKh().getTenKH(), hd.getNv().getTenNV(),
-					dateFormat.format(hd.getNgayThanhToan()), formatter.format(hd.getTongHoaDon()) });
-		}
+//		deleteAllDataJtable(table);
+//		Collections.sort(ds, Comparator.comparing(Bill::getTongHoaDon, Comparator.reverseOrder()));
+//		for (entity.Bill hd : ds) {
+//			tableModel.addRow(new Object[] { hd.getMaHoaDon(), hd.getKh().getTenKH(), hd.getNv().getTenNV(),
+//					dateFormat.format(hd.getNgayThanhToan()), formatter.format(hd.getTongHoaDon()) });
+//		}
 	}
 
 }
