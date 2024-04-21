@@ -59,7 +59,7 @@ public class Room implements Serializable {
 	public void setRoomStatus(String roomStatus) {
 		this.roomStatus = roomStatus;
 	}
-
+ 
 	public String getDescribe() {
 		return describe;
 	}

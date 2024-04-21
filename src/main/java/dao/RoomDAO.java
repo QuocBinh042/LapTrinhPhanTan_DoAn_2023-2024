@@ -41,7 +41,7 @@ public class RoomDAO extends UnicastRemoteObject implements RoomService {
 		}
 		return false;
 	}
-
+ 
 	@Override
 	public boolean updateRoom(Room room) {
 		// TODO Auto-generated method stub
@@ -128,6 +128,9 @@ public class RoomDAO extends UnicastRemoteObject implements RoomService {
 	@Override
 	public List<Room> getRoomsByStatus(String status) {
 		// TODO Auto-generated method stub
+		if ("Tất cả".equals(status)) {
+	        return em.createQuery("SELECT r FROM Room r", Room.class).getResultList();
+	    }
 		return em.createQuery("SELECT r FROM Room r WHERE r.roomStatus = :status", Room.class)
 				.setParameter("status", status).getResultList();
 	}
@@ -135,7 +138,10 @@ public class RoomDAO extends UnicastRemoteObject implements RoomService {
 	@Override
 	public List<Room> getRoomsByType(String type) {
 		// TODO Auto-generated method stub
-		return em.createQuery("SELECT r FROM Room r WHERE r.roomType.typeRoom = :type", Room.class)
+		if ("Tất cả".equals(type)) {
+	        return em.createQuery("SELECT r FROM Room r", Room.class).getResultList();
+	    }
+		return em.createQuery("SELECT r FROM Room r WHERE LOWER(r.roomType.typeRoom) = LOWER(:type)", Room.class)
 				.setParameter("type", type).getResultList();
 	}
 
@@ -150,9 +156,9 @@ public class RoomDAO extends UnicastRemoteObject implements RoomService {
 	public List<Room> getRoomsByRoomName(String nameRoom) {
 		// TODO Auto-generated method stub
 		return em.createQuery("SELECT r FROM Room r WHERE r.roomName like :nameRoom", Room.class)
-				.setParameter("nameRoom", "%"+nameRoom+"%").getResultList();
+				.setParameter("nameRoom", "%" + nameRoom + "%").getResultList();
 	}
-	
+
 	@Override
 	public List<Room> getRoomsByRoomName2(String nameRoom) {
 		// TODO Auto-generated method stub

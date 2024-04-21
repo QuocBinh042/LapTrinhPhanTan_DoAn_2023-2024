@@ -56,7 +56,7 @@ public class FrameLogin extends JFrame implements ActionListener {
 			e1.printStackTrace();
 		}
 
-		Image img_logo = new ImageIcon("src/IMG/login.png").getImage(); // Image Logo
+		Image img_logo = new ImageIcon("src/main/java/img/login.png").getImage(); // Image Logo
 		setTitle("ĐĂNG NHẬP");
 		setSize(520, 250);
 		setIconImage(img_logo);
@@ -70,7 +70,7 @@ public class FrameLogin extends JFrame implements ActionListener {
 		add(panel, BorderLayout.CENTER);
 
 		// label User
-		ImageIcon icon_user = new ImageIcon("src/IMG/user.png");
+		ImageIcon icon_user = new ImageIcon("src/main/java/img/user.png");
 		lblUser = new JLabel("Tài khoản", icon_user, HEIGHT);
 		lblUser.setFont(new Font("Times new roman", ALLBITS, 19));
 		lblUser.setBounds(20, 20, 130, 40);
@@ -83,7 +83,7 @@ public class FrameLogin extends JFrame implements ActionListener {
 		panel.add(txtUser);
 
 		// label Password
-		ImageIcon icon_pass = new ImageIcon("src/IMG/pass.png");
+		ImageIcon icon_pass = new ImageIcon("src/main/java/img/pass.png");
 		lblPass = new JLabel("Mật khẩu", icon_pass, HEIGHT);
 		lblPass.setFont(new Font("Times new roman", ALLBITS, 19));
 		lblPass.setBounds(20, 70, 130, 40);
@@ -104,7 +104,7 @@ public class FrameLogin extends JFrame implements ActionListener {
 		panel.add(btnForgetPass);
 
 		// Show password
-		ImageIcon icon_showPass = new ImageIcon("src/IMG/hide.png");
+		ImageIcon icon_showPass = new ImageIcon("src/main/java/img/hide.png");
 		btnShowPass = new JButton(icon_showPass);
 		btnShowPass.setBorder(null);
 		btnShowPass.setBackground(Color.decode("#e6dbd1"));
@@ -112,7 +112,7 @@ public class FrameLogin extends JFrame implements ActionListener {
 		panel.add(btnShowPass);
 
 		// Hide password
-		ImageIcon icon_hidePass = new ImageIcon("src/IMG/visible.png");
+		ImageIcon icon_hidePass = new ImageIcon("src/main/java/img/visible.png");
 		btnHidePass = new JButton(icon_hidePass);
 		btnHidePass.setBorder(null);
 		btnHidePass.setBackground(Color.decode("#e6dbd1"));
@@ -130,7 +130,7 @@ public class FrameLogin extends JFrame implements ActionListener {
 		btnExit.setForeground(Color.WHITE);
 		btnExit.setBounds(320, 155, 155, 50);
 		panel.add(btnExit);
-
+ 
 		// add event
 		lblPass.setPreferredSize(lblUser.getPreferredSize());
 		btnExit.addActionListener(this);
