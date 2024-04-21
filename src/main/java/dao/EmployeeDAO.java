@@ -4,6 +4,7 @@ import java.rmi.RemoteException;
 import java.util.List;
 
 import entity.Employee;
+import entity.Service;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.Persistence;
@@ -24,23 +25,22 @@ public class EmployeeDAO implements EmployeeService {
 
 	@Override
 	public boolean addEmployee(Employee employee) throws RemoteException {
-		// TODO Auto-generated method stub
-		EntityTransaction tx = em.getTransaction();
-		try {
-			tx.begin();
-			if (em.find(Employee.class, employee.getId()) != null) {
-				return false;
-			}
-			em.persist(em.merge(employee));
-			tx.commit();
-			return true;
-		} catch (Exception e) {
-			// TODO: handle exception
-			tx.rollback();
-			e.printStackTrace();
-		}
-		return false;
+	    EntityTransaction tx = em.getTransaction();
+	    try {
+	        tx.begin();
+	        if (em.find(Employee.class, employee.getId()) != null) {
+	            return false; 
+	        }
+	        em.persist(em.merge(employee));
+	        tx.commit();
+	        return true; 
+	    } catch (Exception e) {
+	        tx.rollback();
+	        e.printStackTrace();
+	        return false; 
+	    }
 	}
+
 
 	@Override
 	public boolean updateEmployee(Employee employee) throws RemoteException {
@@ -87,11 +87,11 @@ public class EmployeeDAO implements EmployeeService {
 		EntityTransaction tx = em.getTransaction();
 		try {
 			tx.begin();
-			Employee e = em.find(Employee.class, employeeID);
-			if (e == null) {
+			Employee employee = em.find(Employee.class, employeeID);
+			if (employee == null) {
 				return false;
 			}
-			em.remove(e);
+			em.remove(employee);
 			tx.commit();
 			return true;
 		} catch (Exception e) {
@@ -126,15 +126,18 @@ public class EmployeeDAO implements EmployeeService {
 	@Override
 	public List<Employee> getEmployeesByPosition(String position) throws RemoteException {
 		// TODO Auto-generated method stub
+		if ("Tất cả".equals(position)) {
+			return em.createQuery("SELECT employee FROM Employee employee", Employee.class).getResultList();
+		}
 		return em.createQuery("SELECT employee FROM Employee employee WHERE employee.position = :position",
 				Employee.class).setParameter("position", position).getResultList();
 	}
 
 	@Override
-	public List<Employee> getEmployeesByStatus(Boolean EmployeeStatus) throws RemoteException {
+	public List<Employee> getEmployeesByStatus(Boolean status) throws RemoteException {
 		// TODO Auto-generated method stub
 		return em.createQuery("SELECT employee FROM Employee employee WHERE employee.employeeStatus = :EmployeeStatus",
-				Employee.class).setParameter("EmployeeStatus", EmployeeStatus).getResultList();
+				Employee.class).setParameter("EmployeeStatus", status).getResultList();
 	}
 
 }

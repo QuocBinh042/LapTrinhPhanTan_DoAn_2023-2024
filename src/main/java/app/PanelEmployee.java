@@ -3,44 +3,47 @@ package app;
 
 import javax.swing.*;
 import javax.swing.border.Border;
-import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableModel;
 
 import com.toedter.calendar.JDateChooser;
 
 import dao.EmployeeDAO;
-
+import entity.Employee;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.sql.SQLException;
+import java.rmi.RemoteException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.regex.Pattern;
+import java.util.List;
 
 public class PanelEmployee extends JPanel implements MouseListener {
 
 	private JLabel lblMaNhanVien, lblTenNhanVien, lblNamSinh, lblGioiTinh, lblSoDienThoai, lblCCCD, lblChucVu,
 			lblMatKhau, lblTinhTrang;
-	private JTextField txtTenNhanVien, txtSoDienThoai, txtCCCD, txtMatKhau, txtTimNhanVien, txtTimSDT, txtMaNV,
-			txtTinhTrang;
+	private JTextField txtEmployeeName, txtPhoneNumber, txtIdentityCard, txtPassword, txtTimNhanVien, txtTimSDT,
+			txtEmployeeID, txtTinhTrang;
 	private JButton btnThemMoi, btnCapNhat, btnXoa, btnLamMoiNV, btnThoat, btnTim, btnLamMoi, btnLuu;
-	private JComboBox cbChucVu, cbTinhTrang, cbGioiTinh, cbTimChucVu;
+	private JComboBox cbPosition, cbTinhTrang, cbGender, cbTimChucVu;
 	private String[] headers = { "Mã nhân viên", "Tên nhân viên", "Năm sinh", "Giới tính", "Số điện thoại", "CCCD",
 			"Chức vụ", "Mật khẩu", "Tình trạng" };
 	private JDateChooser dateNamSinh;
 	private JTable table;
 	private DefaultTableModel tableModel;
-	private SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+	private DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 	private EmployeeDAO daoEmployee = new EmployeeDAO();
-	private ArrayList<entity.Employee> dsNV = new ArrayList<>();
+	private List<Employee> listEmployee;
 //	private MaTuDong maNhanVien = new MaTuDong();
 
-	public PanelEmployee() {
+	public PanelEmployee() throws RemoteException {
 
 		try {
 			UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
@@ -60,28 +63,44 @@ public class PanelEmployee extends JPanel implements MouseListener {
 
 		createUI();
 
-		layToanBoNV();
+		getAllEmployee();
 		// sự kiện
-		btnLamMoi.addActionListener(e -> xuLyLamMoi());
+		btnLamMoi.addActionListener(e -> refesh());
 		btnThemMoi.addActionListener(e -> {
 			try {
-				xuLyThemMoi();
-			} catch (ParseException e2) {
-				// TODO Auto-generated catch block
-				e2.printStackTrace();
-			}
-		});
-		btnLuu.addActionListener(e -> xuLyLuu());
-		btnXoa.addActionListener(e -> xuLyXoa());
-		btnCapNhat.addActionListener(e -> {
-			try {
-				xuLyCapNhat();
-			} catch (ParseException e1) {
+				processAdd();
+			} catch (RemoteException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 		});
-		btnTim.addActionListener(e -> xuLyTimKiem());
+		btnXoa.addActionListener(e -> processDelete());
+		btnCapNhat.addActionListener(e -> {
+			try {
+				processUpdate();
+			} catch (RemoteException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		});
+		btnTim.addActionListener(e -> processSearch());
+		cbTinhTrang.addActionListener(e -> {
+			try {
+				filterEmployeeByStatus();
+			} catch (RemoteException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		});
+
+		cbTimChucVu.addActionListener(e -> {
+			try {
+				filterEmployeeByPosition();
+			} catch (RemoteException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		});
 		table.addMouseListener(this);
 
 	}
@@ -91,32 +110,29 @@ public class PanelEmployee extends JPanel implements MouseListener {
 		Icon img_del = new ImageIcon("src/main/java/img/bin.png");
 		Icon img_reset = new ImageIcon("src/main/java/img/refresh16.png");
 		Icon img_edit = new ImageIcon("src/main/java/img/edit16.png");
-		Icon img_out = new ImageIcon("src/main/java/img/out.png");
 		Icon img_search = new ImageIcon("src/main/java/img/search.png");
-		Icon img_refresh = new ImageIcon("src/main/java/img/refresh16.png");
 		Border line = BorderFactory.createLineBorder(Color.BLACK);
 
 		JPanel pnlInput = new JPanel();
 		pnlInput.setLayout(new GridLayout(4, 2, 40, 0));
-		pnlInput.add(createPanel(lblMaNhanVien = new JLabel("Mã nhân viên"), txtMaNV = new JTextField()));
-		pnlInput.add(createPanel(lblTenNhanVien = new JLabel("Tên nhân viên"), txtTenNhanVien = new JTextField()));
+		pnlInput.add(createPanel(lblMaNhanVien = new JLabel("Mã nhân viên"), txtEmployeeID = new JTextField()));
+		pnlInput.add(createPanel(lblTenNhanVien = new JLabel("Tên nhân viên"), txtEmployeeName = new JTextField()));
 		pnlInput.add(createPanel(lblNamSinh = new JLabel("Ngày sinh"), dateNamSinh = new JDateChooser()));
-		pnlInput.add(createPanel(lblGioiTinh = new JLabel("Giới tính"), cbGioiTinh = new JComboBox<>()));
-		cbGioiTinh.addItem("Nam");
-		cbGioiTinh.addItem("Nữ");
-		pnlInput.add(createPanel(lblSoDienThoai = new JLabel("Số điện thoại"), txtSoDienThoai = new JTextField()));
-		pnlInput.add(createPanel(lblCCCD = new JLabel("CCCD"), txtCCCD = new JTextField()));
-		pnlInput.add(createPanel(lblChucVu = new JLabel("Chức vụ"), cbChucVu = new JComboBox<>()));
-		cbChucVu.addItem("Lễ tân");
-		cbChucVu.addItem("Nhân viên quản lý");
-		cbChucVu.addItem("Phục vụ");
-		pnlInput.add(createPanel(lblMatKhau = new JLabel("Mật khẩu"), txtMatKhau = new JTextField()));
+		pnlInput.add(createPanel(lblGioiTinh = new JLabel("Giới tính"), cbGender = new JComboBox<>()));
+		cbGender.addItem("Nam");
+		cbGender.addItem("Nữ");
+		pnlInput.add(createPanel(lblSoDienThoai = new JLabel("Số điện thoại"), txtPhoneNumber = new JTextField()));
+		pnlInput.add(createPanel(lblCCCD = new JLabel("CCCD"), txtIdentityCard = new JTextField()));
+		pnlInput.add(createPanel(lblChucVu = new JLabel("Chức vụ"), cbPosition = new JComboBox<>()));
+		cbPosition.addItem("Lễ tân");
+		cbPosition.addItem("Nhân viên quản lý");
+		cbPosition.addItem("Phục vụ");
+		pnlInput.add(createPanel(lblMatKhau = new JLabel("Mật khẩu"), txtPassword = new JTextField()));
 
 		// Nút chức năng
 		JPanel pnlChucNang = new JPanel();
 		pnlChucNang.setLayout(new GridLayout(3, 2));
 		pnlChucNang.add(btnThemMoi = new ButtonGradient("Thêm mới", img_add));
-		pnlChucNang.add(btnLuu = new ButtonGradient("Lưu", img_add));
 		pnlChucNang.add(btnCapNhat = new ButtonGradient("Cập nhật", img_edit));
 		pnlChucNang.add(btnXoa = new ButtonGradient("Xóa", img_del));
 		pnlChucNang.add(btnLamMoi = new ButtonGradient("Làm mới", img_reset));
@@ -125,20 +141,20 @@ public class PanelEmployee extends JPanel implements MouseListener {
 		bThongTinKM.add(pnlInput);
 		bThongTinKM.add(Box.createHorizontalStrut(50));
 		bThongTinKM.add(pnlChucNang);
-		JPanel pnlThongTinKM = new JPanel();
-		pnlThongTinKM.setBorder(BorderFactory.createTitledBorder("Thông tin nhân viên"));
-		pnlThongTinKM.add(bThongTinKM);
+		JPanel pnlThongTinNV = new JPanel();
+		pnlThongTinNV.setBorder(BorderFactory.createTitledBorder("Thông tin nhân viên"));
+		pnlThongTinNV.add(bThongTinKM);
 
 		// Set kích thước
 		Dimension dimension = new Dimension(250, 30);
-		txtMaNV.setPreferredSize(dimension);
-		txtTenNhanVien.setPreferredSize(dimension);
+		txtEmployeeID.setPreferredSize(dimension);
+		txtEmployeeName.setPreferredSize(dimension);
 		dateNamSinh.setPreferredSize(dimension);
-		cbGioiTinh.setPreferredSize(dimension);
-		txtSoDienThoai.setPreferredSize(dimension);
-		txtCCCD.setPreferredSize(dimension);
-		cbChucVu.setPreferredSize(dimension);
-		txtMatKhau.setPreferredSize(dimension);
+		cbGender.setPreferredSize(dimension);
+		txtPhoneNumber.setPreferredSize(dimension);
+		txtIdentityCard.setPreferredSize(dimension);
+		cbPosition.setPreferredSize(dimension);
+		txtPassword.setPreferredSize(dimension);
 		lblMaNhanVien.setPreferredSize(lblTenNhanVien.getPreferredSize());
 		lblNamSinh.setPreferredSize(lblTenNhanVien.getPreferredSize());
 		lblGioiTinh.setPreferredSize(lblTenNhanVien.getPreferredSize());
@@ -175,7 +191,7 @@ public class PanelEmployee extends JPanel implements MouseListener {
 //		pnlLblTenNV.add(lblTenNhanVien = new JLabel("Tên nhân viên:"));
 //		pnlTxtTenNV.add(txtTimNhanVien = new JTextField(10));
 		pnlTim.add(lblSoDienThoai = new JLabel("Số điện thoại:"));
-		pnlTim.add(txtTimSDT = new JTextField(15));
+		pnlTim.add(txtTimNhanVien = new JTextField(15));
 		pnlTim.add(btnTim = new ButtonGradient("Tìm kiếm", img_search));
 		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, pnlLoc, pnlTim);
 		splitPane.setDividerLocation(700);
@@ -197,11 +213,11 @@ public class PanelEmployee extends JPanel implements MouseListener {
 		pnlTable.add(scroll, BorderLayout.CENTER);
 
 		// Set editable
-		txtMaNV.setEnabled(false);
+		txtEmployeeID.setEnabled(false);
 
 		// Add vào giao diện
 		setLayout(new BorderLayout());
-		add(pnlThongTinKM, BorderLayout.NORTH);
+		add(pnlThongTinNV, BorderLayout.NORTH);
 		add(pnlTable, BorderLayout.CENTER);
 		dateNamSinh.setBackground(Color.decode("#D0BAFB"));
 		pnlLoc.setBackground(Color.decode("#D0BAFB"));
@@ -209,7 +225,7 @@ public class PanelEmployee extends JPanel implements MouseListener {
 		pnlTable.setBackground(Color.decode("#D0BAFB"));
 		pnlInput.setBackground(Color.decode("#D0BAFB"));
 		pnlChucNang.setBackground(Color.decode("#D0BAFB"));
-		pnlThongTinKM.setBackground(Color.decode("#D0BAFB"));
+		pnlThongTinNV.setBackground(Color.decode("#D0BAFB"));
 	}
 
 	private JPanel createPanel(JLabel label, JComponent component) {
@@ -222,48 +238,47 @@ public class PanelEmployee extends JPanel implements MouseListener {
 		return panel;
 	}
 
-	private void xuLyLuu() {
-//		int luaChon = JOptionPane.showConfirmDialog(null, "Có chắc chắn thêm thông tin nhân viên không?", "Chú ý",
-//				JOptionPane.YES_NO_OPTION);
-//		if (luaChon == JOptionPane.YES_OPTION) {
-//			if (validData() == true) {
-//				String tenNV = txtTenNhanVien.getText();
-//				String namSinh = dateFormat.format(dateNamSinh.getDate());
-//				String gioiTinh = cbGioiTinh.getSelectedItem().toString();
-//				String sdt = txtSoDienThoai.getText();
-//				String cccd = txtCCCD.getText();
-//				String chucVu = cbChucVu.getSelectedItem().toString();
-//				String matKhau = txtMatKhau.getText();
-//				String maNV = txtMaNV.getText();
-//
-//				try {
-//					if (gioiTinh.equalsIgnoreCase("Nam")) {
-//						daoNV.add(new entity.Employee(maNV, tenNV, dateFormat.parse(namSinh), false, sdt, cccd, chucVu,
-//								matKhau, false));
-//					} else {
-//						daoNV.add(new entity.Employee(maNV, tenNV, dateFormat.parse(namSinh), true, sdt, cccd, chucVu,
-//								matKhau, false));
-//					}
-//				} catch (NumberFormatException e) {
-//					e.printStackTrace();
-//				} catch (ParseException e) {
-//					e.printStackTrace();
-//				}
-//				String[] row = { maNV, tenNV, namSinh, gioiTinh, sdt, cccd, chucVu, matKhau, "Đang làm" };
-//				tableModel.addRow(row);
-//				JOptionPane.showMessageDialog(null, "Thêm mới nhân viên thành công!");
-//			}
-//		} else {
-//			JOptionPane.showMessageDialog(null, "Vui lòng nhập đầy đủ thông tin nhân viên!");
-//		}
+	private void processAdd() throws RemoteException {
+		if (!validateInput()) {
+			JOptionPane.showMessageDialog(null, "Vui lòng kiểm tra thông tin nhân viên!");
+			return;
+		}
+		txtEmployeeID.setText((daoEmployee.getAllEmployees().size() + 2) + "");
+		String employeeID = txtEmployeeID.getText();
+		String employeeName = txtEmployeeName.getText();
+		LocalDate dateOfBirth = dateNamSinh.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+		String gender = cbGender.getSelectedItem().toString();
+		String phoneNumber = txtPhoneNumber.getText();
+		String identityCard = txtIdentityCard.getText();
+		String position = cbPosition.getSelectedItem().toString();
+		String password = txtPassword.getText();
+
+		// Tạo đối tượng Employee mới
+		Employee employee = new Employee(Integer.parseInt(employeeID), employeeName, dateOfBirth,
+				gender.equalsIgnoreCase("Nam"), phoneNumber, identityCard, position, password, true);
+
+		try {
+			if (daoEmployee.addEmployee(employee)) {
+				String ngaySinh = dateFormat.format(dateOfBirth);
+				String tinhTrang = "Đang làm";
+				String[] rowData = { String.valueOf(employee.getId()), employeeName, ngaySinh, gender, phoneNumber,
+						identityCard, position, password, tinhTrang };
+				tableModel.addRow(rowData);
+				JOptionPane.showMessageDialog(null, "Thêm mới nhân viên thành công!");
+			} else {
+				JOptionPane.showMessageDialog(null, "Mã nhân viên đã tồn tại!");
+			}
+		} catch (RemoteException e) {
+			e.printStackTrace();
+			JOptionPane.showMessageDialog(null, "Lỗi khi thêm nhân viên vào cơ sở dữ liệu!");
+		}
 	}
 
-	// Kiem tra rang buoc
-	private boolean validData() {
-		String tenNV = txtTenNhanVien.getText();
-		String sdt = txtSoDienThoai.getText();
-		String cccd = txtCCCD.getText();
-		String matKhau = txtMatKhau.getText();
+	private boolean validateInput() {
+		String tenNV = txtEmployeeName.getText();
+		String sdt = txtPhoneNumber.getText();
+		String cccd = txtIdentityCard.getText();
+		String matKhau = txtPassword.getText();
 
 		Pattern p = Pattern.compile("[a-zA-Z]+");
 		if (!(p.matcher(tenNV).find())) {
@@ -291,113 +306,147 @@ public class PanelEmployee extends JPanel implements MouseListener {
 		return true;
 	}
 
-	// Xu ly them moi
-	private void xuLyThemMoi() throws ParseException {
-//		String maNV = maNhanVien.formatMa(dsNV.get(dsNV.size() - 1).getMaNV());
-//		txtMaNV.setText(maNV);
-	}
-
-	private Object xuLyXoa() {
-		// TODO Auto-generated method stub
-		int row = table.getSelectedRow();
-		int luaChon = JOptionPane.showConfirmDialog(null, "Có chắc chắn xóa thông tin nhân viên không?", "Chú ý",
-				JOptionPane.YES_NO_OPTION);
-		if (row != -1) {
-			if (luaChon == JOptionPane.YES_OPTION) {
-				tableModel.removeRow(row);
-			}
+	private void processDelete() {
+		int selectedRow = table.getSelectedRow();
+		if (selectedRow == -1) {
+			JOptionPane.showMessageDialog(null, "Vui lòng chọn nhân viên cần xóa!");
+			return;
 		}
-		return null;
+
+		int confirmation = JOptionPane.showConfirmDialog(null, "Bạn có chắc chắn muốn xóa thông tin nhân viên?",
+				"Chú ý!", JOptionPane.YES_NO_OPTION);
+		if (confirmation == JOptionPane.YES_OPTION) {
+			tableModel.removeRow(selectedRow);
+			JOptionPane.showMessageDialog(null, "Xóa thông tin nhân viên thành công!");
+		}
 	}
 
-	private Object xuLyCapNhat() throws ParseException {
-		// TODO Auto-generated method stub
-//		int luaChon = JOptionPane.showConfirmDialog(null, "Có chắc chắn muốn cập nhật thông tin nhân viên không?",
-//				"Chú ý", JOptionPane.YES_NO_OPTION);
-//		if (luaChon == JOptionPane.YES_OPTION) {
-//			String tenNV = txtTenNhanVien.getText();
-//			String namSinh = dateFormat.format(dateNamSinh.getDate());
-//			String gioiTinh = cbGioiTinh.getSelectedItem().toString();
-//			String sdt = txtSoDienThoai.getText();
-//			String cccd = txtCCCD.getText();
-//			String chucVu = cbChucVu.getSelectedItem().toString();
-//			String matKhau = txtMatKhau.getText();
-//			String maNV = table.getValueAt(table.getSelectedRow(), 0).toString();
-//			String tt = table.getValueAt(table.getSelectedRow(), 8).toString();
-//			Boolean tinhTrang;
-//			if (tt.equals("Đang làm")) {
-//				tinhTrang = true;
-//			} else
-//				tinhTrang = false;
-//			int viTri = table.getSelectedRow();
-//			tableModel.removeRow(viTri);
-//			String[] row = { maNV, tenNV, namSinh, gioiTinh, sdt, cccd, chucVu, matKhau, tt };
-//			try {
-//				if (gioiTinh.equalsIgnoreCase("Nam")) {
-//					daoNV.updateNhanVien(new entity.Employee(maNV, tenNV, dateFormat.parse(namSinh), false, sdt, cccd,
-//							chucVu, matKhau, tinhTrang));
-//				} else {
-//					daoNV.updateNhanVien(new entity.Employee(maNV, tenNV, dateFormat.parse(namSinh), true, sdt, cccd,
-//							chucVu, matKhau, tinhTrang));
-//				}
-//			} catch (NumberFormatException e) {
-//				e.printStackTrace();
-//			} catch (ParseException e) {
-//				e.printStackTrace();
-//			}
-//			tableModel.insertRow(viTri, row);
-//			JOptionPane.showMessageDialog(null, "Cập nhật nhân viên thành công!");
-//		} else {
-//			JOptionPane.showMessageDialog(null, "Vui lòng nhập đầy đủ thông tin nhân viên!");
-//		}
-		return null;
+	private void processUpdate() throws RemoteException {
+		int confirmation = JOptionPane.showConfirmDialog(null,
+				"Bạn có chắc chắn muốn cập nhật thông tin nhân viên không?", "Chú ý", JOptionPane.YES_NO_OPTION);
+		if (confirmation != JOptionPane.YES_OPTION) {
+			return;
+		}
+
+		if (!validateInput()) {
+			JOptionPane.showMessageDialog(null, "Vui lòng nhập đầy đủ thông tin nhân viên!");
+			return;
+		}
+
+		int selectedRow = table.getSelectedRow();
+		if (selectedRow == -1) {
+			JOptionPane.showMessageDialog(null, "Vui lòng chọn nhân viên cần cập nhật!");
+			return;
+		}
+
+		String employeeID = table.getValueAt(table.getSelectedRow(), 0).toString();
+		String employeeName = txtEmployeeName.getText();
+		LocalDate dateOfBirth = dateNamSinh.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+		String gender = cbGender.getSelectedItem().toString();
+		String phoneNumber = txtPhoneNumber.getText();
+		String identityCard = txtIdentityCard.getText();
+		String position = cbPosition.getSelectedItem().toString();
+		String password = txtPassword.getText();
+		String status = table.getValueAt(table.getSelectedRow(), 8).toString();
+
+		boolean isActive = status.equalsIgnoreCase("Đang làm");
+		String formattedDateOfBirth = dateFormat.format(dateOfBirth);
+
+		String[] rowData = { employeeID, employeeName, formattedDateOfBirth, gender, phoneNumber, identityCard,
+				position, password, status };
+
+		try {
+			daoEmployee.updateEmployee(new Employee(Integer.parseInt(employeeID), employeeName, null, isActive,
+					phoneNumber, status, position, password, isActive));
+
+			tableModel.removeRow(selectedRow); // Remove the row after successful update
+			tableModel.insertRow(selectedRow, rowData); // Insert the updated row
+			JOptionPane.showMessageDialog(null, "Cập nhật thông tin nhân viên thành công!");
+		} catch (NumberFormatException e) {
+			e.printStackTrace();
+		}
 	}
 
-	private Object xuLyLamMoi() {
+	private Object refesh() {
 		// TODO Auto-generated method stub
-		txtTenNhanVien.setText("");
+		txtEmployeeID.setText("");
+		txtEmployeeName.setText("");
 		((JTextField) dateNamSinh.getDateEditor().getUiComponent()).setText("");
-		txtSoDienThoai.setText("");
-		txtCCCD.setText("");
-		txtMatKhau.setText("");
-		cbChucVu.setSelectedIndex(-1);
-		cbGioiTinh.setSelectedIndex(-1);
+		txtPhoneNumber.setText("");
+		txtIdentityCard.setText("");
+		txtPassword.setText("");
+		cbPosition.setSelectedIndex(-1);
+		cbGender.setSelectedIndex(-1);
 		return null;
 	}
 
-	private Object xuLyTraCuu() {
-		// TODO Auto-generated method stub
-		txtTimNhanVien.setText("");
-		txtTimSDT.setText("");
-		return null;
-	}
-
-	private void xuLyTimKiem() {
-		String tenNVTim = txtTimNhanVien.getText();
-		int n = 0;
+	private boolean processSearch() {
+		String employeeNameToSearch = txtTimNhanVien.getText();
 		for (int i = 0; i < table.getRowCount(); i++) {
-			if (table.getValueAt(i, 1).toString().equalsIgnoreCase(tenNVTim)) {
+			if (table.getValueAt(i, 4).toString().equalsIgnoreCase(employeeNameToSearch)) {
 				table.setRowSelectionInterval(i, i);
-				n = 1;
+				JOptionPane.showMessageDialog(null, "Nhân viên được tìm thấy!");
+				return true;
 			}
 		}
-		if (n == 1) {
-			JOptionPane.showMessageDialog(null, "Tên nhân viên được tìm thấy!");
+		JOptionPane.showMessageDialog(null, "Tên nhân viên không tồn tại!");
+		return false;
+	}
+
+	// Xu ly combo tinh trang
+	private void filterEmployeeByStatus() throws RemoteException {
+		clearTable();
+		String selectedStatus = cbTinhTrang.getSelectedItem().toString();
+		boolean status;
+		if ("Tất cả".equals(selectedStatus)) {
+			listEmployee = daoEmployee.getAllEmployees();
 		} else {
-			JOptionPane.showMessageDialog(null, "Tên nhân viên không tồn tại!");
+			status = "Đang làm".equals(selectedStatus) ? true : false;
+			listEmployee = daoEmployee.getEmployeesByStatus(status);
+		}
+		for (Employee employee : listEmployee) {
+			String ngaySinh = dateFormat.format(employee.getBirth());
+			String gioiTinh = (employee.isGender()) ? "Nam" : "Nữ";
+			String tinhTrang = employee.isEmployeeStatus() ? "Đang làm" : "Nghỉ việc";
+			tableModel.addRow(
+					new Object[] { employee.getId(), employee.getName(), ngaySinh, gioiTinh, employee.getPhoneNumber(),
+							employee.getCI(), employee.getPosition(), employee.getPassword(), tinhTrang });
+		}
+	}
+
+	private void filterEmployeeByPosition() throws RemoteException {
+		clearTable();
+		String selectedPosition = cbTimChucVu.getSelectedItem().toString();
+		listEmployee = daoEmployee.getEmployeesByPosition(selectedPosition);
+		for (Employee employee : listEmployee) {
+			String ngaySinh = dateFormat.format(employee.getBirth());
+			String gioiTinh = (employee.isGender()) ? "Nam" : "Nữ";
+			String tinhTrang = employee.isEmployeeStatus() ? "Đang làm" : "Nghỉ việc";
+			tableModel.addRow(
+					new Object[] { employee.getId(), employee.getName(), ngaySinh, gioiTinh, employee.getPhoneNumber(),
+							employee.getCI(), employee.getPosition(), employee.getPassword(), tinhTrang });
 		}
 	}
 
 	// Lay toan bo nhan vien
-	private void layToanBoNV() {
-//		dsNV = daoNV.getAll();
-//		for (entity.Employee nv : dsNV) {
-//			String gioiTinh = nv.getGioiTinh() ? "Nữ" : "Nam";
-//			String tinhTrang = nv.getTinhTrangNV() ? "Đang làm" : "Nghỉ việc";
-//			tableModel.addRow(new Object[] { nv.getMaNV(), nv.getTenNV(), dateFormat.format(nv.getNamSinh()), gioiTinh,
-//					nv.getSdthoai(), nv.getCccd(), nv.getChucVu(), nv.getMatKhau(), tinhTrang });
-//
-//		}
+	private void getAllEmployee() throws RemoteException {
+		clearTable();
+		listEmployee = daoEmployee.getAllEmployees();
+		for (Employee employee : listEmployee) {
+			String ngaySinh = dateFormat.format(employee.getBirth());
+			String gioiTinh = (employee.isGender()) ? "Nam" : "Nữ";
+			String tinhTrang = employee.isEmployeeStatus() ? "Đang làm" : "Nghỉ việc";
+			tableModel.addRow(
+					new Object[] { employee.getId(), employee.getName(), ngaySinh, gioiTinh, employee.getPhoneNumber(),
+							employee.getCI(), employee.getPosition(), employee.getPassword(), tinhTrang });
+
+		}
+	}
+
+	// Xoa toan bo dich vu
+	private void clearTable() {
+		DefaultTableModel tableModel = (DefaultTableModel) table.getModel();
+		tableModel.setRowCount(0);
 	}
 
 	// Xu ly mouseclick
@@ -410,22 +459,20 @@ public class PanelEmployee extends JPanel implements MouseListener {
 	@Override
 	public void mousePressed(MouseEvent e) {
 		int row = table.getSelectedRow();
-		txtMaNV.setText(table.getValueAt(row, 0).toString());
-		txtTenNhanVien.setText(table.getValueAt(row, 1).toString());
-		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-		Date date;
+		txtEmployeeID.setText(table.getValueAt(row, 0).toString());
+		txtEmployeeName.setText(table.getValueAt(row, 1).toString());
+		LocalDate date;
 		try {
-			date = dateFormat.parse(table.getValueAt(row, 2).toString());
-			dateNamSinh.setDate(date);
-		} catch (ParseException e1) {
-			// TODO Auto-generated catch block
+			date = LocalDate.parse(table.getValueAt(row, 2).toString(), dateFormat);
+			dateNamSinh.setDate(java.util.Date.from(date.atStartOfDay(ZoneId.systemDefault()).toInstant()));
+		} catch (DateTimeParseException e1) {
 			e1.printStackTrace();
 		}
-		cbGioiTinh.setSelectedItem(table.getValueAt(row, 3).toString());
-		txtSoDienThoai.setText(table.getValueAt(row, 4).toString());
-		txtCCCD.setText(table.getValueAt(row, 5).toString());
-		cbChucVu.setSelectedItem(table.getValueAt(row, 6).toString());
-		txtMatKhau.setText(table.getValueAt(row, 7).toString());
+		cbGender.setSelectedItem(table.getValueAt(row, 3).toString());
+		txtPhoneNumber.setText(table.getValueAt(row, 4).toString());
+		txtIdentityCard.setText(table.getValueAt(row, 5).toString());
+		cbPosition.setSelectedItem(table.getValueAt(row, 6).toString());
+		txtPassword.setText(table.getValueAt(row, 7).toString());
 	}
 
 	@Override

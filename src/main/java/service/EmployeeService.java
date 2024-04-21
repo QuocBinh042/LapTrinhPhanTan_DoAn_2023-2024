@@ -24,5 +24,5 @@ public interface EmployeeService extends Remote {
 
 	public List<Employee> getEmployeesByPosition(String position) throws RemoteException;
 
-	public List<Employee> getEmployeesByStatus(Boolean EmployeeStatus) throws RemoteException;
+	public List<Employee> getEmployeesByStatus(Boolean status) throws RemoteException;
 }
