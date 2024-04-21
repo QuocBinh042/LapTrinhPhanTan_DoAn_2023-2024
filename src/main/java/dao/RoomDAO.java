@@ -20,8 +20,8 @@ public class RoomDAO extends UnicastRemoteObject implements RoomService {
 
 	public RoomDAO() throws RemoteException {
 		em = Persistence.createEntityManagerFactory("KaraokeOneDB").createEntityManager();
-	}
-
+	} 
+ 
 	@Override
 	public boolean addRoom(Room room) {
 		// TODO Auto-generated method stub

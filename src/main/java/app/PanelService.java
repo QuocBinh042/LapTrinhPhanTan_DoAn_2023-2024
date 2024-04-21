@@ -2,78 +2,100 @@ package app;
 
 import javax.swing.*;
 import javax.swing.border.Border;
-import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableModel;
 
-import com.toedter.calendar.JDateChooser;
 
 import dao.ServiceDAO;
+import entity.Service;
 
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.sql.SQLException;
+import java.rmi.RemoteException;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
 import java.util.regex.Pattern;
-
+import java.util.List;
 public class PanelService extends JPanel implements MouseListener {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private JLabel lblTenDichVu, lblDonGia, lblDonVi, lblSoLuong, lblTinhTrang, lblLocTinhTrang, lblTimDV, lblMaDV;
-	private JTextField txtTenDichVu, txtDonGia, txtDonVi, txtSoLuong, txtTimDV, txtMaDV, txtTinhTrang;
+	private JTextField txtServiceName, txtPrice, txtUnit, txtQuantity, txtFindService, txtServiceID, txtStatus;
 	private JButton btnThemMoi, btnCapNhat, btnXoa, btnLamMoi, btnTim, btnLuu;
 	private JComboBox cbTinhTrang;
 	private JTable table;
 	private DefaultTableModel tableModel;
 	private Box bLeft, bRight;
-	private ArrayList<entity.Service> dsDichVu;
+	private List<Service> listService;
 	private ServiceDAO daoService = new ServiceDAO();
 	private DecimalFormat formatter = new DecimalFormat("###");
-	private static int maDVTT = 0;
 
-	public PanelService() {
+	public PanelService() throws RemoteException{
 		createUI();
 
 		// add event button
-		layToanBoDV();
+		fetchAllService(); 
 		table.addMouseListener(this);
-		btnThemMoi.addActionListener(e -> xuLyThemMoi());
-		btnLuu.addActionListener(e -> xuLyLuu());
-		btnLamMoi.addActionListener(e -> xuLyLamMoi());
-		btnXoa.addActionListener(e -> xuLyXoa());
-		btnCapNhat.addActionListener(e -> xuLyCapNhat());
-		btnTim.addActionListener(e -> xuLyTimKiem());
-		cbTinhTrang.addActionListener(e -> xuLyCBTinhTrang());
-		txtTimDV.addActionListener(e -> xuLyGoiY());
+		btnThemMoi.addActionListener(e -> {
+			try {
+				processAdd();
+			} catch (RemoteException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		});
+		btnLamMoi.addActionListener(e -> refesh());
+		btnXoa.addActionListener(e -> {
+			try {
+				processDelete();
+			} catch (RemoteException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		});
+		btnCapNhat.addActionListener(e -> {
+			try {
+				processUpdate();
+			} catch (RemoteException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		});
+		btnTim.addActionListener(e -> search());
+		cbTinhTrang.addActionListener(e -> {
+			try {
+				filterServicesByStatus();
+			} catch (RemoteException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		});
 	}
 
-	private void createUI() {
+	private void createUI() throws RemoteException{
 		Icon img_add = new ImageIcon("src/main/java/img/add16.png");
 		Icon img_del = new ImageIcon("src/main/java/img/bin.png");
 		Icon img_reset = new ImageIcon("src/main/java/img/refresh16.png");
 		Icon img_edit = new ImageIcon("src/main/java/img/edit16.png");
-		Icon img_out = new ImageIcon("src/main/java/img/out.png");
 		Icon img_search = new ImageIcon("src/main/java/img/search.png");
-		Icon img_refresh = new ImageIcon("src/main/java/img/refresh16.png");
 		Border line = BorderFactory.createLineBorder(Color.BLACK);
 
 		// Thông tin khuyến mãi
 		JPanel pnlInput = new JPanel();
 		pnlInput.setLayout(new GridLayout(3, 2, 40, 0));
-		pnlInput.add(createPanel(lblMaDV = new JLabel("Mã dịch vụ"), txtMaDV = new JTextField()));
-		pnlInput.add(createPanel(lblTenDichVu = new JLabel("Tên dịch vụ"), txtTenDichVu = new JTextField()));
-		pnlInput.add(createPanel(lblDonVi = new JLabel("Đơn vị"), txtDonVi = new JTextField()));
-		pnlInput.add(createPanel(lblDonGia = new JLabel("Đơn giá"), txtDonGia = new JTextField()));
-		pnlInput.add(createPanel(lblSoLuong = new JLabel("Số lượng"), txtSoLuong = new JTextField()));
-		pnlInput.add(createPanel(lblTinhTrang = new JLabel("Tình trạng"), txtTinhTrang = new JTextField()));
-
+		pnlInput.add(createPanel(lblMaDV = new JLabel("Mã dịch vụ"), txtServiceID = new JTextField()));
+		pnlInput.add(createPanel(lblTenDichVu = new JLabel("Tên dịch vụ"), txtServiceName = new JTextField()));
+		pnlInput.add(createPanel(lblDonVi = new JLabel("Đơn vị"), txtUnit = new JTextField()));
+		pnlInput.add(createPanel(lblDonGia = new JLabel("Đơn giá"), txtPrice = new JTextField()));
+		pnlInput.add(createPanel(lblSoLuong = new JLabel("Số lượng"), txtQuantity = new JTextField()));
+		pnlInput.add(createPanel(lblTinhTrang = new JLabel("Tình trạng"), txtStatus = new JTextField()));
+ 
 		// Nút chức năng
 		JPanel pnlChucNang = new JPanel();
 		pnlChucNang.setLayout(new GridLayout(3, 2, 0, 10));
 		pnlChucNang.add(btnThemMoi = new ButtonGradient("Thêm mới", img_add));
-		pnlChucNang.add(btnLuu = new ButtonGradient("Lưu", img_add));
 		pnlChucNang.add(btnCapNhat = new ButtonGradient("Cập nhật", img_edit));
 		pnlChucNang.add(btnXoa = new ButtonGradient("Xóa", img_del));
 		pnlChucNang.add(btnLamMoi = new ButtonGradient("Làm mới", img_reset));
@@ -88,12 +110,12 @@ public class PanelService extends JPanel implements MouseListener {
 
 		// Set kích thước
 		Dimension dimension = new Dimension(250, 30);
-		txtTenDichVu.setPreferredSize(dimension);
-		txtDonGia.setPreferredSize(dimension);
-		txtSoLuong.setPreferredSize(dimension);
-		txtDonVi.setPreferredSize(dimension);
-		txtMaDV.setPreferredSize(dimension);
-		txtTinhTrang.setPreferredSize(dimension);
+		txtServiceName.setPreferredSize(dimension);
+		txtPrice.setPreferredSize(dimension);
+		txtQuantity.setPreferredSize(dimension);
+		txtUnit.setPreferredSize(dimension);
+		txtServiceID.setPreferredSize(dimension);
+		txtStatus.setPreferredSize(dimension);
 		lblMaDV.setPreferredSize(lblTenDichVu.getPreferredSize());
 		lblTinhTrang.setPreferredSize(lblTenDichVu.getPreferredSize());
 		lblDonGia.setPreferredSize(lblTenDichVu.getPreferredSize());
@@ -105,14 +127,14 @@ public class PanelService extends JPanel implements MouseListener {
 
 		// Tìm
 		JPanel pnlLoc = new JPanel();
-		String[] cbTT = { "Tất cả", "Còn hàng", "Hết hàng", "Sắp hết hàng", "Đã xóa" };
+		String[] cbTT = { "Tất cả", "Còn hàng", "Hết hàng", "Sắp hết hàng" };
 		pnlLoc.add(lblTinhTrang = new JLabel("Tình trạng"));
 		pnlLoc.add(Box.createHorizontalStrut(30));
 		pnlLoc.add(cbTinhTrang = new JComboBox<>(cbTT));
 		cbTinhTrang.setPreferredSize(dimension);
 		JPanel pnlTim = new JPanel();
 		pnlTim.add(lblTenDichVu = new JLabel("Tên dịch vụ"));
-		pnlTim.add(txtTimDV = new JTextField(20));
+		pnlTim.add(txtFindService = new JTextField(20));
 		pnlTim.add(btnTim = new ButtonGradient("Tìm", img_search));
 		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, pnlLoc, pnlTim);
 		splitPane.setDividerLocation(600);
@@ -135,8 +157,8 @@ public class PanelService extends JPanel implements MouseListener {
 		pnlTable.add(scroll, BorderLayout.CENTER);
 
 		// Set editable
-		txtMaDV.setEnabled(false);
-		txtTinhTrang.setEnabled(false);
+		txtServiceID.setEnabled(false);
+		txtStatus.setEnabled(false);
 
 		// Add vào giao diện
 		setLayout(new BorderLayout());
@@ -161,245 +183,212 @@ public class PanelService extends JPanel implements MouseListener {
 	}
 
 	// Xu ly kiem tra thong tin day du
-	private boolean kiemTraThongTin() {
-		String tenDV = txtTenDichVu.getText();
-		String donVi = txtDonVi.getText();
-		String donGia = txtDonGia.getText();
-		String soLuong = txtSoLuong.getText();
-		if (tenDV.trim().equals("") || donVi.trim().equals("") || donGia.trim().equals("")
-				|| soLuong.trim().equals("")) {
-			return false;
-		}
-		return true;
-	}
+	private boolean validateInput() {
+	    String serviceName = txtServiceName.getText();
+	    String unit = txtUnit.getText();
+	    String price = txtPrice.getText();
+	    String quantity = txtQuantity.getText();
 
-	// Kiem tra rang buoc
-	private boolean validData() {
-		String tenDV = txtTenDichVu.getText();
-		String donVi = txtDonVi.getText();
-		String donGia = txtDonGia.getText();
-		String soLuong = txtSoLuong.getText();
+	    if (serviceName.trim().isEmpty() || unit.trim().isEmpty() || price.trim().isEmpty() || quantity.trim().isEmpty()) {
+	        return false;
+	    }
+	    Pattern serviceNamePattern = Pattern.compile("[a-zA-Z_0-9]");
+	    if (!serviceNamePattern.matcher(serviceName).find()) {
+	        JOptionPane.showMessageDialog(null, "Tên dịch vụ không hợp lệ!");
+	        return false;
+	    }
 
-		Pattern p = Pattern.compile("[a-zA-Z_0-9]");
-		if (!(p.matcher(tenDV).find())) {
-			JOptionPane.showMessageDialog(null, "Tên dịch vụ không hợp lệ!");
-			return false;
-		}
-		Pattern p1 = Pattern.compile("[a-zA-Z]+$");
-		if (!(p1.matcher(donVi).find())) {
-			JOptionPane.showMessageDialog(null, "Đơn vị chỉ bao gồm chữ cái!");
-			return false;
-		}
-		Pattern p2 = Pattern.compile("^\\d+$");
-		if (!(p2.matcher(donGia).find())) {
-			JOptionPane.showMessageDialog(null, "Đơn giá nhập không hợp lệ!");
-			return false;
-		}
-		Pattern p3 = Pattern.compile("^\\d+$");
-		if (!(soLuong.length() > 0 && p3.matcher(soLuong).find())) {
-			JOptionPane.showMessageDialog(null, "Số lượng không hợp lệ!");
-			return false;
-		}
-		return true;
-	}
+	    Pattern unitPattern = Pattern.compile("[a-zA-Z]+$");
+	    if (!unitPattern.matcher(unit).find()) {
+	        JOptionPane.showMessageDialog(null, "Đơn vị chỉ bao gồm chữ cái!");
+	        return false;
+	    }
 
-	private Object xuLyThemMoi() {
-		// TODO Auto-generated method stub
-//		String maDV = maDVTD.formatMa(daoDV.getAllDichVu().get(daoDV.getAllDichVu().size() - 1).getMaDichVu());
-//		txtMaDV.setText(maDV);
-		return null;
+	    Pattern pricePattern = Pattern.compile("^\\d+$");
+	    if (!pricePattern.matcher(price).find()) {
+	        JOptionPane.showMessageDialog(null, "Đơn giá nhập không hợp lệ!");
+	        return false;
+	    }
+
+	    Pattern quantityPattern = Pattern.compile("^\\d+$");
+	    if (!(quantity.length() > 0 && quantityPattern.matcher(quantity).find())) {
+	        JOptionPane.showMessageDialog(null, "Số lượng không hợp lệ!");
+	        return false;
+	    }
+
+	    return true;
 	}
 
 	// Xu ly them moi
-	private void xuLyLuu() {
-//		if (kiemTraThongTin()) {
-//			if (validData() == true) {
-//				String maDV = txtMaDV.getText();
-//				String tenDV = txtTenDichVu.getText();
-//				String donVi = txtDonVi.getText();
-//				double donGia = Double.valueOf(txtDonGia.getText());
-//				int soLuong = Integer.valueOf(txtSoLuong.getText());
-//				String tinhTrang = "";
-//				if (soLuong == 0) {
-//					tinhTrang = "Hết hàng";
-//				} else if (soLuong > 0 && soLuong <= 10) {
-//					tinhTrang = "Sắp hết hàng";
-//				} else if (soLuong > 10) {
-//					tinhTrang = "Còn hàng";
-//				}
-//				entity.Service dv = new entity.Service(maDV, tenDV, donGia, donVi, soLuong, tinhTrang);
-//				int i = JOptionPane.showConfirmDialog(null, "Bạn có chắc chắn muốn thêm mới dịch vụ không ?", "Chú ý!",
-//						JOptionPane.YES_OPTION);
-//				if (i == JOptionPane.YES_OPTION) {
-//
-//					if (daoDV.add(dv)) {
-//						String[] row = { maDV, tenDV, formatter.format(donGia), donVi, soLuong + "", tinhTrang };
-//						tableModel.addRow(row);
-//						JOptionPane.showMessageDialog(null, "Thêm mới dịch vụ thành công!");
-//					}
-//				}
-//			}
-//
-//		} else {
-//			JOptionPane.showMessageDialog(null, "Vui lòng nhập đầy đủ thông tin dịch vụ!");
-//		}
+	private void processAdd() throws RemoteException {		    
+	    if (!validateInput()) {
+	        JOptionPane.showMessageDialog(null, "Kiểm tra lại thông tin dịch vụ!");
+	        return;
+	    }
+	    txtServiceID.setText((daoService.getAllServices().size()+1)+"");
+	    String serviceID = txtServiceID.getText();
+	    String serviceName = txtServiceName.getText();
+	    String unit = txtUnit.getText();
+	    double price = Double.parseDouble(txtPrice.getText());
+	    int quantity = Integer.parseInt(txtQuantity.getText());
+	    String status = "";
+	    if (quantity == 0) {
+	        status = "Hết hàng";
+	    } else if (quantity > 0 && quantity <= 10) {
+	        status = "Sắp hết hàng";
+	    } else if (quantity > 10) {
+	        status = "Còn hàng";
+	    }
+	    Service service = new Service(Integer.parseInt(serviceID), serviceName, price, unit, quantity, status);
+
+	    int confirmation = JOptionPane.showConfirmDialog(null, "Bạn có chắc chắn muốn thêm mới dịch vụ không ?", "Chú ý!",
+	            JOptionPane.YES_OPTION);
+	    if (confirmation == JOptionPane.YES_OPTION && daoService.addService(service)) {
+	        Object[] rowData = { serviceID, serviceName, price, unit, quantity, status };
+	        tableModel.addRow(rowData);
+	        JOptionPane.showMessageDialog(null, "Thêm mới dịch vụ thành công!");
+	    }
 	}
 
-	// Xu ly cap nhat(0: het, 1: sap het; 2: con; 3 da xoa)
-	private void xuLyCapNhat() {
-//		int r = table.getSelectedRow();
-//		if (r != -1) {
-//			if (kiemTraThongTin()) {
-//				if (validData() == true) {
-//					int i = JOptionPane.showConfirmDialog(null, "Bạn có chắc chắn muốn cập nhật dịch vụ không ?",
-//							"Chú ý!", JOptionPane.YES_NO_OPTION);
-//					if (i == JOptionPane.YES_OPTION) {
-//						String tenDV = txtTenDichVu.getText();
-//						String donVi = txtDonVi.getText();
-//						double donGia = Double.valueOf(txtDonGia.getText());
-//						int soLuong = Integer.valueOf(txtSoLuong.getText());
-//						String tinhTrang = "";
-//						table.setValueAt(tenDV, r, 1);
-//						table.setValueAt(donGia, r, 2);
-//						table.setValueAt(donVi, r, 3);
-//						table.setValueAt(soLuong, r, 4);
-//						entity.Service dv = new entity.Service((String) table.getValueAt(r, 0), tenDV, donGia, donVi,
-//								soLuong, tinhTrang);
-//						daoDV.update(dv);
-//						if (Integer.parseInt(table.getValueAt(r, 4).toString()) == 0) {
-//							table.setValueAt("Hết hàng", r, 5);
-//						} else if (Integer.parseInt(table.getValueAt(r, 4).toString()) > 10) {
-//							table.setValueAt("Còn hàng", r, 5);
-//						} else if (Integer.parseInt(table.getValueAt(r, 4).toString()) > 0
-//								&& Integer.parseInt(table.getValueAt(r, 4).toString()) <= 10) {
-//							table.setValueAt("Sắp hết hàng", r, 5);
-//						}
-//						table.setValueAt(formatter.format(donGia), r, 2);
-//						JOptionPane.showMessageDialog(null, "Cập nhật thông tin dịch vụ thành công!");
-//					}
-//				}
-//
-//			} else {
-//				JOptionPane.showMessageDialog(null, "Vui lòng nhập đầy đủ thông tin dịch vụ!");
-//			}
-//
-//		} else {
-//			JOptionPane.showMessageDialog(null, "Vui lòng chọn dịch vụ cần cập nhật!");
-//		}
+
+	// Xu ly cap nhat 
+	private void processUpdate() throws RemoteException {
+	    int selectedRow = table.getSelectedRow();
+	    if (selectedRow == -1) {
+	        JOptionPane.showMessageDialog(null, "Vui lòng chọn dịch vụ cần cập nhật!");
+	        return;
+	    }
+
+	    if (!validateInput()) {
+	        JOptionPane.showMessageDialog(null, "Vui lòng nhập đầy đủ thông tin dịch vụ!");
+	        return;
+	    }
+
+	    int confirmation = JOptionPane.showConfirmDialog(null, "Bạn có chắc chắn muốn cập nhật dịch vụ không ?", "Chú ý!", JOptionPane.YES_NO_OPTION);
+	    if (confirmation != JOptionPane.YES_OPTION) {
+	        return;
+	    }
+	    int serviceID = Integer.parseInt(table.getValueAt(selectedRow, 0).toString());
+	    String serviceName = txtServiceName.getText();
+	    String unit = txtUnit.getText();
+	    double price = Double.parseDouble(txtPrice.getText());
+	    int quantity = Integer.parseInt(txtQuantity.getText());
+
+	    table.setValueAt(serviceName, selectedRow, 1);
+	    table.setValueAt(price, selectedRow, 2);
+	    table.setValueAt(unit, selectedRow, 3);
+	    table.setValueAt(quantity, selectedRow, 4);
+
+	    String currentStatus = table.getValueAt(selectedRow, 5).toString();
+	    Service service = new Service(serviceID, serviceName, price, unit, quantity, currentStatus);
+	    daoService.updateService(service);
+
+	    if (quantity == 0) {
+	        table.setValueAt("Hết hàng", selectedRow, 5);
+	    } else if (quantity > 10) {
+	        table.setValueAt("Còn hàng", selectedRow, 5);
+	    } else if (quantity > 0 && quantity <= 10) {
+	        table.setValueAt("Sắp hết hàng", selectedRow, 5);
+	    }
+	    table.setValueAt(formatter.format(price), selectedRow, 2);
+
+	    JOptionPane.showMessageDialog(null, "Cập nhật thông tin dịch vụ thành công!");
 	}
+
 
 	// Xu ly lam moi
-	private void xuLyLamMoi() {
-		txtMaDV.setText("");
-		txtTenDichVu.setText("");
-		txtDonVi.setText("");
-		txtDonGia.setText("");
-		txtSoLuong.setText("");
-		txtTimDV.setText("");
-		txtTinhTrang.setText("");
+	private void refesh() {
+		txtServiceID.setText("");
+		txtServiceName.setText("");
+		txtUnit.setText("");
+		txtPrice.setText("");
+		txtQuantity.setText("");
+		txtFindService.setText("");
+		txtStatus.setText("");
 		cbTinhTrang.setSelectedIndex(0);
 	}
 
 	// Xu ly xoa
-	private void xuLyXoa() {
-//		int row = table.getSelectedRow();
-//		if (row != -1) {
-//			int i = JOptionPane.showConfirmDialog(null, "Bạn có chắc chắn muốn xóa dịch vụ này không ?", "Chú ý!",
-//					JOptionPane.YES_NO_OPTION);
-//			if (i == JOptionPane.YES_OPTION) {
-//				daoDV.delete(table.getValueAt(row, 0).toString());
-//				tableModel.removeRow(row);
-//				JOptionPane.showMessageDialog(null, "Xóa dịch vụ thành công!");
-//			}
-//		} else {
-//			JOptionPane.showMessageDialog(null, "Vui lòng chọn dịch vụ cần xóa!");
-//		}
+	private void processDelete() throws RemoteException {
+	    int row = table.getSelectedRow();
+	    if (row == -1) {
+	        JOptionPane.showMessageDialog(null, "Vui lòng chọn dịch vụ cần xóa!");
+	        return;
+	    }
+
+	    int confirmation = JOptionPane.showConfirmDialog(null, "Bạn có chắc chắn muốn xóa dịch vụ này không?", "Chú ý!", JOptionPane.YES_NO_OPTION);
+	    if (confirmation != JOptionPane.YES_OPTION) {
+	        return;
+	    }
+
+	    int serviceID = Integer.parseInt(table.getValueAt(row, 0).toString());
+	    if (daoService.deleteService(serviceID)) {
+	        tableModel.removeRow(row);
+	        JOptionPane.showMessageDialog(null, "Xóa dịch vụ thành công!");
+	    } else {
+	        JOptionPane.showMessageDialog(null, "Xóa dịch vụ không thành công!");
+	    }
 	}
 
-	// Xu ly thoat
-	private void xuLyThoat() {
-		int i = JOptionPane.showConfirmDialog(null, "Bạn có chắc chắc muốn thoát không ?", "Chú ý!",
-				JOptionPane.YES_OPTION);
-		if (i == JOptionPane.YES_OPTION) {
-			System.exit(0);
-		}
-	}
 
 	// Xu ly tim kiem
-	private void xuLyTimKiem() {
-		String maDVTim = txtTimDV.getText();
-		int n = 0;
-		for (int i = 0; i < table.getRowCount(); i++) {
-			if (table.getValueAt(i, 1).toString().equalsIgnoreCase(maDVTim)) {
-				table.setRowSelectionInterval(i, i);
-				n = 1;
-			}
-		}
-		if (n == 1) {
-			JOptionPane.showMessageDialog(null, "Dịch vụ được tìm thấy!");
-		} else {
-			JOptionPane.showMessageDialog(null, "Dịch vụ không tồn tại!");
-		}
+	private boolean search() {
+	    String serviceName = txtFindService.getText();
+	    for (int i = 0; i < table.getRowCount(); i++) {
+	        if (table.getValueAt(i, 1).equals(serviceName)) {
+	            table.setRowSelectionInterval(i, i);
+	            JOptionPane.showMessageDialog(null, "Dịch vụ được tìm thấy!");
+	            return true;
+	        }
+	    }
+	    JOptionPane.showMessageDialog(null, "Dịch vụ không tồn tại!");
+	    return false;
 	}
+
 
 	// Lay toan bo dich vu
-	private void layToanBoDV() {
-//		dsDichVu = daoDV.getAllDichVu();
-//		for (entity.Service dv : dsDichVu) {
-//			tableModel.addRow(new Object[] { dv.getMaDichVu(), dv.getTenDichVu(), formatter.format(dv.getDonGia()),
-//					dv.getDonVi(), dv.getSoLuong(), dv.getTinhTrang() });
-//			locDVDaXoa();
-//		}
-	}
-
-	// Loc dich vu trang thai da xoa
-	private void locDVDaXoa() {
-		for (int i = 0; i < tableModel.getRowCount(); i++) {
-			String tt = table.getValueAt(i, 5).toString();
-			if (tt.equalsIgnoreCase("Đã xóa")) {
-				tableModel.removeRow(i);
-			}
-		}
+	private void fetchAllService() throws RemoteException  {
+		clearTable();
+	    listService = daoService.getAllServices();
+	    for (entity.Service dv : listService) {
+	        Object[] rowData = new Object[] { 
+	            dv.getId(), 
+	            dv.getName(), 
+	            formatter.format(dv.getPrice()), 
+	            dv.getUnit(), 
+	            dv.getQuantity(), 
+	            dv.getStatus() 
+	        };
+	        tableModel.addRow(rowData);
+	    }
 	}
 
 	// Xoa toan bo dich vu
-	private void xoaToanBoDV() {
-		DefaultTableModel dm = (DefaultTableModel) table.getModel();
-		while (dm.getRowCount() > 0) {
-			dm.removeRow(0);
-		}
-
+	private void clearTable() {
+		DefaultTableModel tableModel = (DefaultTableModel) table.getModel();
+		tableModel.setRowCount(0);
 	}
 
 	// Xu ly combo tinh trang
-	private void xuLyCBTinhTrang() {
-//		xoaToanBoDV();
-//		String tt = cbTinhTrang.getSelectedItem().toString();
-//		dsDichVu = daoDV.getDichVuCB(tt);
-//		for (entity.Service dv : dsDichVu) {
-//			tableModel.addRow(new Object[] { dv.getMaDichVu(), dv.getTenDichVu(), formatter.format(dv.getDonGia()),
-//					dv.getDonVi(), dv.getSoLuong(), dv.getTinhTrang() });
-//		}
-
+	private void filterServicesByStatus() throws RemoteException {
+	    clearTable(); 
+	    String selectedStatus = cbTinhTrang.getSelectedItem().toString();
+	    listService = daoService.getActiveServices(selectedStatus);
+	    
+	    for (Service s : listService) {
+	        Object[] rowData = new Object[] { 
+	            s.getId(), 
+	            s.getName(), 
+	            formatter.format(s.getPrice()), 
+	            s.getUnit(), 
+	            s.getQuantity(), 
+	            s.getStatus() 
+	        };
+	        tableModel.addRow(rowData);
+	    }
 	}
 
-	// Xu ly goi y
-	private void xuLyGoiY() {
-//		dsDichVu = daoDV.getAllDichVu();
-//		String tenDV = "";
-//		for (entity.Service dv : dsDichVu) {
-//			tenDV += dv.getTenDichVu().toString() + ";";
-//		}
-//		String[] data = tenDV.split(";");
-//		String searchTerm = txtTimDV.getText().toLowerCase();
-//		txtTimDV.setText(""); // Xóa gợi ý trước đó
-//		for (String suggestion : data) {
-//			if (suggestion.toLowerCase().contains(searchTerm)) {
-//				txtTimDV.setText(suggestion);
-//				break; // Dừng sau khi tìm thấy một dòng gợi ý
-//			}
-//		}
-	}
+
 
 	// Xu ly mouseclick
 	@Override
@@ -411,12 +400,12 @@ public class PanelService extends JPanel implements MouseListener {
 	@Override
 	public void mousePressed(MouseEvent e) {
 		int row = table.getSelectedRow();
-		txtMaDV.setText(table.getValueAt(row, 0).toString());
-		txtTenDichVu.setText(table.getValueAt(row, 1).toString());
-		txtDonGia.setText(table.getValueAt(row, 2).toString());
-		txtDonVi.setText(table.getValueAt(row, 3).toString());
-		txtSoLuong.setText(table.getValueAt(row, 4).toString());
-		txtTinhTrang.setText(table.getValueAt(row, 5).toString());
+		txtServiceID.setText(table.getValueAt(row, 0).toString());
+		txtServiceName.setText(table.getValueAt(row, 1).toString());
+		txtPrice.setText(table.getValueAt(row, 2).toString());
+		txtUnit.setText(table.getValueAt(row, 3).toString());
+		txtQuantity.setText(table.getValueAt(row, 4).toString());
+		txtStatus.setText(table.getValueAt(row, 5).toString());
 	}
 
 	@Override
