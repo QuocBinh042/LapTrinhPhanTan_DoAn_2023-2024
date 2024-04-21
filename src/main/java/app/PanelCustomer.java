@@ -2,39 +2,33 @@ package app;
 
 import javax.swing.*;
 import javax.swing.border.Border;
-import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableModel;
 
-import com.toedter.calendar.JDateChooser;
-
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.sql.SQLException;
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Date;
+import java.rmi.RemoteException;
 import java.util.regex.Pattern;
-
+import java.util.List;
 import dao.CustomerDAO;
+import entity.Customer;
 
 public class PanelCustomer extends JPanel implements MouseListener {
-	private JLabel lblTenKhachHang, lblGioiTinh, lblSoDienThoai, lblEmail, lblGhiChu, lblLoaiKhachHang, lblMaKH;
-	private JTextField txtTenKhachHang, txtSoDienThoai, txtEmail, txtTimSDT, txtTimTenKH, txtMaKH;
-	private JTextArea txaGhiChu;
-	private JButton btnThemMoi, btnCapNhat, btnLamMoi, btnThoat, btnTim, btnLamMoiKH, btnLuu;
-	private JComboBox cbLoaiKhachHang, cbGioiTinh;
-	private String[] headers = { "Mã khách hàng", "Tên khách hàng", "Loại khách hàng", "Giới tính", "Số điện thoại",
-			"Email", "Số giờ đã thuê", "Ghi chú" };
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	private JLabel lblTenKhachHang, lblSoDienThoai, lblGhiChu, lblMaKH;
+	private JTextField txtCustomerName, txtPhoneNumber, txtEmail, txtTimSDT, txtTimTenKH, txtMaKH;
+	private JTextArea txaNote;
+	private JButton btnThemMoi, btnCapNhat, btnLamMoi, btnTim, btnLamMoiKH, btnLuu;
+	private String[] headers = { "Mã khách hàng", "Tên khách hàng", "Số điện thoại", "Ghi chú" };
 	private JTable table;
 	private DefaultTableModel tableModel;
 	private CustomerDAO daoCustomer = new CustomerDAO();
-	private ArrayList<entity.Customer> dsKH = new ArrayList<>();
-	private Boolean gt;
+	private List<Customer> listCustomer;
 
-	public PanelCustomer() {
+	public PanelCustomer() throws RemoteException {
 		try {
 			UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
 		} catch (ClassNotFoundException e1) {
@@ -52,14 +46,26 @@ public class PanelCustomer extends JPanel implements MouseListener {
 		}
 
 		createUI();
-		layDanhSachKH(dsKH);
+		getAllCustomers();
 		// sự kiện
-		cbLoaiKhachHang.addActionListener(e -> xuLyCBLoaiKH());
-		btnLamMoi.addActionListener(e -> xuLyLamMoi());
-		btnThemMoi.addActionListener(e -> xuLyThemMoi());
-		btnLuu.addActionListener(e -> xuLyLuu());
-		btnCapNhat.addActionListener(e -> xuLyCapNhat());
-		btnTim.addActionListener(e -> xuLyTimKiem());
+		btnLamMoi.addActionListener(e -> refesh());
+		btnThemMoi.addActionListener(e -> {
+			try {
+				processAddCustomer();
+			} catch (RemoteException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		});
+		btnCapNhat.addActionListener(e -> {
+			try {
+				processUpdate();
+			} catch (RemoteException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		});
+		btnTim.addActionListener(e -> processSearch());
 		table.addMouseListener(this);
 
 	}
@@ -78,67 +84,48 @@ public class PanelCustomer extends JPanel implements MouseListener {
 		JPanel pnlInput = new JPanel();
 		pnlInput.setLayout(new GridLayout(3, 2, 40, 0));
 		pnlInput.add(createPanel(lblMaKH = new JLabel("Mã khách hàng"), txtMaKH = new JTextField()));
-		pnlInput.add(createPanel(lblTenKhachHang = new JLabel("Tên khách hàng"), txtTenKhachHang = new JTextField()));
-		pnlInput.add(createPanel(lblGioiTinh = new JLabel("Giới tính"), cbGioiTinh = new JComboBox<>()));
-		cbGioiTinh.addItem("Nam");
-		cbGioiTinh.addItem("Nữ");
-		pnlInput.add(createPanel(lblSoDienThoai = new JLabel("Số điện thoại"), txtSoDienThoai = new JTextField()));
-		pnlInput.add(createPanel(lblEmail = new JLabel("Email"), txtEmail = new JTextField()));
-		pnlInput.add(createPanel(lblGhiChu = new JLabel("Ghi chú"), txaGhiChu = new JTextArea()));
+		pnlInput.add(createPanel(lblTenKhachHang = new JLabel("Tên khách hàng"), txtCustomerName = new JTextField()));
+		pnlInput.add(createPanel(lblSoDienThoai = new JLabel("Số điện thoại"), txtPhoneNumber = new JTextField()));
+		pnlInput.add(createPanel(lblGhiChu = new JLabel("Ghi chú"), txaNote = new JTextArea()));
 
 		// Nút chức năng
 		JPanel pnlChucNang = new JPanel();
 		pnlChucNang.setBackground(Color.decode("#cccccc"));
 		pnlChucNang.setLayout(new GridLayout(3, 2));
 		pnlChucNang.add(btnThemMoi = new ButtonGradient("Thêm mới", img_add));
-		pnlChucNang.add(btnLuu = new ButtonGradient("Lưu", img_add));
 		pnlChucNang.add(btnCapNhat = new ButtonGradient("Cập nhật", img_edit));
 		pnlChucNang.add(btnLamMoi = new ButtonGradient("Làm mới", img_reset));
 
-		Box bThongTinKM = Box.createHorizontalBox();
-		bThongTinKM.add(pnlInput);
-		bThongTinKM.add(Box.createHorizontalStrut(50));
-		bThongTinKM.add(pnlChucNang);
-		JPanel pnlThongTinKM = new JPanel();
-		pnlThongTinKM.setBorder(BorderFactory.createTitledBorder("Thông tin khách hàng"));
-		pnlThongTinKM.add(bThongTinKM);
+		Box bThongTinKH = Box.createHorizontalBox();
+		bThongTinKH.add(pnlInput);
+		bThongTinKH.add(Box.createHorizontalStrut(50));
+		bThongTinKH.add(pnlChucNang);
+		JPanel pnlThongTinKH = new JPanel();
+		pnlThongTinKH.setBorder(BorderFactory.createTitledBorder("Thông tin khách hàng"));
+		pnlThongTinKH.add(bThongTinKH);
 
 		// Set kích thước
 		Dimension dimension = new Dimension(250, 30);
 		txtMaKH.setPreferredSize(dimension);
-		txtTenKhachHang.setPreferredSize(dimension);
-		cbGioiTinh.setPreferredSize(dimension);
-		txtSoDienThoai.setPreferredSize(dimension);
-		txtEmail.setPreferredSize(dimension);
-		txaGhiChu.setPreferredSize(dimension);
+		txtCustomerName.setPreferredSize(dimension);
+		txtPhoneNumber.setPreferredSize(dimension);
+		txaNote.setPreferredSize(dimension);
 		lblTenKhachHang.setPreferredSize(lblTenKhachHang.getPreferredSize());
 		lblSoDienThoai.setPreferredSize(lblTenKhachHang.getPreferredSize());
-		lblGioiTinh.setPreferredSize(lblTenKhachHang.getPreferredSize());
-		lblEmail.setPreferredSize(lblTenKhachHang.getPreferredSize());
 		lblGhiChu.setPreferredSize(lblTenKhachHang.getPreferredSize());
 		int preferredWidth = 300;
 		Dimension preferredSize = new Dimension(preferredWidth, pnlChucNang.getPreferredSize().height);
 		pnlChucNang.setPreferredSize(preferredSize);
 
 		// Tìm
-		JPanel pnlLoc = new JPanel();
-		pnlLoc.add(lblLoaiKhachHang = new JLabel("Loại khách hàng:"));
-		pnlLoc.add(Box.createHorizontalStrut(10));
-		pnlLoc.add(cbLoaiKhachHang = new JComboBox<>());
-		cbLoaiKhachHang.setPreferredSize(dimension);
-		cbLoaiKhachHang.addItem("Tất cả");
-		cbLoaiKhachHang.addItem("Thường");
-		cbLoaiKhachHang.addItem("VIP");
 		JPanel pnlTim = new JPanel();
 		pnlTim.add(lblSoDienThoai = new JLabel("Số điện thoại"));
 		pnlTim.add(txtTimSDT = new JTextField(15));
 		pnlTim.add(btnTim = new ButtonGradient("Tìm kiếm", img_search));
-		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, pnlLoc, pnlTim);
-		splitPane.setDividerLocation(600);
 
 		// Table
 		JPanel pnlTable = new JPanel();
-		pnlTable.setBorder(BorderFactory.createTitledBorder(line,"Danh sách khuyến mãi"));
+		pnlTable.setBorder(BorderFactory.createTitledBorder(line, "Danh sách khách hàng "));
 		table = new JTable();
 		tableModel = new DefaultTableModel(headers, 0);
 		table.setModel(tableModel);
@@ -149,7 +136,7 @@ public class PanelCustomer extends JPanel implements MouseListener {
 				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		scroll.setViewportView(table);
 		pnlTable.setLayout(new BorderLayout());
-		pnlTable.add(splitPane, BorderLayout.NORTH);
+		pnlTable.add(pnlTim, BorderLayout.NORTH);
 		pnlTable.add(scroll, BorderLayout.CENTER);
 
 		// Set editable
@@ -157,14 +144,13 @@ public class PanelCustomer extends JPanel implements MouseListener {
 
 		// Add vào giao diện
 		setLayout(new BorderLayout());
-		add(pnlThongTinKM, BorderLayout.NORTH);
+		add(pnlThongTinKH, BorderLayout.NORTH);
 		add(pnlTable, BorderLayout.CENTER);
-		pnlLoc.setBackground(Color.decode("#D0BAFB"));
 		pnlTim.setBackground(Color.decode("#D0BAFB"));
 		pnlTable.setBackground(Color.decode("#D0BAFB"));
 		pnlInput.setBackground(Color.decode("#D0BAFB"));
 		pnlChucNang.setBackground(Color.decode("#D0BAFB"));
-		pnlThongTinKM.setBackground(Color.decode("#D0BAFB"));
+		pnlThongTinKH.setBackground(Color.decode("#D0BAFB"));
 	}
 
 	private JPanel createPanel(JLabel label, JComponent component) {
@@ -177,73 +163,55 @@ public class PanelCustomer extends JPanel implements MouseListener {
 		return panel;
 	}
 
-	private void xuLyLuu() {
-//		int luaChon = JOptionPane.showConfirmDialog(null, "Có chắc chắn thêm thông tin khách hàng không?", "Chú ý",
-//				JOptionPane.YES_NO_OPTION);
-//		if (luaChon == JOptionPane.YES_OPTION) {
-//			if (validData() == true) {
-//				String tenKH = txtTenKhachHang.getText();
-//				String gioiTinh = cbGioiTinh.getSelectedItem().toString();
-//				if (gioiTinh == "Nam") {
-//					gt = false;
-//				} else
-//					gt = true;
-//				String sdt = txtSoDienThoai.getText();
-//				String email = txtEmail.getText();
-//				String ghichu = txaGhiChu.getText();
-//				String maKH = txtMaKH.getText();
-//				String[] row = { maKH, tenKH, "Thường", gioiTinh, sdt, email, "0", ghichu };
-//				if (daoKH.add(new entity.Customer(maKH, tenKH, false, gt, sdt, email, 0, ghichu))) {
-//					tableModel.addRow(row);
-//					JOptionPane.showMessageDialog(null, "Thêm mới khách hàng thành công!");
-//				} else
-//					JOptionPane.showMessageDialog(null, "Thêm mới khách hàng không thành công!");
-//
-//			}
-//
-//		} else {
-//			JOptionPane.showMessageDialog(null, "Vui lòng nhập đầy đủ thông tin khách hàng!");
-//		}
-	}
-
-	// Xoa toan bo dich vu
-	private void xoaToanBoKH() {
-		DefaultTableModel dm = (DefaultTableModel) table.getModel();
-		while (dm.getRowCount() > 0) {
-			dm.removeRow(0);
+	private void processAddCustomer() throws RemoteException {
+		if (!validateInput()) {
+			JOptionPane.showMessageDialog(null, "Vui lòng nhập đầy đủ thông tin khách hàng!");
+			return;
 		}
 
+		String customerID = Integer.toString(daoCustomer.getAllCustomers().size() + 1);
+		String customerName = txtCustomerName.getText();
+		String phoneNumber = txtPhoneNumber.getText();
+		String note = txaNote.getText();
+
+		Customer customer = new Customer(Integer.parseInt(customerID), customerName, phoneNumber, note);
+
+		int confirmation = JOptionPane.showConfirmDialog(null, "Bạn có chắc chắn muốn thêm mới khách hàng không ?",
+				"Chú ý!", JOptionPane.YES_OPTION);
+		if (confirmation == JOptionPane.YES_OPTION && daoCustomer.addCustomer(customer)) {
+			Object[] rowData = { customerID, customerName, phoneNumber, note };
+			tableModel.addRow(rowData);
+			JOptionPane.showMessageDialog(null, "Thêm mới khách hàng thành công!");
+		} else {
+			JOptionPane.showMessageDialog(null, "Thêm mới khách hàng không thành công!");
+		}
+	}
+
+	// Xoa toan bo khach hang
+	private void clearTable() {
+		DefaultTableModel tableModel = (DefaultTableModel) table.getModel();
+		tableModel.setRowCount(0);
 	}
 
 	// Lay toan bo khach hang
-	private void layDanhSachKH(ArrayList<entity.Customer> dsKH) {
-//		xoaToanBoKH();
-//		for (entity.Customer kh : dsKH) {
-////			String gioiTinh = kh.getGioiTinh() ? "Nữ" : "Nam";
-//			String loaikh = kh.getLoaiKH() ? "VIP" : "Thường";
-//			tableModel.addRow(new Object[] { kh.getMaKH(), kh.getTenKH(), loaikh, gioiTinh, kh.getSdthoai(),
-//					kh.getEmail(), kh.getSoGioDaThue(), kh.getGhiChu() });
-//
-//		}
-	}
+	private void getAllCustomers() throws RemoteException {
+		clearTable();
+		listCustomer = daoCustomer.getAllCustomers();
+		listCustomer.forEach(c -> {
+			tableModel.addRow(new Object[] { 
+					c.getId(), 
+					c.getCustomerName(), 
+					c.getPhoneNumber(), 
+					c.getNote() 
+				});
 
-	// Xu ly combobox loai khach hang
-	private void xuLyCBLoaiKH() {
-//		if (cbLoaiKhachHang.getSelectedItem().toString().equalsIgnoreCase("VIP")) {
-//			dsKH = DAOKhachHang.getKhachHangCB(true);
-//		} else if (cbLoaiKhachHang.getSelectedItem().toString().equalsIgnoreCase("Thường")) {
-//			dsKH = DAOKhachHang.getKhachHangCB(false);
-//		} else
-//			dsKH = daoKH.getAll();
-//		layDanhSachKH(dsKH);
+		});
 	}
 
 	// Kiem tra rang buoc
-	private boolean validData() {
-		String tenKH = txtTenKhachHang.getText();
-		String sdt = txtSoDienThoai.getText();
-		String email = txtEmail.getText();
-
+	private boolean validateInput() {
+		String tenKH = txtCustomerName.getText();
+		String sdt = txtPhoneNumber.getText();
 		Pattern p = Pattern.compile("[a-zA-Z]+");
 		if (!(p.matcher(tenKH).find())) {
 			JOptionPane.showMessageDialog(null, "Tên khách hàng không hợp lệ!");
@@ -256,98 +224,70 @@ public class PanelCustomer extends JPanel implements MouseListener {
 			return false;
 		}
 
-		Pattern p2 = Pattern.compile("^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@"
-				+ "[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$");
-		if (!(p2.matcher(email).find())) {
-			JOptionPane.showMessageDialog(null, "Email không được để trống!");
-			return false;
-		}
-
 		return true;
 	}
 
-	// Xu ly them moi
-	private void xuLyThemMoi() {
-//		String maKH = maKhachHang.formatMa(dsKH.get(dsKH.size() - 1).getMaKH());
-//		txtMaKH.setText(maKH);
+	private void processUpdate() throws RemoteException {
+		int selectedRow = table.getSelectedRow();
+		if (selectedRow == -1) {
+			JOptionPane.showMessageDialog(null, "Vui lòng chọn khách hàng cần cập nhật!");
+			return;
+		}
+
+		if (!validateInput()) {
+			JOptionPane.showMessageDialog(null, "Vui lòng kiểm tra lại thông tin đã nhập!");
+			return;
+		}
+
+		int confirmation = JOptionPane.showConfirmDialog(null, "Có chắc chắn muốn cập nhật thông tin khách hàng không?",
+				"Chú ý", JOptionPane.YES_NO_OPTION);
+		if (confirmation != JOptionPane.YES_OPTION) {
+			return;
+		}
+
+		String customerName = txtCustomerName.getText();
+		String phoneNumber = txtPhoneNumber.getText();
+		String note = txaNote.getText();
+
+		table.setValueAt(customerName, selectedRow, 1);
+		table.setValueAt(phoneNumber, selectedRow, 2);
+		table.setValueAt(note, selectedRow, 3);
+
+		String customerId = table.getValueAt(selectedRow, 0).toString();
+		Customer customer = new Customer(Integer.parseInt(customerId), customerName, phoneNumber, note);
+		daoCustomer.updateCustomer(customer);
+
+		JOptionPane.showMessageDialog(null, "Cập nhật thông tin khách hàng thành công!");
 	}
 
-	private Object xuLyCapNhat() {
-		// TODO Auto-generated method stub
-//		int luaChon = JOptionPane.showConfirmDialog(null, "Có chắc chắn muốn cập nhật thông tin khách hàng không?",
-//				"Chú ý", JOptionPane.YES_NO_OPTION);
-//		if (luaChon == JOptionPane.YES_OPTION) {
-//			if (validData() == true) {
-//				String tenKH = txtTenKhachHang.getText();
-//				String gioiTinh = cbGioiTinh.getSelectedItem().toString();
-//				String sdt = txtSoDienThoai.getText();
-//				String email = txtEmail.getText();
-//				String ghichu = txaGhiChu.getText();
-//				int viTri = table.getSelectedRow();
-//				String maKH = (String) table.getValueAt(table.getSelectedRow(), 0);
-//				tableModel.removeRow(viTri);
-//				String[] row = { maKH, tenKH, "Thường", gioiTinh, sdt, email, "2", ghichu };
-//				daoKH.updateKhachHang(new entity.Customer(maKH, tenKH, false, false, sdt, email, 0, ghichu));
-//				tableModel.insertRow(viTri, row);
-//				JOptionPane.showMessageDialog(null, "Cập nhật khách hàng thành công!");
-//			} else {
-//				JOptionPane.showMessageDialog(null, "Vui lòng nhập đầy đủ thông tin khách hàng!");
-//			}
-//		}
-		return null;
-
-	}
-
-	private Object xuLyLamMoi() {
+	private void refesh() {
 		// TODO Auto-generated method stub
 		txtMaKH.setText("");
-		txtTenKhachHang.setText("");
-		cbGioiTinh.setSelectedIndex(-1);
-		txtSoDienThoai.setText("");
-		txtEmail.setText("");
-		txaGhiChu.setText("");
-		return null;
+		txtCustomerName.setText("");
+		txtPhoneNumber.setText("");
+		txaNote.setText("");
 	}
 
-	private Object xuLyTraCuu() {
-		// TODO Auto-generated method stub
-		txtTimTenKH.setText("");
-		txtTimSDT.setText("");
-		return null;
-	}
-
-	private void xuLyTimKiem() {
-		String SDT = txtTimSDT.getText();
-		int n = 0;
+	private boolean processSearch() {
+		String phoneNumber = txtTimSDT.getText();
 		for (int i = 0; i < table.getRowCount(); i++) {
-			if (table.getValueAt(i, 4).toString().equalsIgnoreCase(SDT)) {
+			if (table.getValueAt(i, 2).equals(phoneNumber)) {
 				table.setRowSelectionInterval(i, i);
-				n = 1;
+				JOptionPane.showMessageDialog(null, "Khách hàng được tìm thấy!");
+				return true;
 			}
 		}
-		if (n == 1) {
-			JOptionPane.showMessageDialog(null, "Tên khách hàng được tìm thấy!");
-		} else {
-			JOptionPane.showMessageDialog(null, "Tên khách hàng không tồn tại!");
-		}
-	}
-
-	// Xu ly mouseclick
-	@Override
-	public void mouseClicked(MouseEvent e) {
-		// TODO Auto-generated method stub
-
+		JOptionPane.showMessageDialog(null, "Không tìm thấy số điện thoại!");
+		return false;
 	}
 
 	@Override
 	public void mousePressed(MouseEvent e) {
 		int row = table.getSelectedRow();
 		txtMaKH.setText(table.getValueAt(row, 0).toString());
-		txtTenKhachHang.setText(table.getValueAt(row, 1).toString());
-		cbGioiTinh.setSelectedItem(table.getValueAt(row, 3).toString());
-		txtSoDienThoai.setText(table.getValueAt(row, 4).toString());
-		txtEmail.setText(table.getValueAt(row, 5).toString());
-		txaGhiChu.setText(table.getValueAt(row, 7).toString());
+		txtCustomerName.setText(table.getValueAt(row, 1).toString());
+		txtPhoneNumber.setText(table.getValueAt(row, 2).toString());
+		txaNote.setText(table.getValueAt(row, 3).toString());
 	}
 
 	@Override
@@ -364,6 +304,12 @@ public class PanelCustomer extends JPanel implements MouseListener {
 
 	@Override
 	public void mouseExited(MouseEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void mouseClicked(MouseEvent e) {
 		// TODO Auto-generated method stub
 
 	}

@@ -1,6 +1,7 @@
 package dao;
 
 import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.List;
 
 import entity.Customer;
@@ -9,10 +10,10 @@ import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.Persistence;
 import service.CustomerService;
 
-public class CustomerDAO implements CustomerService {
+public class CustomerDAO extends UnicastRemoteObject implements CustomerService {
 	private EntityManager em;
 
-	public CustomerDAO() {
+	public CustomerDAO() throws RemoteException{
 		em = Persistence.createEntityManagerFactory("KaraokeOneDB").createEntityManager();
 	}
 
