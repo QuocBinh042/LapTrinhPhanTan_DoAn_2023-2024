@@ -25,7 +25,7 @@ public interface BillService extends Remote{
 
 	public List<Bill> getBillsByDay(int day) throws RemoteException;
 
-	public List<Bill> getBillsByMonth(int month) throws RemoteException;
+	public List<Bill> getBillsByMonth(LocalDate month) throws RemoteException;
 
 	public List<Bill> getBillsByYear(int year) throws RemoteException;
 

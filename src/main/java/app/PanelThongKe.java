@@ -347,7 +347,11 @@ public class PanelThongKe extends JPanel {
 		Double tienPhong = 5.5; //= daoCTHD.ThongKeTienPhongTheoNgay(date) * 0.9;
 		Double tienDV = 6.0; //= daoCTDVPhong.ThongKeTienDVTheoNgay(date) * 0.9;
 		loadData(daoBill.getBillsByDate(date), tableTG, tableModelTG);
-		addKetQua(5.6, slhd, tienPhong, tienDV);
+		if (dt != null) {
+	        addKetQua(dt, slhd, tienPhong, tienDV);
+	    } else {
+	        addKetQua(0.0, slhd, tienPhong, tienDV); 
+	    }
 		cardLayout.show(pnlCardTG, "TablePanel");
 	}
 
@@ -357,8 +361,12 @@ public class PanelThongKe extends JPanel {
 		long slhd = daoBill.calculateNumberOfBillsByMonth(date);
 		Double tienPhong = 5.5; // = daoCTHD.ThongKeTienPhongTheoThang(date) * 0.9;
 		Double tienDV = 6.0; //daoCTDVPhong.ThongKeTienDVTheoThang(date) * 0.9;
-		loadData(daoBill.getBillsByMonth(), tableTG, tableModelTG);
-		addKetQua(dt, slhd, tienPhong, tienDV);
+		loadData(daoBill.getBillsByMonth(date), tableTG, tableModelTG);
+		if (dt != null) {
+	        addKetQua(dt, slhd, tienPhong, tienDV);
+	    } else {
+	        addKetQua(0.0, slhd, tienPhong, tienDV); 
+	    }
 		pnlCardTG.add(createChartPanel(createDatasetMonth(date), "Ngày"), "ChartPanel");
 		cardLayout.show(pnlCardTG, "ChartPanel");
 	}
