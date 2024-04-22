@@ -7,9 +7,13 @@ import java.awt.Font;
 import java.awt.GridLayout;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.rmi.RemoteException;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -30,7 +34,7 @@ import javax.swing.table.DefaultTableModel;
 import com.toedter.calendar.JDateChooser;
 
 import dao.BillDAO;
-
+import entity.Bill;
 
 public class PanelBill extends JPanel {
 	private JTable table;
@@ -41,12 +45,13 @@ public class PanelBill extends JPanel {
 	private JTextField txtTimNV, txtTimKH, txtTimMaHD;
 	private ButtonGradient btnTim, btnLamMoi, btnXemCT;
 	private JDateChooser dateBDTim, dateKTTim;
-//	private BillDAO daoBill = new BillDAO();
+	private BillDAO daoBill = new BillDAO();
 	private JComboBox<String> cbLuaChon;
-	private SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+	private DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 	private DecimalFormat formatter = new DecimalFormat("###,###,### VNĐ");
+	private List<Bill> listBill;
 
-	public PanelBill() {
+	public PanelBill() throws RemoteException {
 		try {
 			UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
 		} catch (ClassNotFoundException e1) {
@@ -65,26 +70,48 @@ public class PanelBill extends JPanel {
 
 		createUI();
 		// Load data
-//		loadData(daoHD.getAllDataHD());
+		getAllBills(listBill);
 
 		// Sự kiện
-		btnTim.addActionListener(e -> xuLyTimKiem());
+		btnTim.addActionListener(e -> {
+			try {
+				processSearch();
+			} catch (RemoteException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		});
 		btnLamMoi.addActionListener(e -> xuLyLamMoi());
 		cbLuaChon.addActionListener(e -> xuLyCBLuaChon());
-//		dateBDTim.getDateEditor().addPropertyChangeListener(new PropertyChangeListener() {
-//			@Override
-//			public void propertyChange(PropertyChangeEvent evt) {
-//				if (dateKTTim.getDate() != null)
-//					loadData(daoHD.layDSHoaDonTrongKhoangThoiGian(dateBDTim.getDate(), dateKTTim.getDate()));
-//			}
-//		});
-//		dateKTTim.getDateEditor().addPropertyChangeListener(new PropertyChangeListener() {
-//			@Override
-//			public void propertyChange(PropertyChangeEvent evt) {
-//				if (dateBDTim.getDate() != null)
-//					loadData(daoHD.layDSHoaDonTrongKhoangThoiGian(dateBDTim.getDate(), dateKTTim.getDate()));
-//			}
-//		});
+		dateBDTim.getDateEditor().addPropertyChangeListener(new PropertyChangeListener() {
+			@Override
+			public void propertyChange(PropertyChangeEvent evt) {
+				if (dateKTTim.getDate() != null)
+					try {
+						getAllBills(daoBill.getBillsByTimeFrame(
+								dateBDTim.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate(),
+								dateKTTim.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate()));
+					} catch (RemoteException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+			}
+		});
+		dateKTTim.getDateEditor().addPropertyChangeListener(new PropertyChangeListener() {
+			@Override
+			public void propertyChange(PropertyChangeEvent evt) {
+				if (dateBDTim.getDate() != null) {
+					try {
+						getAllBills(daoBill.getBillsByTimeFrame(
+								dateBDTim.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate(),
+								dateKTTim.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate()));
+					} catch (RemoteException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			}
+		});
 		btnXemCT.addActionListener(e -> xuLyXemCT());
 
 	}
@@ -143,14 +170,14 @@ public class PanelBill extends JPanel {
 		pnlNorth.add(bMaHD);
 		pnlNorth.add(bTenNV);
 		pnlNorth.add(bSDT);
-		pnlNorth.setBorder(BorderFactory.createTitledBorder("Tra cứu"));		
+		pnlNorth.setBorder(BorderFactory.createTitledBorder("Tra cứu"));
 		bb.add(pnlNorth);
 		bb.add(pnlChucNang);
 		dateBDTim.setBackground(Color.decode("#D0BAFB"));
 		dateKTTim.setBackground(Color.decode("#D0BAFB"));
 		pnlNorth.setBackground(Color.decode("#D0BAFB"));
 		pnlChucNang.setBackground(Color.decode("#D0BAFB"));
-		
+
 		cbLuaChon.setPreferredSize(dimension);
 		dateBDTim.setPreferredSize(dimension);
 		dateKTTim.setPreferredSize(dimension);
@@ -177,53 +204,51 @@ public class PanelBill extends JPanel {
 		this.setLayout(new BorderLayout());
 		this.add(bb, BorderLayout.NORTH);
 		this.add(scroll, BorderLayout.CENTER);
-		
+
 	}
 
-	public void loadData(ArrayList<entity.Bill> dsHD) {
+	public void getAllBills(List<Bill> listBills) throws RemoteException {
 		// delete all
-		deleteAllDataJtable();
+		clearTable();
 		// Load data
-//		for (entity.Bill hd : dsHD) {
-//			tableModel.addRow(new Object[] { hd.getMaHoaDon(), dateFormat.format(hd.getNgayThanhToan()),
-//					hd.getGioThanhToan().toString(), hd.getKh().getTenKH(), hd.getNv().getTenNV(),
-//					hd.getKh().getSdthoai(), formatter.format(hd.getTongHoaDon()) });
-//		}
+		listBills = daoBill.getAllBills();
+		for (Bill bill : listBills) {
+			tableModel.addRow(new Object[] { bill.getId(), dateFormat.format(bill.getPaymentDate()),
+					bill.getPaymentTime().toString(), bill.getCustomer().getCustomerName(),
+					bill.getEmployee().getName(), bill.getCustomer().getPhoneNumber(),
+					formatter.format(bill.getTotal()) });
+		}
 
 	}
 
-	private void deleteAllDataJtable() {
-		DefaultTableModel dm = (DefaultTableModel) table.getModel();
-		while (dm.getRowCount() > 0) {
-			dm.removeRow(0);
-		}
+	private void clearTable() {
+		DefaultTableModel tableModel = (DefaultTableModel) table.getModel();
+		tableModel.setRowCount(0);
 	}
 
 	private Object xuLyCBLuaChon() {
 		// TODO Auto-generated method stub
-//		if (cbLuaChon.getSelectedItem().equals("Tất cả"))
-//			loadData(daoHD.getAllDataHD());
-//		else if (cbLuaChon.getSelectedItem().equals("Ngày hiện tại"))
-//			loadData(daoHD.layDSHoaDonTrongNgay());
-//		else if (cbLuaChon.getSelectedItem().equals("Tháng hiện tại"))
-//			loadData(daoHD.layDSHoaDonTheoThang());
-//		else if (cbLuaChon.getSelectedItem().equals("Năm hiện tại"))
-//			loadData(daoHD.layDSHoaDonTheoNam());
+		if (cbLuaChon.getSelectedItem().equals("Tất cả"))
+			getAllBills(daoBill.getAllBills());
+		else if (cbLuaChon.getSelectedItem().equals("Ngày hiện tại"))
+			getAllBills(daoBill.layDSHoaDonTrongNgay());
+		else if (cbLuaChon.getSelectedItem().equals("Tháng hiện tại"))
+			getAllBills(daoBill.layDSHoaDonTheoThang());
+		else if (cbLuaChon.getSelectedItem().equals("Năm hiện tại"))
+			getAllBills(daoBill.layDSHoaDonTheoNam());
 		return null;
 	}
 
-	private Object xuLyTimKiem() {
+	private void processSearch() throws RemoteException {
 		// TODO Auto-generated method stub
-		deleteAllDataJtable();
-//		ArrayList<entity.Bill> ds = daoHD.timKiemHoaDon(txtTimMaHD.getText(), txtTimNV.getText(), txtTimKH.getText());
-//		// Load data
-//		if (ds.size() > 0) {
-//			loadData(ds);
-//			JOptionPane.showMessageDialog(null, "Đã tìm thấy hoá đơn!");
-//		} else
-//			JOptionPane.showMessageDialog(null, "Không tìm thấy hoá đơn!");
-
-		return null;
+		clearTable();
+		List<Bill> ds = daoBill.searchBills(txtTimMaHD.getText(), txtTimNV.getText(), txtTimKH.getText());
+		// Load data
+		if (ds.size() > 0) {
+			getAllBills(ds);
+			JOptionPane.showMessageDialog(null, "Đã tìm thấy hoá đơn!");
+		} else
+			JOptionPane.showMessageDialog(null, "Không tìm thấy hoá đơn!");
 	}
 
 	private Object xuLyXemCT() {
