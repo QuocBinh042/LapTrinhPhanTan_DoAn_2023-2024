@@ -15,31 +15,31 @@ VALUES (5, N'105', N'VIP', 25, 250000, N'Còn trống', N'')
 INSERT INTO [dbo].[Room] ([RoomID], [RoomName], [TypeRoom], [Capacity], [Price], [RoomStatus], [Describe])
 VALUES (6, N'201', N'VIP', 25, 250000, N'Còn trống', N'')
 INSERT INTO [dbo].[Room] ([RoomID], [RoomName], [TypeRoom], [Capacity], [Price], [RoomStatus], [Describe])
-VALUES (7, N'202', N'Thường', 15, 150000, N'Đang thuê', N'')
+VALUES (7, N'202', N'Thường', 15, 150000, N'Còn trống', N'')
 INSERT INTO [dbo].[Room] ([RoomID], [RoomName], [TypeRoom], [Capacity], [Price], [RoomStatus], [Describe])
-VALUES (8, N'203', N'Thường', 15, 150000, N'Đang thuê', N'')
+VALUES (8, N'203', N'Thường', 15, 150000, N'Còn trống', N'')
 INSERT INTO [dbo].[Room] ([RoomID], [RoomName], [TypeRoom], [Capacity], [Price], [RoomStatus], [Describe])
 VALUES (9, N'204', N'Thường', 15, 150000, N'Đã xóa', N'')
 INSERT INTO [dbo].[Room] ([RoomID], [RoomName], [TypeRoom], [Capacity], [Price], [RoomStatus], [Describe])
-VALUES (10, N'205', N'VIP', 25, 250000, N'Đang thuê', N'')
+VALUES (10, N'205', N'VIP', 25, 250000, N'Còn trống', N'')
 INSERT INTO [dbo].[Room] ([RoomID], [RoomName], [TypeRoom], [Capacity], [Price], [RoomStatus], [Describe])
-VALUES (11, N'301', N'VIP', 25, 250000, N'Đã đặt trước', N'')
+VALUES (11, N'301', N'VIP', 25, 250000, N'Còn trống', N'')
 INSERT INTO [dbo].[Room] ([RoomID], [RoomName], [TypeRoom], [Capacity], [Price], [RoomStatus], [Describe])
-VALUES (12, N'302', N'Thường', 15, 150000, N'Đã đặt trước', N'')
+VALUES (12, N'302', N'Thường', 15, 150000, N'Còn trống', N'')
 INSERT INTO [dbo].[Room] ([RoomID], [RoomName], [TypeRoom], [Capacity], [Price], [RoomStatus], [Describe])
 VALUES (13, N'303', N'Thường', 15, 150000, N'Đã xóa', N'')
 INSERT INTO [dbo].[Room] ([RoomID], [RoomName], [TypeRoom], [Capacity], [Price], [RoomStatus], [Describe])
-VALUES (14, N'304', N'Thường', 15, 150000, N'Đang thuê', N'')
+VALUES (14, N'304', N'Thường', 15, 150000, N'Còn trống', N'')
 INSERT INTO [dbo].[Room] ([RoomID], [RoomName], [TypeRoom], [Capacity], [Price], [RoomStatus], [Describe])
-VALUES (15, N'305', N'VIP', 25, 250000, N'Đang thuê', N'')
+VALUES (15, N'305', N'VIP', 25, 250000, N'Còn trống', N'')
 INSERT INTO [dbo].[Room] ([RoomID], [RoomName], [TypeRoom], [Capacity], [Price], [RoomStatus], [Describe])
 VALUES (16, N'401', N'VIP', 25, 250000, N'Đã xóa', N'')
 INSERT INTO [dbo].[Room] ([RoomID], [RoomName], [TypeRoom], [Capacity], [Price], [RoomStatus], [Describe])
-VALUES (17, N'402', N'VIP', 25, 250000, N'Đã đặt trước', N'')
+VALUES (17, N'402', N'VIP', 25, 250000, N'Còn trống', N'')
 INSERT INTO [dbo].[Room] ([RoomID], [RoomName], [TypeRoom], [Capacity], [Price], [RoomStatus], [Describe])
 VALUES (18, N'403', N'VIP', 25, 250000, N'Còn trống', N'')
 INSERT INTO [dbo].[Room] ([RoomID], [RoomName], [TypeRoom], [Capacity], [Price], [RoomStatus], [Describe])
-VALUES (19, N'404', N'VIP', 25, 250000, N'Đang thuê', N'')
+VALUES (19, N'404', N'VIP', 25, 250000, N'Còn trống', N'')
 INSERT INTO [dbo].[Room] ([RoomID], [RoomName], [TypeRoom], [Capacity], [Price], [RoomStatus], [Describe])
 VALUES (20, N'405', N'VIP', 25, 250000, N'Còn trống', N'')
 go
@@ -183,36 +183,36 @@ go
 
 SET IDENTITY_INSERT [dbo].[Booking] ON
 go
-INSERT INTO [dbo].[Booking] ([BookingID], [EmployeeID], [CustomerID], [RoomID], [BookingTime], [CheckinTime], [BookingStatus], [Describe])
-VALUES  (1, 1, 1, 1, '2023-09-01 10:00:00', '2023-09-01 12:00:00', 0, N'Business meeting')
-INSERT INTO [dbo].[Booking] ([BookingID], [EmployeeID], [CustomerID], [RoomID], [BookingTime], [CheckinTime], [BookingStatus], [Describe]) 
-VALUES  (2, 2, 2, 2, '2023-09-02 14:00:00', '2023-09-03 12:00:00', 0, N'Family vacation')
-INSERT INTO [dbo].[Booking] ([BookingID], [EmployeeID], [CustomerID], [RoomID], [BookingTime], [CheckinTime], [BookingStatus], [Describe]) 
-VALUES  (3, 3, 3, 3, '2023-10-03 16:30:00', '2023-10-03 20:30:00', 0, N'Wedding party')
-INSERT INTO [dbo].[Booking] ([BookingID], [EmployeeID], [CustomerID], [RoomID], [BookingTime], [CheckinTime], [BookingStatus], [Describe])
-VALUES  (4, 4, 4, 4, '2023-10-04 18:00:00', '2023-10-05 12:00:00', 0, N'Weekend getaway')
-INSERT INTO [dbo].[Booking] ([BookingID], [EmployeeID], [CustomerID], [RoomID], [BookingTime], [CheckinTime], [BookingStatus], [Describe]) 
-VALUES  (5, 5, 5, 5, '2023-10-05 09:00:00', '2023-10-05 17:00:00', 0, N'')
-INSERT INTO [dbo].[Booking] ([BookingID], [EmployeeID], [CustomerID], [RoomID], [BookingTime], [CheckinTime], [BookingStatus], [Describe]) 
-VALUES  (6, 6, 6, 6, '2023-10-06 20:00:00', '2023-10-07 10:00:00', 0, N'Birthday party')
-INSERT INTO [dbo].[Booking] ([BookingID], [EmployeeID], [CustomerID], [RoomID], [BookingTime], [CheckinTime], [BookingStatus], [Describe]) 
-VALUES  (7, 7, 7, 7, '2023-10-07 10:00:00', '2023-10-07 12:00:00', 0, N'Business meeting')
-INSERT INTO [dbo].[Booking] ([BookingID], [EmployeeID], [CustomerID], [RoomID], [BookingTime], [CheckinTime], [BookingStatus], [Describe]) 
-VALUES  (8, 8, 8, 8, '2023-11-01 14:00:00', '2023-11-02 12:00:00', 0, N'Family vacation')
-INSERT INTO [dbo].[Booking] ([BookingID], [EmployeeID], [CustomerID], [RoomID], [BookingTime], [CheckinTime], [BookingStatus], [Describe]) 
-VALUES  (9, 9, 9, 9, '2023-11-02 08:00:00', '2023-11-02 18:00:00', 0, N'Học sinh')
-INSERT INTO [dbo].[Booking] ([BookingID], [EmployeeID], [CustomerID], [RoomID], [BookingTime], [CheckinTime], [BookingStatus], [Describe]) 
-VALUES  (10, 10, 1, 1, '2023-11-02 15:00', '2023-11-03 12:00',1, N'');
-INSERT INTO [dbo].[Booking] ([BookingID], [EmployeeID], [CustomerID], [RoomID], [BookingTime], [CheckinTime], [BookingStatus], [Describe]) 
-VALUES  (11, 11, 12, 2, '2023-11-04 11:00', '2023-11-04 20:00', 1, N'Nghỉ ngơi và thư giãn');
-INSERT INTO [dbo].[Booking] ([BookingID], [EmployeeID], [CustomerID], [RoomID], [BookingTime], [CheckinTime], [BookingStatus], [Describe]) 
-VALUES  (12, 2, 17, 11, '2023-11-10 08:00', '2023-11-10 18:00', 1, N'Họp công ty');
-INSERT INTO [dbo].[Booking] ([BookingID], [EmployeeID], [CustomerID], [RoomID], [BookingTime], [CheckinTime], [BookingStatus], [Describe]) 
-VALUES  (13, 5, 12, 12, '2023-11-10 14:00', '2023-11-12 10:00', 1, N'Tiệc gia đình');
-INSERT INTO [dbo].[Booking] ([BookingID], [EmployeeID], [CustomerID], [RoomID], [BookingTime], [CheckinTime], [BookingStatus], [Describe]) 
-VALUES  (14, 10, 15, 17, '2023-11-15 09:00', '2023-11-16 16:00', 1, N'Sinh viên');
-INSERT INTO [dbo].[Booking] ([BookingID], [EmployeeID], [CustomerID], [RoomID], [BookingTime], [CheckinTime], [BookingStatus], [Describe]) 
-VALUES  (15, 8, 10,20, '2023-11-20 12:00', '2023-11-21 10:00', 1, N'Tiệc gia đình');
+INSERT INTO [dbo].[Booking] ([BookingID], [EmployeeID], [CustomerID], [RoomID], [BookingDateTime], [BookingStatus], [Describe])
+VALUES  (1, 1, 1, 1, '2023-09-01 10:00:00', 0, N'Business meeting')
+INSERT INTO [dbo].[Booking] ([BookingID], [EmployeeID], [CustomerID], [RoomID], [BookingDateTime], [BookingStatus], [Describe])
+VALUES  (2, 2, 2, 2, '2023-09-02 14:00:00',0, N'Family vacation')
+INSERT INTO [dbo].[Booking] ([BookingID], [EmployeeID], [CustomerID], [RoomID], [BookingDateTime], [BookingStatus], [Describe])
+VALUES  (3, 3, 3, 3, '2023-10-03 16:30:00',  0, N'Wedding party')
+INSERT INTO [dbo].[Booking] ([BookingID], [EmployeeID], [CustomerID], [RoomID], [BookingDateTime], [BookingStatus], [Describe])
+VALUES  (4, 4, 4, 4, '2023-10-04 18:00:00',  0, N'Weekend getaway')
+INSERT INTO [dbo].[Booking] ([BookingID], [EmployeeID], [CustomerID], [RoomID], [BookingDateTime], [BookingStatus], [Describe])
+VALUES  (5, 5, 5, 5, '2023-10-05 09:00:00', 0, N'')
+INSERT INTO [dbo].[Booking] ([BookingID], [EmployeeID], [CustomerID], [RoomID], [BookingDateTime], [BookingStatus], [Describe])
+VALUES  (6, 6, 6, 6, '2023-10-06 20:00:00', 0, N'Birthday party')
+INSERT INTO [dbo].[Booking] ([BookingID], [EmployeeID], [CustomerID], [RoomID], [BookingDateTime], [BookingStatus], [Describe])
+VALUES  (7, 7, 7, 7, '2023-10-07 10:00:00', 0, N'Business meeting')
+INSERT INTO [dbo].[Booking] ([BookingID], [EmployeeID], [CustomerID], [RoomID], [BookingDateTime], [BookingStatus], [Describe])
+VALUES  (8, 8, 8, 8, '2023-11-01 14:00:00', 0, N'Family vacation')
+INSERT INTO [dbo].[Booking] ([BookingID], [EmployeeID], [CustomerID], [RoomID], [BookingDateTime], [BookingStatus], [Describe])
+VALUES  (9, 9, 9, 9, '2023-11-02 08:00:00', 0, N'Học sinh')
+INSERT INTO [dbo].[Booking] ([BookingID], [EmployeeID], [CustomerID], [RoomID], [BookingDateTime], [BookingStatus], [Describe])
+VALUES  (10, 10, 1, 1, '2023-11-02 15:00',1, N'');
+INSERT INTO [dbo].[Booking] ([BookingID], [EmployeeID], [CustomerID], [RoomID], [BookingDateTime], [BookingStatus], [Describe])
+VALUES  (11, 11, 12, 2, '2023-11-04 11:00', 1, N'Nghỉ ngơi và thư giãn');
+INSERT INTO [dbo].[Booking] ([BookingID], [EmployeeID], [CustomerID], [RoomID], [BookingDateTime], [BookingStatus], [Describe])
+VALUES  (12, 2, 17, 11, '2023-11-10 08:00', 0, N'Họp công ty');
+INSERT INTO [dbo].[Booking] ([BookingID], [EmployeeID], [CustomerID], [RoomID], [BookingDateTime], [BookingStatus], [Describe])
+VALUES  (13, 5, 12, 12, '2023-11-10 14:00', 0, N'Tiệc gia đình');
+INSERT INTO [dbo].[Booking] ([BookingID], [EmployeeID], [CustomerID], [RoomID], [BookingDateTime], [BookingStatus], [Describe])
+VALUES  (14, 10, 15, 17, '2023-11-15 09:00', 0, N'Sinh viên');
+INSERT INTO [dbo].[Booking] ([BookingID], [EmployeeID], [CustomerID], [RoomID], [BookingDateTime], [BookingStatus], [Describe])
+VALUES  (15, 8, 10,20, '2023-11-20 12:00', 0, N'Tiệc gia đình');
 go
 SET IDENTITY_INSERT [dbo].[Booking] OFF
 go
@@ -255,35 +255,35 @@ go
 SET IDENTITY_INSERT [dbo].[Bill] OFF
 SET IDENTITY_INSERT [dbo].[DetailBill] ON
 go
-INSERT INTO [dbo].[DetailBill] ([DetailBillID], [RoomID], [BillID], [CheckinDate], [CheckoutDate])  
+INSERT INTO [dbo].[DetailBill] ([DetailBillID], [RoomID], [BillID], [Checkin], [Checkout])  
 VALUES  (1,1, 1, '2022-09-01 12:00:00', '2022-09-01 15:30:00')
-INSERT INTO [dbo].[DetailBill] ([DetailBillID],[RoomID], [BillID], [CheckinDate], [CheckoutDate]) 
+INSERT INTO [dbo].[DetailBill] ([DetailBillID],[RoomID], [BillID], [Checkin], [Checkout]) 
 VALUES  (2,2, 2, '2023-09-03 12:00:00', '2023-09-02 15:45:00')
-INSERT INTO [dbo].[DetailBill] ([DetailBillID],[RoomID], [BillID], [CheckinDate], [CheckoutDate]) 
+INSERT INTO [dbo].[DetailBill] ([DetailBillID],[RoomID], [BillID], [Checkin], [Checkout]) 
 VALUES  (3,3, 3, '2023-10-03 20:30:00', '2023-10-03 21:30:00')
-INSERT INTO [dbo].[DetailBill] ([DetailBillID],[RoomID], [BillID], [CheckinDate], [CheckoutDate]) 
+INSERT INTO [dbo].[DetailBill] ([DetailBillID],[RoomID], [BillID], [Checkin], [Checkout]) 
 VALUES  (4,4, 4, '2023-10-05 12:00:00', '2023-10-04 13:30:00')
-INSERT INTO [dbo].[DetailBill] ([DetailBillID],[RoomID], [BillID], [CheckinDate], [CheckoutDate]) 
+INSERT INTO [dbo].[DetailBill] ([DetailBillID],[RoomID], [BillID], [Checkin], [Checkout]) 
 VALUES  (5,5, 5, '2023-10-05 17:00:00', '2023-10-05 13:30:00')
-INSERT INTO [dbo].[DetailBill] ([DetailBillID],[RoomID], [BillID], [CheckinDate], [CheckoutDate]) 
+INSERT INTO [dbo].[DetailBill] ([DetailBillID],[RoomID], [BillID], [Checkin], [Checkout]) 
 VALUES  (6,6, 6, '2023-10-07 10:00:00', '2023-10-06 15:30:00')
-INSERT INTO [dbo].[DetailBill] ([DetailBillID],[RoomID], [BillID], [CheckinDate], [CheckoutDate]) 
+INSERT INTO [dbo].[DetailBill] ([DetailBillID],[RoomID], [BillID], [Checkin], [Checkout]) 
 VALUES  (7,7, 7, '2023-10-07 12:00:00', '2023-10-07 13:30:00')
-INSERT INTO [dbo].[DetailBill] ([DetailBillID],[RoomID], [BillID], [CheckinDate], [CheckoutDate]) 
+INSERT INTO [dbo].[DetailBill] ([DetailBillID],[RoomID], [BillID], [Checkin], [Checkout]) 
 VALUES  (8,8, 8, '2023-11-02 12:00:00', '2023-11-01 13:30:00')
-INSERT INTO [dbo].[DetailBill] ([DetailBillID],[RoomID], [BillID], [CheckinDate], [CheckoutDate]) 
+INSERT INTO [dbo].[DetailBill] ([DetailBillID],[RoomID], [BillID], [Checkin], [Checkout]) 
 VALUES  (9,9, 9, '2023-11-02 18:00:00', '2023-11-02 19:30:00')
-INSERT INTO [dbo].[DetailBill] ([DetailBillID],[RoomID], [BillID], [CheckinDate], [CheckoutDate]) 
+INSERT INTO [dbo].[DetailBill] ([DetailBillID],[RoomID], [BillID], [Checkin], [Checkout]) 
 VALUES  (10,1, 10, '2023-11-03 12:00', '2023-11-02 16:00');
-INSERT INTO [dbo].[DetailBill] ([DetailBillID],[RoomID], [BillID], [CheckinDate], [CheckoutDate]) 
+INSERT INTO [dbo].[DetailBill] ([DetailBillID],[RoomID], [BillID], [Checkin], [Checkout]) 
 VALUES  (11,2, 11, '2023-11-04 20:00', '2023-11-04 21:00');
-INSERT INTO [dbo].[DetailBill] ([DetailBillID],[RoomID], [BillID], [CheckinDate], [CheckoutDate]) 
+INSERT INTO [dbo].[DetailBill] ([DetailBillID],[RoomID], [BillID], [Checkin], [Checkout]) 
 VALUES  (12,11, 12, '2023-11-10 18:00', '2023-11-10 19:30');
-INSERT INTO [dbo].[DetailBill] ([DetailBillID],[RoomID], [BillID], [CheckinDate], [CheckoutDate]) 
+INSERT INTO [dbo].[DetailBill] ([DetailBillID],[RoomID], [BillID], [Checkin], [Checkout]) 
 VALUES  (13,12, 13, '2023-11-12 10:00', '2023-11-12 15:00');
-INSERT INTO [dbo].[DetailBill] ([DetailBillID],[RoomID], [BillID], [CheckinDate], [CheckoutDate]) 
+INSERT INTO [dbo].[DetailBill] ([DetailBillID],[RoomID], [BillID], [Checkin], [Checkout]) 
 VALUES  (14,17, 14, '2023-11-16 16:00', '2023-11-16 18:30');
-INSERT INTO [dbo].[DetailBill] ([DetailBillID],[RoomID], [BillID], [CheckinDate], [CheckoutDate]) 
+INSERT INTO [dbo].[DetailBill] ([DetailBillID],[RoomID], [BillID], [Checkin], [Checkout]) 
 VALUES  (15,20, 15, '2023-11-21 10:00', '2023-11-21 12:30');
 go
 SET IDENTITY_INSERT [dbo].[DetailBill] OFF
