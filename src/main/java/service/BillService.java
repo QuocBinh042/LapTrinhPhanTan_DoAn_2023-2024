@@ -1,14 +1,14 @@
 package service;
 
-import java.util.Date;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.time.LocalDate;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.List;
 import java.util.Map;
 
 import entity.Bill;
+import entity.DetailBill;
 
 public interface BillService extends Remote{
 	public boolean createBill(Bill bill) throws RemoteException;
@@ -16,28 +16,30 @@ public interface BillService extends Remote{
 	public List<Bill> getAllBills() throws RemoteException;
 
 	public boolean updateBillAfterPayment(Bill bill) throws RemoteException;
+	
+	public List<Bill> getBillsByDetailBillID(int id) throws RemoteException;
 
-	public ArrayList<Bill> getBillsByTimeFrame(LocalDate startDate, LocalDate endDate) throws RemoteException;
+	public List<Bill> getBillsByTimeFrame(LocalDate startDate, LocalDate endDate) throws RemoteException;
 
-	public ArrayList<Bill> getBillsByDate(LocalDate date) throws RemoteException;
+	public List<Bill> getBillsByDate(LocalDate date) throws RemoteException;
 
-	public ArrayList<Bill> getBillsByDay(int day) throws RemoteException;
+	public List<Bill> getBillsByDay(int day) throws RemoteException;
 
-	public ArrayList<Bill> getBillsByMonth(int month) throws RemoteException;
+	public List<Bill> getBillsByMonth(int month) throws RemoteException;
 
-	public ArrayList<Bill> getBillsByYear(int year) throws RemoteException;
+	public List<Bill> getBillsByYear(int year) throws RemoteException;
 
-	public ArrayList<Bill> getBillsWithinDay() throws RemoteException;
+	public List<Bill> getBillsWithinDay() throws RemoteException;
 
-	public ArrayList<Bill> getBillsByMonth() throws RemoteException;
+	public List<Bill> getBillsByMonth() throws RemoteException;
 
-	public ArrayList<Bill> getBillsByYear() throws RemoteException;
+	public List<Bill> getBillsByYear() throws RemoteException;
 
-	public ArrayList<Bill> searchBills(String billID, String employeeName, String phoneNumber) throws RemoteException;
+	public List<Bill> searchBills(String billID, String employeeName, String phoneNumber) throws RemoteException;
 
-	public ArrayList<Bill> searchBillsByBillID(String id) throws RemoteException;
+	public List<Bill> searchBillsByBillID(String id) throws RemoteException;
 
-	public ArrayList<Bill> getBillsForStatistics(LocalDate date,LocalDate date2) throws RemoteException;
+	public List<Bill> getBillsForStatistics(LocalDate date,LocalDate date2) throws RemoteException;
 
 	public Double calculateDailyRevenue(LocalDate date) throws RemoteException;
 

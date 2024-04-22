@@ -5,7 +5,8 @@ import java.rmi.server.UnicastRemoteObject;
 import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
+import java.time.temporal.TemporalAdjusters;
+import java.util.List;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -13,6 +14,7 @@ import java.util.stream.Collectors;
 
 import entity.Bill;
 import entity.Customer;
+import entity.DetailBill;
 import entity.Employee;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
@@ -20,20 +22,21 @@ import jakarta.persistence.Persistence;
 import jakarta.persistence.Tuple;
 import service.BillService;
 
-public class BillDAO extends UnicastRemoteObject implements BillService{
+public class BillDAO extends UnicastRemoteObject implements BillService {
 	public static final DecimalFormat FORMATMONEY = new DecimalFormat("###,###,### VNĐ");
 	private EntityManager em;
-	
-	public BillDAO() throws RemoteException{
+
+	public BillDAO() throws RemoteException {
 		em = Persistence.createEntityManagerFactory("KaraokeOneDB").createEntityManager();
 	}
-	
-	public static void main(String[] args) throws RemoteException{
+
+	public static void main(String[] args) throws RemoteException {
 		BillDAO billDAO = new BillDAO();
-		Employee employee = new Employee(0, "Tung", LocalDate.of(2003, 10, 10), true, "1234567890", "058203001143", "", "", true);
+		Employee employee = new Employee(0, "Tung", LocalDate.of(2003, 10, 10), true, "1234567890", "058203001143", "",
+				"", true);
 		Customer customer = new Customer(0, "Tung", "2234567890", "AAAA");
 		Bill bill = new Bill(3, LocalDate.now(), LocalTime.now(), employee, customer, 0.0);
-		
+
 		try {
 			billDAO.createBill(bill);
 //			billDAO.getAllBills().forEach(e -> System.out.println(e));
@@ -58,16 +61,16 @@ public class BillDAO extends UnicastRemoteObject implements BillService{
 			e.printStackTrace();
 		}
 	}
-	
+
 	@Override
 	public boolean createBill(Bill bill) throws RemoteException {
 		// TODO Auto-generated method stub
 		EntityTransaction tx = em.getTransaction();
 		try {
 			tx.begin();
-			if(em.find(Bill.class, bill.getId()) != null)
+			if (em.find(Bill.class, bill.getId()) != null)
 				return false;
-	
+
 			em.merge(bill);
 			tx.commit();
 			return true;
@@ -76,7 +79,7 @@ public class BillDAO extends UnicastRemoteObject implements BillService{
 			e.printStackTrace();
 			tx.rollback();
 		}
-		
+
 		return false;
 	}
 
@@ -92,9 +95,9 @@ public class BillDAO extends UnicastRemoteObject implements BillService{
 		EntityTransaction tx = em.getTransaction();
 		try {
 			tx.begin();
-			if(em.find(Bill.class, bill.getId()) == null)
+			if (em.find(Bill.class, bill.getId()) == null)
 				return false;
-			
+
 			em.merge(bill);
 			tx.commit();
 			return true;
@@ -107,70 +110,74 @@ public class BillDAO extends UnicastRemoteObject implements BillService{
 	}
 
 	@Override
-	public ArrayList<Bill> getBillsByYear(int year) throws RemoteException {
+	public List<Bill> getBillsByYear(int year) throws RemoteException {
 		// TODO Auto-generated method stub
-		return (ArrayList<Bill>) em.createQuery("select b from Bill b where YEAR(b.paymentDate)  = :year", Bill.class)
-								   .setParameter("year", year)
-								   .getResultList();
+		return em.createQuery("select b from Bill b where YEAR(b.paymentDate)  = :year", Bill.class)
+				.setParameter("year", year).getResultList();
 	}
 
 	@Override
-	public ArrayList<Bill> getBillsWithinDay() throws RemoteException {
+	public List<Bill> getBillsWithinDay() throws RemoteException {
 		// TODO Auto-generated method stub
-		return (ArrayList<Bill>) em.createQuery("select b from Bill b where b.paymentDate >= :currentDay and b.paymentDate < :tomorrow",
-									Bill.class)
-								   .setParameter("currentDay", LocalDate.now().atStartOfDay().toLocalDate())
-								   .setParameter("tomorrow", LocalDate.now().atStartOfDay().toLocalDate().plusDays(1))
-								   .getResultList();
+		return em
+				.createQuery("select b from Bill b where b.paymentDate >= :currentDay and b.paymentDate < :tomorrow",
+						Bill.class)
+				.setParameter("currentDay", LocalDate.now().atStartOfDay().toLocalDate())
+				.setParameter("tomorrow", LocalDate.now().atStartOfDay().toLocalDate().plusDays(1)).getResultList();
 	}
 
 	@Override
-	public ArrayList<Bill> getBillsByMonth() throws RemoteException {
-		// TODO Auto-generated method stub
-		
-		return null;
+	public List<Bill> getBillsByMonth() throws RemoteException {
+		LocalDate firstDayOfMonth = LocalDate.now().withDayOfMonth(1);
+		LocalDate lastDayOfMonth = LocalDate.now().with(TemporalAdjusters.lastDayOfMonth());
+
+		return em.createQuery(
+				"SELECT b FROM Bill b WHERE b.paymentDate >= :firstDayOfMonth AND b.paymentDate <= :lastDayOfMonth",
+				Bill.class).setParameter("firstDayOfMonth", firstDayOfMonth)
+				.setParameter("lastDayOfMonth", lastDayOfMonth).getResultList();
 	}
 
 	@Override
-	public ArrayList<Bill> getBillsByYear() throws RemoteException {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	public List<Bill> getBillsByYear() throws RemoteException {
+		LocalDate firstDayOfYear = LocalDate.now().withDayOfYear(1);
+		LocalDate lastDayOfYear = LocalDate.now().with(TemporalAdjusters.lastDayOfYear());
 
-	@Override
-	public ArrayList<Bill> searchBills(String billID, String employeeName, String phoneNumber) throws RemoteException {
-		// TODO Auto-generated method stub
-		return (ArrayList<Bill>) em.createQuery("select b from Bill b "
-				+ "where b.id like :id or b.employee.name like :name or b.customer.phoneNumber = :phoneNumber", Bill.class)
-				.setParameter("id", billID)
-				.setParameter("name", employeeName)
-				.setParameter("phoneNumber", phoneNumber)
+		return em.createQuery(
+				"SELECT b FROM Bill b WHERE b.paymentDate >= :firstDayOfYear AND b.paymentDate <= :lastDayOfYear",
+				Bill.class).setParameter("firstDayOfYear", firstDayOfYear).setParameter("lastDayOfYear", lastDayOfYear)
 				.getResultList();
 	}
 
 	@Override
-	public ArrayList<Bill> searchBillsByBillID(String id) throws RemoteException {
+	public List<Bill> searchBills(String billID, String employeeName, String phoneNumber) throws RemoteException {
 		// TODO Auto-generated method stub
-		return (ArrayList<Bill>) em.createQuery("select b from Bill b where b.id = :id", Bill.class)
-				   .setParameter("id", id)
-				   .getResultList();
+		return em
+				.createQuery("select b from Bill b "
+						+ "where b.id like :id or b.employee.name like :name or b.customer.phoneNumber = :phoneNumber",
+						Bill.class)
+				.setParameter("id", billID).setParameter("name", employeeName).setParameter("phoneNumber", phoneNumber)
+				.getResultList();
 	}
 
+	@Override
+	public List<Bill> searchBillsByBillID(String id) throws RemoteException {
+		// TODO Auto-generated method stub
+		return em.createQuery("select b from Bill b where b.id = :id", Bill.class).setParameter("id", id)
+				.getResultList();
+	}
 
 	@Override
 	public Double calculateYearlyRevenue(String year) throws RemoteException {
 		// TODO Auto-generated method stub
-		return em.createQuery("select SUM(b.total) as revenue from Bill b where YEAR(b.paymentDate) = :year", Double.class)
-				 .setParameter("year", year)
-				 .getSingleResult();
+		return em.createQuery("select SUM(b.total) as revenue from Bill b where YEAR(b.paymentDate) = :year",
+				Double.class).setParameter("year", year).getSingleResult();
 	}
 
 	@Override
 	public long calculateNumberOfBillsByYear(String year) throws RemoteException {
 		// TODO Auto-generated method stub
 		return em.createQuery("select count(b) from Bill b where YEAR(b.paymentDate) = :year", Long.class)
-				 .setParameter("year", year)
-				 .getSingleResult();
+				.setParameter("year", year).getSingleResult();
 	}
 
 	@Override
@@ -180,121 +187,103 @@ public class BillDAO extends UnicastRemoteObject implements BillService{
 	}
 
 	@Override
-	public ArrayList<Bill> getBillsByTimeFrame(LocalDate startDate, LocalDate endDate) throws RemoteException {
+	public List<Bill> getBillsByTimeFrame(LocalDate startDate, LocalDate endDate) throws RemoteException {
 		// TODO Auto-generated method stub
-		
-		return (ArrayList<Bill>) em.createQuery("select b from Bill b "
-				+ "where b.paymentDate >= :startDate and b.paymentDate <= :endDate", Bill.class)
-				 .setParameter("startDate", startDate)
-				 .setParameter("endDate", endDate)
-				 .getResultList();
+		return em
+				.createQuery(
+						"select b from Bill b " + "where b.paymentDate >= :startDate and b.paymentDate <= :endDate",
+						Bill.class)
+				.setParameter("startDate", startDate).setParameter("endDate", endDate).getResultList();
 	}
 
 	@Override
-	public ArrayList<Bill> getBillsByDate(LocalDate date) throws RemoteException {
+	public List<Bill> getBillsByDate(LocalDate date) throws RemoteException {
 		// TODO Auto-generated method stub
-		return (ArrayList<Bill>) em.createQuery("select b from Bill b where b.paymentDate = :date", Bill.class)
-				 .setParameter("date", date)
-				 .getResultList();
+		return em.createQuery("select b from Bill b where b.paymentDate = :date", Bill.class).setParameter("date", date)
+				.getResultList();
 	}
 
 	@Override
-	public ArrayList<Bill> getBillsByDay(int day) throws RemoteException {
+	public List<Bill> getBillsByDay(int day) throws RemoteException {
 		// TODO Auto-generated method stub
-		
-		return (ArrayList<Bill>) em.createQuery("select b from Bill b where function('DAY', b.paymentDate) = :day", Bill.class)
-				 .setParameter("day", day)
-				 .getResultList();
+
+		return em.createQuery("select b from Bill b where function('DAY', b.paymentDate) = :day", Bill.class)
+				.setParameter("day", day).getResultList();
 	}
 
 	@Override
-	public ArrayList<Bill> getBillsByMonth(int month) throws RemoteException {
+	public List<Bill> getBillsByMonth(int month) throws RemoteException {
 		// TODO Auto-generated method stub
-		return (ArrayList<Bill>) em.createQuery("select b from Bill b where function('MONTH', b.paymentDate) = :month", Bill.class)
-				 .setParameter("month", month)
-				 .getResultList();
+		return em.createQuery("select b from Bill b where function('MONTH', b.paymentDate) = :month", Bill.class)
+				.setParameter("month", month).getResultList();
 	}
 
 	@Override
 	public Double calculateTotalRevenue(LocalDate startDate, LocalDate endDate) throws RemoteException {
 		// TODO Auto-generated method stub
-		return em.createQuery("select SUM(b.total) from Bill b "
-				+ "where b.paymentDate >= :startDate and b.paymentDate <= :endDate", Double.class)
-				 .setParameter("startDate", startDate)
-				 .setParameter("endDate", endDate)
-				 .getSingleResult();
+		return em
+				.createQuery("select SUM(b.total) from Bill b "
+						+ "where b.paymentDate >= :startDate and b.paymentDate <= :endDate", Double.class)
+				.setParameter("startDate", startDate).setParameter("endDate", endDate).getSingleResult();
 	}
 
 	@Override
 	public long calculateNumberOfBills(LocalDate startDate, LocalDate endDate) throws RemoteException {
 		// TODO Auto-generated method stub
-		return em.createQuery("select COUNT(b) from Bill b "
-				+ "where b.paymentDate >= :startDate and b.paymentDate <= :endDate", Long.class)
-				 .setParameter("startDate", startDate)
-				 .setParameter("endDate", endDate)
-				 .getSingleResult();
+		return em
+				.createQuery("select COUNT(b) from Bill b "
+						+ "where b.paymentDate >= :startDate and b.paymentDate <= :endDate", Long.class)
+				.setParameter("startDate", startDate).setParameter("endDate", endDate).getSingleResult();
 	}
 
 	@Override
 	public long calculateNumberOfBillsByDate(LocalDate date) throws RemoteException {
 		// TODO Auto-generated method stub
-		return em.createQuery("select COUNT(b) from Bill b "
-				+ "where b.paymentDate = :date", Long.class)
-				 .setParameter("date", date)
-				 .getSingleResult();
+		return em.createQuery("select COUNT(b) from Bill b " + "where b.paymentDate = :date", Long.class)
+				.setParameter("date", date).getSingleResult();
 	}
 
 	@Override
 	public long calculateNumberOfBillsByMonth(String month) throws RemoteException {
 		// TODO Auto-generated method stub
-		return em.createQuery("select COUNT(b) from Bill b "
-				+ "where MONTH(b.paymentDate) = :month", Long.class)
-				 .setParameter("month", month)
-				 .getSingleResult();
+		return em.createQuery("select COUNT(b) from Bill b " + "where MONTH(b.paymentDate) = :month", Long.class)
+				.setParameter("month", month).getSingleResult();
 	}
 
 	@Override
 	public Map<String, Double> getMonthlyRevenueInRange(LocalDate startDate, LocalDate endDate) throws RemoteException {
 		// TODO Auto-generated method stub
-		return em.createQuery("SELECT MONTH(b.paymentDate) as month, SUM(b.total) as total "
-				+ "FROM Bill b "
-				+ "WHERE b.paymentDate >= :startDate and b.paymentDate <= :endDate "
-				+ "GROUP BY MONTH(b.paymentDate)", Tuple.class)
-				 .setParameter("startDate", startDate)
-				 .setParameter("endDate", endDate)
-				 .getResultList()
-				 .stream()
-				 .collect(Collectors.toMap(t -> String.valueOf(t.get("month")), t -> ((Number) t.get("total")).doubleValue()));
+		return em
+				.createQuery("SELECT MONTH(b.paymentDate) as month, SUM(b.total) as total " + "FROM Bill b "
+						+ "WHERE b.paymentDate >= :startDate and b.paymentDate <= :endDate "
+						+ "GROUP BY MONTH(b.paymentDate)", Tuple.class)
+				.setParameter("startDate", startDate).setParameter("endDate", endDate).getResultList().stream()
+				.collect(Collectors.toMap(t -> String.valueOf(t.get("month")),
+						t -> ((Number) t.get("total")).doubleValue()));
 	}
 
 	@Override
 	public Map<Integer, Double> getYearlyRevenueTotal(int year) throws RemoteException {
 		// TODO Auto-generated method stub
-		return em.createQuery("SELECT YEAR(b.paymentDate) as year, SUM(b.total) as total "
-				+ "FROM Bill b "
-				+ "WHERE YEAR(b.paymentDate) = :year "
-				+ "GROUP BY YEAR(b.paymentDate)", Tuple.class)
-		  .setParameter("year", year)
-		  .getResultList()
-		  .stream()
-		  .collect(Collectors.toMap(t -> ((Number) t.get("year")).intValue(), t -> ((Number) t.get("total")).doubleValue()));
+		return em
+				.createQuery("SELECT YEAR(b.paymentDate) as year, SUM(b.total) as total " + "FROM Bill b "
+						+ "WHERE YEAR(b.paymentDate) = :year " + "GROUP BY YEAR(b.paymentDate)", Tuple.class)
+				.setParameter("year", year).getResultList().stream().collect(Collectors
+						.toMap(t -> ((Number) t.get("year")).intValue(), t -> ((Number) t.get("total")).doubleValue()));
 	}
 
 	@Override
 	public Map<Integer, Double> getDailyRevenueForMonth(LocalDate month) throws RemoteException {
 		// TODO Auto-generated method stub
-		return em.createQuery("SELECT DAY(b.paymentDate) as day, SUM(b.total) as total "
-				+ "FROM Bill b "
-				+ "WHERE MONTH(b.paymentDate) = :month "
-				+ "GROUP BY DAY(b.paymentDate)", Tuple.class)
-				 .setParameter("month", month.getMonthValue())
-				 .getResultList()
-				 .stream()
-				 .collect(Collectors.toMap(t -> ((Number) t.get("day")).intValue(), t -> ((Number) t.get("total")).doubleValue()));
+		return em
+				.createQuery("SELECT DAY(b.paymentDate) as day, SUM(b.total) as total " + "FROM Bill b "
+						+ "WHERE MONTH(b.paymentDate) = :month " + "GROUP BY DAY(b.paymentDate)", Tuple.class)
+				.setParameter("month", month.getMonthValue()).getResultList().stream().collect(Collectors
+						.toMap(t -> ((Number) t.get("day")).intValue(), t -> ((Number) t.get("total")).doubleValue()));
 	}
 
 	@Override
-	public ArrayList<Bill> getBillsForStatistics(LocalDate date, LocalDate date2) throws RemoteException {
+	public List<Bill> getBillsForStatistics(LocalDate date, LocalDate date2) throws RemoteException {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -309,6 +298,13 @@ public class BillDAO extends UnicastRemoteObject implements BillService{
 	public Double calculateMonthlyRevenue(LocalDate date) throws RemoteException {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public List<Bill> getBillsByDetailBillID(int id) throws RemoteException {
+		// TODO Auto-generated method stub
+		return em.createQuery("select b from Bill b join b.detailBills db where db.id = :id", Bill.class)
+				.setParameter("id", id).getResultList();
 	}
 
 }

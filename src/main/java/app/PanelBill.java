@@ -82,7 +82,14 @@ public class PanelBill extends JPanel {
 			}
 		});
 		btnLamMoi.addActionListener(e -> xuLyLamMoi());
-		cbLuaChon.addActionListener(e -> xuLyCBLuaChon());
+		cbLuaChon.addActionListener(e -> {
+			try {
+				xuLyCBLuaChon();
+			} catch (RemoteException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		});
 		dateBDTim.getDateEditor().addPropertyChangeListener(new PropertyChangeListener() {
 			@Override
 			public void propertyChange(PropertyChangeEvent evt) {
@@ -226,16 +233,16 @@ public class PanelBill extends JPanel {
 		tableModel.setRowCount(0);
 	}
 
-	private Object xuLyCBLuaChon() {
+	private Object xuLyCBLuaChon() throws RemoteException {
 		// TODO Auto-generated method stub
 		if (cbLuaChon.getSelectedItem().equals("Tất cả"))
 			getAllBills(daoBill.getAllBills());
 		else if (cbLuaChon.getSelectedItem().equals("Ngày hiện tại"))
-			getAllBills(daoBill.layDSHoaDonTrongNgay());
+			getAllBills(daoBill.getBillsWithinDay());
 		else if (cbLuaChon.getSelectedItem().equals("Tháng hiện tại"))
-			getAllBills(daoBill.layDSHoaDonTheoThang());
+			getAllBills(daoBill.getBillsByMonth());
 		else if (cbLuaChon.getSelectedItem().equals("Năm hiện tại"))
-			getAllBills(daoBill.layDSHoaDonTheoNam());
+			getAllBills(daoBill.getBillsByYear());
 		return null;
 	}
 
