@@ -16,8 +16,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.rmi.RemoteException;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -76,10 +80,10 @@ public class PanelThongKe extends JPanel {
 	private JDateChooser dateBD, dateKT, dcChonNgay, dcChonThang;
 	private JComboBox<String> cbLuaChonTG;
 	private JComboBox<Integer> cbChonNam;
-//	private BillDAO daoBill = new BillDAO();
+	private BillDAO daoBill = new BillDAO();
 	private ArrayList<entity.Bill> dsHD = new ArrayList<>();
 	private DecimalFormat formatter = new DecimalFormat("###,###,### VNĐ");
-	private SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+	private DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 	private CategoryDataset dataset;
 	private JScrollPane scroll;
 	private CardLayout cardLayout;
@@ -90,7 +94,7 @@ public class PanelThongKe extends JPanel {
 	private JPanel pnlMenu = new JPanel(new FlowLayout(FlowLayout.LEFT));
 	private JPanel pnlCardMain;
 
-	public PanelThongKe() {
+	public PanelThongKe() throws RemoteException {
 		pnlMenu.setBackground(Color.decode("#D0BAFB"));
 		pnlMenu.add(btnThoiGian = new JButton("Thống kê doanh thu"));
 		pnlMenu.add(btnKhachHang = new JButton("Thống kê khách hàng"));
@@ -134,10 +138,8 @@ public class PanelThongKe extends JPanel {
 
 	}
 
-	private JPanel createUIThongKeTheoTG() {
+	private JPanel createUIThongKeTheoTG() throws RemoteException {
 		// Khai báo
-		Icon img_search = new ImageIcon("src/main/java/img/search.png");
-		Icon img_check = new ImageIcon("src/main/java/img/check.png");
 		Icon img_dollar = new ImageIcon("src/main/java/img/dollar.png");
 		lblDolar = new JLabel(img_dollar);
 		Border line = BorderFactory.createLineBorder(Color.BLACK);
@@ -151,15 +153,15 @@ public class PanelThongKe extends JPanel {
 		cbLuaChonTG.addItem("Năm");
 		pnlLuaChonTK.add(pnlThoiGian);
 		pnlThoiGian.add(dcChonNgay = new JDateChooser());
-//		pnlThoiGian.add(dcChonNgay = new JDateChooser((Date) null, "dd/MM/yyyy"));
+		pnlThoiGian.add(dcChonNgay = new JDateChooser((Date) null, "dd/MM/yyyy"));
 		dcChonNgay.setDate(new Date());
 		dcChonThang = new JDateChooser((Date) null, "MM/yyyy");
 		dcChonThang.setDate(new Date());
 		cbChonNam = new JComboBox<Integer>();
-//		List<Integer> dsNam = daoHD.layNamLapHoaDon();
-//		for (Integer string : dsNam) {
-//			cbChonNam.addItem(string);
-//		}
+		List<Integer> dsNam = daoBill.getBillYears();
+		for (Integer nam : dsNam) {
+			cbChonNam.addItem(nam);
+		}
 		pnlThoiGian.setBackground(Color.decode("#D0BAFB"));
 		pnlLuaChonTK.setBackground(Color.decode("#D0BAFB"));
 		dcChonNgay.setBackground(Color.decode("#D0BAFB"));
@@ -210,7 +212,12 @@ public class PanelThongKe extends JPanel {
 		dcChonNgay.getDateEditor().addPropertyChangeListener(new PropertyChangeListener() {
 			@Override
 			public void propertyChange(PropertyChangeEvent evt) {
-				thongKeTheoNgay();
+				try {
+					thongKeTheoNgay();
+				} catch (RemoteException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				btnChart.enable(false);
 			}
 		});
@@ -218,15 +225,32 @@ public class PanelThongKe extends JPanel {
 			@Override
 			public void propertyChange(PropertyChangeEvent evt) {
 				btnChart.enable(true);
-				thongKeTheoThang();
+				try {
+					thongKeTheoThang();
+				} catch (RemoteException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		});
 		cbChonNam.addPropertyChangeListener(new PropertyChangeListener() {
 			@Override
 			public void propertyChange(PropertyChangeEvent evt) {
 				btnChart.enable(true);
-				thongKeTheoNam();
-				cbChonNam.addActionListener(e -> thongKeTheoNam());
+				try {
+					thongKeTheoNam();
+				} catch (RemoteException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				cbChonNam.addActionListener(e -> {
+					try {
+						thongKeTheoNam();
+					} catch (RemoteException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				});
 			}
 		});
 		btnTable.addActionListener(new ActionListener() {
@@ -407,49 +431,51 @@ public class PanelThongKe extends JPanel {
 		return pnlChart;
 	}
 
-	private void thongKeTheoNgay() {
-		Date date = dcChonNgay.getDate();
-//		Double dt = daoHD.ThongKeHoaDonTheoNgay(date);
-//		Integer slhd = daoHD.ThongKeSoLuongHoaDonTheoNgay(date);
-//		Double dttb = dt / slhd;
-//		if (slhd == 0)
-//			dttb = 0.0;
-//		loadData(daoHD.layDSHoaDonTheoNgay(date), tableTG, tableModelTG);
-//		addKetQua(dt, slhd, dttb);
-		cardLayout.show(pnlCardTG, "TablePanel");
+	private void thongKeTheoNgay() throws RemoteException {
+		LocalDate date = dcChonNgay.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+		Double dt = daoBill.calculateDailyRevenue(date);
+		long slhd = daoBill.calculateNumberOfBillsByDate(date);
+		Double dttb = 0.0;
+		if (dt != null && slhd != 0) {
+			dttb = dt / slhd;
+			loadData(daoBill.getBillsByDate(date), tableTG, tableModelTG);
+			addKetQua(dt, slhd, dttb);
+			cardLayout.show(pnlCardTG, "TablePanel");
+		}
+
 	}
 
-	private void thongKeTheoThang() {
-		Date date = dcChonThang.getDate();
-//		Double dt = daoHD.ThongKeHoaDonTheoThang(date);
-//		Integer slhd = daoHD.ThongKeSoLuongHoaDonTheoThang(date);
-//		Double dttb = dt / slhd;
-//		if (slhd == 0)
-//			dttb = 0.0;
-//		loadData(daoHD.layDSHoaDonTheoThang(date), tableTG, tableModelTG);
-//		addKetQua(dt, slhd, dttb);
-		pnlCardTG.add(createChartPanel(createDatasetMonth(date), "Ngày"), "ChartPanel");
+	private void thongKeTheoThang() throws RemoteException {
+		LocalDate month = dcChonThang.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+		Double dt = daoBill.calculateMonthlyRevenue(month);
+		long slhd = daoBill.calculateNumberOfBillsByMonth(month);
+		Double dttb = dt / slhd;
+		if (slhd == 0)
+			dttb = 0.0;
+		loadData(daoBill.getBillsByMonth(), tableTG, tableModelTG);
+		addKetQua(dt, slhd, dttb);
+		pnlCardTG.add(createChartPanel(createDatasetMonth(month), "Ngày"), "ChartPanel");
 		cardLayout.show(pnlCardTG, "ChartPanel");
 	}
 
-	private void thongKeTheoNam() {
+	private void thongKeTheoNam() throws RemoteException {
 		String year = cbChonNam.getSelectedItem().toString();
-//		Double dt = daoHD.ThongKeHoaDonTheoNam(year);
-//		Integer slhd = daoHD.ThongKeSoLuongHoaDonTheoNam(year);
-//		Double dttb = dt / slhd;
-//		if (slhd == 0)
-//			dttb = 0.0;
-//		loadData(dsHD = daoHD.layDSHoaDonTheoNam(Integer.valueOf(year)), tableTG, tableModelTG);
-//		addKetQua(dt, slhd, dttb);
+		Double dt = daoBill.calculateYearlyRevenue(year);
+		long slhd = daoBill.calculateNumberOfBillsByYear(year);
+		Double dttb = dt / slhd;
+		if (slhd == 0)
+			dttb = 0.0;
+		loadData(daoBill.getBillsByYear(Integer.valueOf(year)), tableTG, tableModelTG);
+		addKetQua(dt, slhd, dttb);
 		pnlCardTG.add(createChartPanel(createDatasetYear(Integer.valueOf(year)), "Tháng"), "ChartPanel");
 		cardLayout.show(pnlCardTG, "ChartPanel");
 	}
 
-	private CategoryDataset createDatasetMonth(Date date) {
+	private CategoryDataset createDatasetMonth(LocalDate month) throws RemoteException {
 		// TODO Auto-generated method stub
 		DefaultCategoryDataset dataset = new DefaultCategoryDataset();
 		Map<Integer, Double> dsThongKe = new HashMap<>();
-//		dsThongKe = daoHD.ThongKeHoaDonThang(date);
+		dsThongKe = daoBill.getDailyRevenueForMonth(month);
 		for (Entry<Integer, Double> entry : dsThongKe.entrySet()) {
 			Integer day = entry.getKey();
 			Double totalCount = entry.getValue();
@@ -458,38 +484,37 @@ public class PanelThongKe extends JPanel {
 		return dataset;
 	}
 
-	private void addKetQua(Double dt, Integer slhd, Double dttb) {
+	private void addKetQua(Double dt, long slhd, Double dttb) {
 		lblDoanhThuValue.setText(formatter.format(dt));
-		lblSoLuongHDValue.setText(slhd.toString());
-//		lblDoanhThuTBValue.setText(formatter.format(dttb));
+		lblSoLuongHDValue.setText(slhd + "");
+		lblDoanhThuTBValue.setText(formatter.format(dttb));
 	}
 
-	private CategoryDataset createDatasetYear(Integer year) {
+	private CategoryDataset createDatasetYear(Integer year) throws RemoteException {
 		DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-//		Map<Integer, Double> dsThongKe = new HashMap<>();
-//		dsThongKe = daoHD.ThongKeHoaDonNam(year);
-//		for (Entry<Integer, Double> entry : dsThongKe.entrySet()) {
-//			Integer month = entry.getKey();
-//			Double totalCount = entry.getValue();
-//			dataset.addValue(totalCount, "Doanh thu trong tháng", month);
-//		}
+		Map<Integer, Double> dsThongKe = new HashMap<>();
+		dsThongKe = daoBill.getYearlyRevenueTotal(year);
+		for (Entry<Integer, Double> entry : dsThongKe.entrySet()) {
+			Integer month = entry.getKey();
+			Double totalCount = entry.getValue();
+			dataset.addValue(totalCount, "Doanh thu trong tháng", month);
+		}
 		return dataset;
 	}
 
-	private void deleteAllDataJtable(JTable table) {
-		DefaultTableModel dm = (DefaultTableModel) table.getModel();
-		while (dm.getRowCount() > 0) {
-			dm.removeRow(0);
-		}
+	private void clearTable(JTable table) {
+		DefaultTableModel tableModel = (DefaultTableModel) table.getModel();
+		tableModel.setRowCount(0);
 	}
 
-	private void loadData(ArrayList<Bill> ds, JTable table, DefaultTableModel tableModel) {
-//		deleteAllDataJtable(table);
-//		Collections.sort(ds, Comparator.comparing(Bill::getTongHoaDon, Comparator.reverseOrder()));
-//		for (entity.Bill hd : ds) {
-//			tableModel.addRow(new Object[] { hd.getMaHoaDon(), hd.getKh().getTenKH(), hd.getNv().getTenNV(),
-//					dateFormat.format(hd.getNgayThanhToan()), formatter.format(hd.getTongHoaDon()) });
-//		}
+	private void loadData(List<Bill> ds, JTable table, DefaultTableModel tableModel) {
+		clearTable(table);
+		Collections.sort(ds, Comparator.comparing(Bill::getTotal, Comparator.reverseOrder()));
+		for (Bill bill : ds) {
+			tableModel.addRow(
+					new Object[] { bill.getId(), bill.getCustomer().getCustomerName(), bill.getEmployee().getName(),
+							dateFormat.format(bill.getPaymentDate()), formatter.format(bill.getTotal()) });
+		}
 	}
 
 }

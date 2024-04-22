@@ -53,7 +53,7 @@ public interface BillService extends Remote{
 
 	public long calculateNumberOfBillsByDate(LocalDate date) throws RemoteException;
 
-	public long calculateNumberOfBillsByMonth(String month) throws RemoteException;
+	public long calculateNumberOfBillsByMonth(LocalDate month) throws RemoteException;
 
 	public long calculateNumberOfBillsByYear(String year) throws RemoteException;
 

@@ -7,6 +7,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.temporal.TemporalAdjusters;
 import java.util.List;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -131,61 +132,59 @@ public class BillDAO extends UnicastRemoteObject implements BillService {
 
 	@Override
 	public List<Bill> getBillsByMonth() throws RemoteException {
-	    LocalDate firstDayOfMonth = LocalDate.now().withDayOfMonth(1);
-	    LocalDate lastDayOfMonth = LocalDate.now().with(TemporalAdjusters.lastDayOfMonth());
-	    
-	    return em.createQuery("SELECT b FROM Bill b WHERE b.paymentDate >= :firstDayOfMonth AND b.paymentDate <= :lastDayOfMonth", Bill.class)
-	             .setParameter("firstDayOfMonth", firstDayOfMonth)
-	             .setParameter("lastDayOfMonth", lastDayOfMonth)
-	             .getResultList();
+		LocalDate firstDayOfMonth = LocalDate.now().withDayOfMonth(1);
+		LocalDate lastDayOfMonth = LocalDate.now().with(TemporalAdjusters.lastDayOfMonth());
+
+		return em.createQuery(
+				"SELECT b FROM Bill b WHERE b.paymentDate >= :firstDayOfMonth AND b.paymentDate <= :lastDayOfMonth",
+				Bill.class).setParameter("firstDayOfMonth", firstDayOfMonth)
+				.setParameter("lastDayOfMonth", lastDayOfMonth).getResultList();
 	}
 
 	@Override
 	public List<Bill> getBillsByYear() throws RemoteException {
-	    LocalDate firstDayOfYear = LocalDate.now().withDayOfYear(1);
-	    LocalDate lastDayOfYear = LocalDate.now().with(TemporalAdjusters.lastDayOfYear());
-	    
-	    return em.createQuery("SELECT b FROM Bill b WHERE b.paymentDate >= :firstDayOfYear AND b.paymentDate <= :lastDayOfYear", Bill.class)
-	             .setParameter("firstDayOfYear", firstDayOfYear)
-	             .setParameter("lastDayOfYear", lastDayOfYear)
-	             .getResultList();
-	}
+		LocalDate firstDayOfYear = LocalDate.now().withDayOfYear(1);
+		LocalDate lastDayOfYear = LocalDate.now().with(TemporalAdjusters.lastDayOfYear());
 
+		return em.createQuery(
+				"SELECT b FROM Bill b WHERE b.paymentDate >= :firstDayOfYear AND b.paymentDate <= :lastDayOfYear",
+				Bill.class).setParameter("firstDayOfYear", firstDayOfYear).setParameter("lastDayOfYear", lastDayOfYear)
+				.getResultList();
+	}
 
 	@Override
 	public List<Bill> searchBills(String billID, String employeeName, String phoneNumber) throws RemoteException {
-	    StringBuilder queryStringBuilder = new StringBuilder("SELECT b FROM Bill b WHERE ");
-	    Map<String, Object> parameters = new HashMap<>();
+		StringBuilder queryStringBuilder = new StringBuilder("SELECT b FROM Bill b WHERE ");
+		Map<String, Object> parameters = new HashMap<>();
 
-	    if (billID != null && !billID.isEmpty()) {
-	        queryStringBuilder.append("b.id = :id");
-	        parameters.put("id", Integer.parseInt(billID));
-	    }
-	    
-	    if (employeeName != null && !employeeName.isEmpty()) {
-	        if (parameters.size() > 0) {
-	            queryStringBuilder.append(" AND ");
-	        }
-	        queryStringBuilder.append("b.employee.name LIKE :name");
-	        parameters.put("name", "%" + employeeName + "%");
-	    }
-	    
-	    if (phoneNumber != null && !phoneNumber.isEmpty()) {
-	        if (parameters.size() > 0) {
-	            queryStringBuilder.append(" AND ");
-	        }
-	        queryStringBuilder.append("b.customer.phoneNumber = :phoneNumber");
-	        parameters.put("phoneNumber", phoneNumber);
-	    }
+		if (billID != null && !billID.isEmpty()) {
+			queryStringBuilder.append("b.id = :id");
+			parameters.put("id", Integer.parseInt(billID));
+		}
 
-	    TypedQuery<Bill> query = em.createQuery(queryStringBuilder.toString(), Bill.class);
-	    for (Map.Entry<String, Object> entry : parameters.entrySet()) {
-	        query.setParameter(entry.getKey(), entry.getValue());
-	    }
+		if (employeeName != null && !employeeName.isEmpty()) {
+			if (parameters.size() > 0) {
+				queryStringBuilder.append(" AND ");
+			}
+			queryStringBuilder.append("b.employee.name LIKE :name");
+			parameters.put("name", "%" + employeeName + "%");
+		}
 
-	    return query.getResultList();
+		if (phoneNumber != null && !phoneNumber.isEmpty()) {
+			if (parameters.size() > 0) {
+				queryStringBuilder.append(" AND ");
+			}
+			queryStringBuilder.append("b.customer.phoneNumber = :phoneNumber");
+			parameters.put("phoneNumber", phoneNumber);
+		}
+
+		TypedQuery<Bill> query = em.createQuery(queryStringBuilder.toString(), Bill.class);
+		for (Map.Entry<String, Object> entry : parameters.entrySet()) {
+			query.setParameter(entry.getKey(), entry.getValue());
+		}
+
+		return query.getResultList();
 	}
-
 
 	@Override
 	public List<Bill> searchBillsByBillID(String id) throws RemoteException {
@@ -210,8 +209,12 @@ public class BillDAO extends UnicastRemoteObject implements BillService {
 
 	@Override
 	public List<Integer> getBillYears() throws RemoteException {
-		// TODO Auto-generated method stub
-		return null;
+		try {
+			return em.createQuery("SELECT DISTINCT YEAR(b.paymentDate) FROM Bill b", Integer.class).getResultList();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return Collections.emptyList();
 	}
 
 	@Override
@@ -272,7 +275,7 @@ public class BillDAO extends UnicastRemoteObject implements BillService {
 	}
 
 	@Override
-	public long calculateNumberOfBillsByMonth(String month) throws RemoteException {
+	public long calculateNumberOfBillsByMonth(LocalDate month) throws RemoteException {
 		// TODO Auto-generated method stub
 		return em.createQuery("select COUNT(b) from Bill b " + "where MONTH(b.paymentDate) = :month", Long.class)
 				.setParameter("month", month).getSingleResult();
@@ -319,13 +322,17 @@ public class BillDAO extends UnicastRemoteObject implements BillService {
 	@Override
 	public Double calculateDailyRevenue(LocalDate date) throws RemoteException {
 		// TODO Auto-generated method stub
-		return null;
+		return em.createQuery("SELECT SUM(b.total) FROM Bill b WHERE b.total != 0 AND b.paymentDate = :date",
+				Double.class).setParameter("date", date).getSingleResult();
 	}
 
 	@Override
 	public Double calculateMonthlyRevenue(LocalDate date) throws RemoteException {
 		// TODO Auto-generated method stub
-		return null;
+		return em.createQuery(
+				"SELECT SUM(b.total) FROM Bill b WHERE b.total != 0 AND MONTH(b.paymentDate) = MONTH(:date)",
+				Double.class).setParameter("date", date).getSingleResult();
+
 	}
 
 	@Override
