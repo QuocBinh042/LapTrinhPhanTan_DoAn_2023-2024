@@ -2,6 +2,8 @@ package entity;
 
 import java.util.Date;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Objects;
 
 import org.hibernate.annotations.ManyToAny;
@@ -24,10 +26,8 @@ public class Booking {
 	@Column(name = "BookingID")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
-	@Column(name = "BookingTime", nullable = false)
-	private LocalDate bookingTime;
-	@Column(name = "CheckinTime", nullable = false)
-	private LocalDate checkinTime;
+	@Column(name = "BookingDateTime", nullable = false)
+	private LocalDateTime bookingDateTime;
 	@Column(name = "BookingStatus", nullable = false)
 	private int bookingStatus;
 	@Column(name = "Describe", columnDefinition = "Nvarchar(250)", nullable = true)
@@ -43,18 +43,7 @@ public class Booking {
 	@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@JoinColumn(name = "EmployeeID", referencedColumnName = "EmployeeID")
 	private Employee employee;
-	public Booking(int id, LocalDate bookingTime, LocalDate checkinTime, int bookingStatus, String describe, Room room,
-			Customer customer, Employee employee) {
-		super();
-		this.id = id;
-		this.bookingTime = bookingTime;
-		this.checkinTime = checkinTime;
-		this.bookingStatus = bookingStatus;
-		this.describe = describe;
-		this.room = room;
-		this.customer = customer;
-		this.employee = employee;
-	}
+	
 	public Booking() {
 		super();
 	}
@@ -64,18 +53,7 @@ public class Booking {
 	public void setId(int id) {
 		this.id = id;
 	}
-	public LocalDate getBookingTime() {
-		return bookingTime;
-	}
-	public void setBookingTime(LocalDate bookingTime) {
-		this.bookingTime = bookingTime;
-	}
-	public LocalDate getCheckinTime() {
-		return checkinTime;
-	}
-	public void setCheckinTime(LocalDate checkinTime) {
-		this.checkinTime = checkinTime;
-	}
+	
 	public int getBookingStatus() {
 		return bookingStatus;
 	}
@@ -108,8 +86,25 @@ public class Booking {
 	}
 	@Override
 	public String toString() {
-		return "Booking [id=" + id + ", bookingTime=" + bookingTime + ", checkinTime=" + checkinTime
-				+ ", bookingStatus=" + bookingStatus + ", describe=" + describe + ", room=" + room + ", customer="
-				+ customer + ", employee=" + employee + "]";
+		return "Booking [id=" + id + ", bookingDateTime=" + bookingDateTime + ", bookingStatus=" + bookingStatus
+				+ ", describe=" + describe + ", room=" + room + ", customer=" + customer + ", employee=" + employee
+				+ "]";
+	}
+	public LocalDateTime getBookingDateTime() {
+		return bookingDateTime;
+	}
+	public void setBookingDateTime(LocalDateTime bookingDateTime) {
+		this.bookingDateTime = bookingDateTime;
+	}
+	public Booking(int id, LocalDateTime bookingDateTime, int bookingStatus, String describe, Room room,
+			Customer customer, Employee employee) {
+		super();
+		this.id = id;
+		this.bookingDateTime = bookingDateTime;
+		this.bookingStatus = bookingStatus;
+		this.describe = describe;
+		this.room = room;
+		this.customer = customer;
+		this.employee = employee;
 	}
 }

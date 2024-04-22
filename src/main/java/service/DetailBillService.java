@@ -15,7 +15,10 @@ public interface DetailBillService extends Remote{
 	public List<DetailBill> findDetailBillByRoomName(String roomName) throws RemoteException;
 
 	public List<DetailBill> findDetailBillByBillID(int BillID) throws RemoteException;
+	
+	public List<DetailBill> findDetailBillByRoomIDOrderByID(String roomName) throws RemoteException;
 
 	public boolean updateCheckoutTime(DetailBill detailBill) throws RemoteException;
+	
 
 }

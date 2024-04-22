@@ -53,6 +53,14 @@ public class DetailBillDAO extends UnicastRemoteObject implements DetailBillServ
 				 .setParameter("roomID", roomID)
 				 .getResultList();
 	}
+	
+	@Override
+	public List<DetailBill> findDetailBillByRoomIDOrderByID(String roomName) throws RemoteException {
+		// TODO Auto-generated method stub
+		return em.createQuery("select b from DetailBill b where b.room.roomName = :roomName ORDER BY b.id DESC", DetailBill.class)
+				 .setParameter("roomName", roomName)
+				 .getResultList();
+	}
 
 	@Override
 	public List<DetailBill> findDetailBillByRoomName(String roomName) throws RemoteException {

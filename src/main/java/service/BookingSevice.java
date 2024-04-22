@@ -11,6 +11,8 @@ public interface BookingSevice extends Remote {
 
 	public List<Booking> getAllBooking() throws RemoteException;
 
+	public List<Booking> getBookingsByStatus(int status) throws RemoteException;
+
 	public Booking searchBookingByID(int bookingID) throws RemoteException;
 
 	public boolean updateBookingStatusByID(int status, int bookingID) throws RemoteException;

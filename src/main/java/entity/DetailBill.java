@@ -1,10 +1,7 @@
 package entity;
 
 import java.io.Serializable;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -36,20 +33,20 @@ public class DetailBill implements Serializable {
 	@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@JoinColumn(name = "BillID")
 	private Bill bill;
-	@Column(name = "CheckinDate", nullable = false)
-	private LocalDate checkinDate;
-	@Column(name = "CheckoutDate", nullable = true)
-	private LocalDate checkoutDate;
-	
-	public DetailBill(int id, Room room, Bill bill, LocalDate checkinDate, LocalDate checkoutDate) {
+	@Column(name = "Checkin", nullable = false)
+	private LocalDateTime checkin;
+	@Column(name = "Checkout", nullable = true)
+	private LocalDateTime checkout;
+
+	public DetailBill(int id, Room room, Bill bill, LocalDateTime checkin, LocalDateTime checkout) {
 		super();
 		this.id = id;
 		this.room = room;
 		this.bill = bill;
-		this.checkinDate = checkinDate;
-		this.checkoutDate = checkoutDate;
+		this.checkin = checkin;
+		this.checkout = checkout;
 	}
-	
+
 	public DetailBill() {
 		super();
 	}
@@ -63,8 +60,8 @@ public class DetailBill implements Serializable {
 	
 	@Override
 	public String toString() {
-		return "DetailBill [id=" + id + ", room=" + room + ", bill=" + bill + ", checkinDate=" + checkinDate
-				+ ", checkoutDate=" + checkoutDate + "]";
+		return "DetailBill [id=" + id + ", room=" + room + ", bill=" + bill + ", checkin=" + checkin + ", checkout="
+				+ checkout + "]";
 	}
 	public Room getRoom() {
 		return room;
@@ -78,16 +75,20 @@ public class DetailBill implements Serializable {
 	public void setBill(Bill bill) {
 		this.bill = bill;
 	}
-	public LocalDate getCheckinDate() {
-		return checkinDate;
+
+	public LocalDateTime getCheckin() {
+		return checkin;
 	}
-	public void setCheckinDate(LocalDate checkinDate) {
-		this.checkinDate = checkinDate;
+
+	public void setCheckin(LocalDateTime checkin) {
+		this.checkin = checkin;
 	}
-	public LocalDate getCheckoutDate() {
-		return checkoutDate;
+
+	public LocalDateTime getCheckout() {
+		return checkout;
 	}
-	public void setCheckoutDate(LocalDate checkoutDate) {
-		this.checkoutDate = checkoutDate;
+
+	public void setCheckout(LocalDateTime checkout) {
+		this.checkout = checkout;
 	}
 }
