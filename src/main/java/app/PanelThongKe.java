@@ -61,6 +61,8 @@ import org.jfree.data.category.DefaultCategoryDataset;
 import com.toedter.calendar.JDateChooser;
 
 import dao.BillDAO;
+import dao.DetailBillDAO;
+import dao.DetailServiceDAO;
 import entity.Bill;
 
 public class PanelThongKe extends JPanel {
@@ -81,7 +83,9 @@ public class PanelThongKe extends JPanel {
 	private JComboBox<String> cbLuaChonTG;
 	private JComboBox<Integer> cbChonNam;
 	private BillDAO daoBill = new BillDAO();
-	private ArrayList<entity.Bill> dsHD = new ArrayList<>();
+	private List<Bill> dsHD = new ArrayList<>();
+	private DetailBillDAO daoDetailBill = new DetailBillDAO();
+	private DetailServiceDAO daoDetailService = new DetailServiceDAO();
 	private DecimalFormat formatter = new DecimalFormat("###,###,### VNĐ");
 	private DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 	private CategoryDataset dataset;
@@ -95,115 +99,31 @@ public class PanelThongKe extends JPanel {
 	private JPanel pnlCardMain;
 
 	public PanelThongKe() throws RemoteException {
-		pnlMenu.setBackground(Color.decode("#D0BAFB"));
-		pnlMenu.add(btnThoiGian = new JButton("Thống kê doanh thu"));
-		pnlMenu.add(btnKhachHang = new JButton("Thống kê khách hàng"));
-		pnlMenu.add(btnPhong = new JButton("Thống kê phòng"));
-		pnlMenu.add(btnDichVu = new JButton("Thống kê dịch vụ"));
-		pnlMenu.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 		setLayout(new BorderLayout());
-		add(pnlMenu, BorderLayout.NORTH);
-
-		pnlCardMain = new JPanel(cardLayoutMenu);
-		pnlCardMain.add(createUIThongKeTheoTG(), "ThoiGianPanel");
-		pnlCardMain.add(createUIThongKeTheoKH(), "KhachHangPanel");
-		pnlCardMain.add(createUIThongKeTheoPhong(), "PhongPanel");
-		pnlCardMain.add(createUIThongKeTheoDichVu(), "DichVuPanel");
-		add(pnlCardMain, BorderLayout.CENTER);
-
-		btnThoiGian.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				cardLayoutMenu.show(pnlCardMain, "ThoiGianPanel");
-			}
-		});
-		btnKhachHang.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				cardLayoutMenu.show(pnlCardMain, "KhachHangPanel");
-			}
-		});
-		btnPhong.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				cardLayoutMenu.show(pnlCardMain, "PhongPanel");
-			}
-		});
-		btnDichVu.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				cardLayoutMenu.show(pnlCardMain, "DichVuPanel");
-			}
-		});
-
-	}
-
-	private JPanel createUIThongKeTheoTG() throws RemoteException {
-		// Khai báo
-		Icon img_dollar = new ImageIcon("src/main/java/img/dollar.png");
-		lblDolar = new JLabel(img_dollar);
-		Border line = BorderFactory.createLineBorder(Color.BLACK);
-		Dimension dimension = new Dimension(300, 30);
-
-		pnlLuaChonTK.add(lblLuaChonTG = new JLabel("Loại thời gian"));
-		lblLuaChonTG.setFont(new Font("Arial", Font.BOLD, 13));
-		pnlLuaChonTK.add(cbLuaChonTG = new JComboBox<>());
-		cbLuaChonTG.addItem("Ngày");
-		cbLuaChonTG.addItem("Tháng");
-		cbLuaChonTG.addItem("Năm");
-		pnlLuaChonTK.add(pnlThoiGian);
-		pnlThoiGian.add(dcChonNgay = new JDateChooser());
-		pnlThoiGian.add(dcChonNgay = new JDateChooser((Date) null, "dd/MM/yyyy"));
-		dcChonNgay.setDate(new Date());
-		dcChonThang = new JDateChooser((Date) null, "MM/yyyy");
-		dcChonThang.setDate(new Date());
-		cbChonNam = new JComboBox<Integer>();
-		List<Integer> dsNam = daoBill.getBillYears();
-		for (Integer nam : dsNam) {
-			cbChonNam.addItem(nam);
-		}
-		pnlThoiGian.setBackground(Color.decode("#D0BAFB"));
-		pnlLuaChonTK.setBackground(Color.decode("#D0BAFB"));
-		dcChonNgay.setBackground(Color.decode("#D0BAFB"));
-		dcChonThang.setBackground(Color.decode("#D0BAFB"));
-		cbLuaChonTG.setPreferredSize(new Dimension(150, 30));
-		dcChonNgay.setPreferredSize(dimension);
-		dcChonThang.setPreferredSize(dimension);
-		cbChonNam.setPreferredSize(dimension);
-
-		JPanel pnlKetQua = createKetQuaPanel();
-		pnlKetQua.setBorder(line);
-		createTableTG();
-		JPanel pnlCenter = new JPanel(new BorderLayout());
-		cardLayout = new CardLayout();
-		pnlCardTG = new JPanel(cardLayout);
-		pnlCardTG.setBackground(Color.decode("#D0BAFB"));
-		pnlCardTG.add(createChartPanel(null, ""), "ChartPanel");
-		pnlCardTG.add(createTablePanel(tableTG), "TablePanel");
-		pnlCenter.add(pnlCardTG, BorderLayout.CENTER);
-		JPanel pnlLuaChonKQ = new JPanel(new FlowLayout(FlowLayout.LEFT));
-		pnlLuaChonKQ.add(btnChart = new JButton("Biểu đồ"));
-		pnlLuaChonKQ.add(btnTable = new JButton("Bảng thống kê"));
-		pnlCenter.add(pnlLuaChonKQ, BorderLayout.NORTH);
-		JPanel mainPanel = new JPanel();
-		mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-		mainPanel.add(pnlLuaChonTK);
-		mainPanel.add(pnlKetQua);
-		mainPanel.add(pnlCenter);
-
+		add(createUIThongKeTheoTG(), BorderLayout.CENTER);
+		btnChart.enable(false);
+		btnTable.setBackground(Color.GRAY);
 		thongKeTheoNgay();
 		cbLuaChonTG.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				btnChart.enable(true);
+
 				Component selectedComponent = null;
 				pnlThoiGian.removeAll();
 				if (cbLuaChonTG.getSelectedItem().equals("Ngày")) {
+					btnChart.enable(false);
+					btnTable.setBackground(Color.GRAY);
 					selectedComponent = dcChonNgay;
 				} else if (cbLuaChonTG.getSelectedItem().equals("Tháng")) {
 					selectedComponent = dcChonThang;
+					btnChart.enable(true);
+					btnChart.setBackground(Color.GRAY);
+					btnTable.setBackground(getBackground());
 				} else {
 					selectedComponent = cbChonNam;
+					btnChart.enable(true);
+					btnChart.setBackground(Color.GRAY);
+					btnTable.setBackground(getBackground());
 				}
 				pnlThoiGian.add(selectedComponent);
 			}
@@ -218,13 +138,12 @@ public class PanelThongKe extends JPanel {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				btnChart.enable(false);
+
 			}
 		});
 		dcChonThang.getDateEditor().addPropertyChangeListener(new PropertyChangeListener() {
 			@Override
 			public void propertyChange(PropertyChangeEvent evt) {
-				btnChart.enable(true);
 				try {
 					thongKeTheoThang();
 				} catch (RemoteException e) {
@@ -236,7 +155,6 @@ public class PanelThongKe extends JPanel {
 		cbChonNam.addPropertyChangeListener(new PropertyChangeListener() {
 			@Override
 			public void propertyChange(PropertyChangeEvent evt) {
-				btnChart.enable(true);
 				try {
 					thongKeTheoNam();
 				} catch (RemoteException e) {
@@ -257,80 +175,73 @@ public class PanelThongKe extends JPanel {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				cardLayout.show(pnlCardTG, "TablePanel");
+				btnTable.setBackground(Color.GRAY);
+				btnChart.setBackground(getBackground());
 			}
 		});
 		btnChart.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				cardLayout.show(pnlCardTG, "ChartPanel");
+				btnChart.setBackground(Color.GRAY);
+				btnTable.setBackground(getBackground());
 			}
 		});
-
-		return mainPanel;
 	}
 
-	private JPanel createUIThongKeTheoKH() {
-		JPanel pnlNgay = new JPanel(new FlowLayout(FlowLayout.LEFT));
-		pnlNgay.add(lblThoiGianBD = new JLabel("Từ ngày"));
-		pnlNgay.add(dateBD = new JDateChooser());
-		pnlNgay.add(lblThoiGianKT = new JLabel("Đến ngày"));
-		pnlNgay.add(dateKT = new JDateChooser());
-		Dimension dimension = new Dimension(300, 30);
-		dateBD.setPreferredSize(dimension);
-		dateKT.setPreferredSize(dimension);
+	private JPanel createUIThongKeTheoTG() throws RemoteException {
+		// Khai báo
+		Icon img_search = new ImageIcon("src/img/search.png");
+		Icon img_check = new ImageIcon("src/img/check.png");
+		Icon img_dollar = new ImageIcon("src/img/dollar.png");
+		lblDolar = new JLabel(img_dollar);
+		Border line = BorderFactory.createLineBorder(Color.BLACK);
+		Dimension dimension = new Dimension(300, 40);
 
-		JPanel pnlKetQua = new JPanel();
-		pnlKetQua.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-		createTableKH();
-		JPanel mainPanel = new JPanel(new BorderLayout());
-		mainPanel.add(pnlNgay, BorderLayout.NORTH);
+		pnlLuaChonTK.add(lblLuaChonTG = new JLabel("Loại thời gian"));
+		lblLuaChonTG.setFont(new Font("Arial", Font.BOLD, 13));
+		pnlLuaChonTK.add(cbLuaChonTG = new JComboBox<>());
+		cbLuaChonTG.addItem("Ngày");
+		cbLuaChonTG.addItem("Tháng");
+		cbLuaChonTG.addItem("Năm");
+		pnlLuaChonTK.add(pnlThoiGian);
+		pnlThoiGian.add(dcChonNgay = new JDateChooser());
+//		pnlThoiGian.add(dcChonNgay = new JDateChooser((Date) null, "dd/MM/yyyy"));
+		dcChonNgay.setDate(new Date());
+		dcChonThang = new JDateChooser((Date) null, "MM/yyyy");
+		dcChonThang.setDate(new Date());
+		cbChonNam = new JComboBox<Integer>();
+		List<Integer> dsNam = daoBill.getBillYears();
+		for (Integer nam : dsNam) {
+			cbChonNam.addItem(nam);
+		}
+		pnlThoiGian.setBackground(Color.decode("#D0BAFB"));
+		pnlLuaChonTK.setBackground(Color.decode("#D0BAFB"));
+		dcChonNgay.setBackground(Color.decode("#D0BAFB"));
+		dcChonThang.setBackground(Color.decode("#D0BAFB"));
+		cbLuaChonTG.setPreferredSize(new Dimension(150, 40));
+		dcChonNgay.setPreferredSize(dimension);
+		dcChonThang.setPreferredSize(dimension);
+		cbChonNam.setPreferredSize(dimension);
+		JPanel pnlKetQua = createKetQuaPanel();
+		pnlKetQua.setBorder(line);
+		createTableTG();
+		JPanel pnlCenter = new JPanel(new BorderLayout());
+		cardLayout = new CardLayout();
+		pnlCardTG = new JPanel(cardLayout);
+		pnlCardTG.setBackground(Color.decode("#D0BAFB"));
+		pnlCardTG.add(createChartPanel(null, ""), "ChartPanel");
+		pnlCardTG.add(createTablePanel(tableTG), "TablePanel");
+		pnlCenter.add(pnlCardTG, BorderLayout.CENTER);
+		JPanel pnlLuaChonKQ = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		pnlLuaChonKQ.add(btnChart = new JButton("Biểu đồ"));
+		pnlLuaChonKQ.add(btnTable = new JButton("Bảng thống kê"));
+		pnlCenter.add(pnlLuaChonKQ, BorderLayout.NORTH);
+		JPanel mainPanel = new JPanel();
 		mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+		mainPanel.add(pnlLuaChonTK);
 		mainPanel.add(pnlKetQua);
-		mainPanel.add(createTablePanel(tableKH));
-
-		return mainPanel;
-	}
-
-	private JPanel createUIThongKeTheoDichVu() {
-		JPanel pnlNgay = new JPanel(new FlowLayout(FlowLayout.LEFT));
-		pnlNgay.add(lblThoiGianBD = new JLabel("Từ ngày"));
-		pnlNgay.add(dateBD = new JDateChooser());
-		pnlNgay.add(lblThoiGianKT = new JLabel("Đến ngày"));
-		pnlNgay.add(dateKT = new JDateChooser());
-		Dimension dimension = new Dimension(300, 30);
-		dateBD.setPreferredSize(dimension);
-		dateKT.setPreferredSize(dimension);
-
-		JPanel pnlKetQua = new JPanel();
-		pnlKetQua.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-		createTableDV();
-		JPanel mainPanel = new JPanel(new BorderLayout());
-		mainPanel.add(pnlNgay, BorderLayout.NORTH);
-		mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-		mainPanel.add(pnlKetQua);
-		mainPanel.add(createTablePanel(tableDV));
-		return mainPanel;
-	}
-
-	private JPanel createUIThongKeTheoPhong() {
-		JPanel pnlNgay = new JPanel(new FlowLayout(FlowLayout.LEFT));
-		pnlNgay.add(lblThoiGianBD = new JLabel("Từ ngày"));
-		pnlNgay.add(dateBD = new JDateChooser());
-		pnlNgay.add(lblThoiGianKT = new JLabel("Đến ngày"));
-		pnlNgay.add(dateKT = new JDateChooser());
-		Dimension dimension = new Dimension(300, 30);
-		dateBD.setPreferredSize(dimension);
-		dateKT.setPreferredSize(dimension);
-
-		JPanel pnlKetQua = new JPanel();
-		pnlKetQua.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-		createTableP();
-
-		JPanel mainPanel = new JPanel(new BorderLayout());
-		mainPanel.add(pnlNgay, BorderLayout.NORTH);
-		mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-		mainPanel.add(pnlKetQua);
-		mainPanel.add(createTablePanel(tableP));
+		mainPanel.add(pnlCenter);
 		return mainPanel;
 	}
 
@@ -353,7 +264,7 @@ public class PanelThongKe extends JPanel {
 		lblTienDVValue.setPreferredSize(componentSize);
 		gbc.gridx = 0;
 		gbc.gridy = 0;
-		gbc.insets = new Insets(0, 10, 0, 10);
+		gbc.insets = new Insets(-10, 10, -10, 10);
 		pnlKetQua.add(b1, gbc);
 		gbc.gridx = 1;
 		pnlKetQua.add(b2, gbc);
@@ -365,7 +276,7 @@ public class PanelThongKe extends JPanel {
 	}
 
 	private JPanel createPanelWithLabelAndTextField(JLabel label, JLabel valueLabel, Color color) {
-		Icon img_dollar = new ImageIcon("src/main/java/img/dollar.png");
+		Icon img_dollar = new ImageIcon("src/img/dollar.png");
 		JPanel panel = new JPanel(new BorderLayout());
 		panel.setBackground(color);
 		label.setFont(new Font("Arial", Font.BOLD, 13));
@@ -376,7 +287,7 @@ public class PanelThongKe extends JPanel {
 		textPanel.add(label);
 		textPanel.add(valueLabel);
 		textPanel.setBackground(color);
-		valueLabel.setFont(new Font("Arial", Font.BOLD, 25));
+		valueLabel.setFont(new Font("Arial", Font.BOLD, 26));
 		panel.add(textPanel, BorderLayout.CENTER);
 		return panel;
 	}
@@ -435,26 +346,22 @@ public class PanelThongKe extends JPanel {
 		LocalDate date = dcChonNgay.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 		Double dt = daoBill.calculateDailyRevenue(date);
 		long slhd = daoBill.calculateNumberOfBillsByDate(date);
-		Double dttb = 0.0;
-		if (dt != null && slhd != 0) {
-			dttb = dt / slhd;
-			loadData(daoBill.getBillsByDate(date), tableTG, tableModelTG);
-			addKetQua(dt, slhd, dttb);
-			cardLayout.show(pnlCardTG, "TablePanel");
-		}
-
+		Double tienPhong = 5.5; //= daoCTHD.ThongKeTienPhongTheoNgay(date) * 0.9;
+		Double tienDV = 6.0; //= daoCTDVPhong.ThongKeTienDVTheoNgay(date) * 0.9;
+		loadData(daoBill.getBillsByDate(date), tableTG, tableModelTG);
+		addKetQua(dt, slhd, tienPhong, tienDV);
+		cardLayout.show(pnlCardTG, "TablePanel");
 	}
 
 	private void thongKeTheoThang() throws RemoteException {
-		LocalDate month = dcChonThang.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-		Double dt = daoBill.calculateMonthlyRevenue(month);
-		long slhd = daoBill.calculateNumberOfBillsByMonth(month);
-		Double dttb = dt / slhd;
-		if (slhd == 0)
-			dttb = 0.0;
+		LocalDate date = dcChonThang.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+		Double dt = daoBill.calculateMonthlyRevenue(date);
+		long slhd = daoBill.calculateNumberOfBillsByMonth(date);
+		Double tienPhong = 5.5; // = daoCTHD.ThongKeTienPhongTheoThang(date) * 0.9;
+		Double tienDV = 6.0; //daoCTDVPhong.ThongKeTienDVTheoThang(date) * 0.9;
 		loadData(daoBill.getBillsByMonth(), tableTG, tableModelTG);
-		addKetQua(dt, slhd, dttb);
-		pnlCardTG.add(createChartPanel(createDatasetMonth(month), "Ngày"), "ChartPanel");
+		addKetQua(dt, slhd, tienPhong, tienDV);
+		pnlCardTG.add(createChartPanel(createDatasetMonth(date), "Ngày"), "ChartPanel");
 		cardLayout.show(pnlCardTG, "ChartPanel");
 	}
 
@@ -462,11 +369,10 @@ public class PanelThongKe extends JPanel {
 		String year = cbChonNam.getSelectedItem().toString();
 		Double dt = daoBill.calculateYearlyRevenue(year);
 		long slhd = daoBill.calculateNumberOfBillsByYear(year);
-		Double dttb = dt / slhd;
-		if (slhd == 0)
-			dttb = 0.0;
+		Double tienPhong = 5.5;//daoCTHD.ThongKeTienPhongTheoNam(year) * 0.9;
+		Double tienDV = 6.0; //daoCTDVPhong.ThongKeTienDVTheoNam(year) * 0.9;
 		loadData(daoBill.getBillsByYear(Integer.valueOf(year)), tableTG, tableModelTG);
-		addKetQua(dt, slhd, dttb);
+		addKetQua(dt, slhd, tienPhong, tienDV);
 		pnlCardTG.add(createChartPanel(createDatasetYear(Integer.valueOf(year)), "Tháng"), "ChartPanel");
 		cardLayout.show(pnlCardTG, "ChartPanel");
 	}
@@ -484,10 +390,11 @@ public class PanelThongKe extends JPanel {
 		return dataset;
 	}
 
-	private void addKetQua(Double dt, long slhd, Double dttb) {
+	private void addKetQua(Double dt, long slhd, Double tienPhong, Double tienDV) {
 		lblDoanhThuValue.setText(formatter.format(dt));
-		lblSoLuongHDValue.setText(slhd + "");
-		lblDoanhThuTBValue.setText(formatter.format(dttb));
+		lblSoLuongHDValue.setText(slhd+ "");
+		lblTienPhongValue.setText(formatter.format(dt - tienDV));
+		lblTienDVValue.setText(formatter.format(tienDV));
 	}
 
 	private CategoryDataset createDatasetYear(Integer year) throws RemoteException {
