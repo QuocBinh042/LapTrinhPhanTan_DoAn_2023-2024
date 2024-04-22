@@ -3,6 +3,8 @@ package app;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.File;
+import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.Arrays;
 import java.util.List;
@@ -108,8 +110,6 @@ public class Card extends JFrame {
 		pnl.add(kh, "kh");
 		pnl.add(hd, "hd");
 		pnl.add(tk, "tk");
-		pnl.add(tg, "tg");
-		pnl.add(tg, "dx");
 	}
 
 	private JPanel createLeftPanel() throws RemoteException {
@@ -225,8 +225,16 @@ public class Card extends JFrame {
 	}
 
 	private void xuLyTroGiup() {
-		CardLayout card = (CardLayout) pnl.getLayout();
-		card.show(pnl, "tg");
+		int result = JOptionPane.showConfirmDialog(null, "Bạn muốn xem hướng dãn sử dụng không?", "Chú ý",
+				JOptionPane.YES_NO_OPTION);
+		if (result == JOptionPane.YES_OPTION) {
+			try {
+				Desktop.getDesktop().open(new File("document\\UserManual.pdf"));
+				return;
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+		}
 	}
 
 	private void xuLyTrangChu() {
