@@ -276,10 +276,21 @@ public class BillDAO extends UnicastRemoteObject implements BillService {
 
 	@Override
 	public long calculateNumberOfBillsByMonth(LocalDate month) throws RemoteException {
-		// TODO Auto-generated method stub
-		return em.createQuery("select COUNT(b) from Bill b " + "where MONTH(b.paymentDate) = :month", Long.class)
-				.setParameter("month", month).getSingleResult();
+	    try {
+	        int monthValue = month.getMonthValue();
+	        int yearValue = month.getYear();
+	        return em.createQuery("select count(b) from Bill b " +
+	                              "where function('MONTH', b.paymentDate) = :month " +
+	                              "and function('YEAR', b.paymentDate) = :year", Long.class)
+	                 .setParameter("month", monthValue)
+	                 .setParameter("year", yearValue)
+	                 .getSingleResult();
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return 0;
+	    }
 	}
+
 
 	@Override
 	public Map<String, Double> getMonthlyRevenueInRange(LocalDate startDate, LocalDate endDate) throws RemoteException {

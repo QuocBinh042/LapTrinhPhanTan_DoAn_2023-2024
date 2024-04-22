@@ -191,9 +191,7 @@ public class PanelThongKe extends JPanel {
 
 	private JPanel createUIThongKeTheoTG() throws RemoteException {
 		// Khai báo
-		Icon img_search = new ImageIcon("src/img/search.png");
-		Icon img_check = new ImageIcon("src/img/check.png");
-		Icon img_dollar = new ImageIcon("src/img/dollar.png");
+		Icon img_dollar = new ImageIcon("src/main/java/img/dollar.png");
 		lblDolar = new JLabel(img_dollar);
 		Border line = BorderFactory.createLineBorder(Color.BLACK);
 		Dimension dimension = new Dimension(300, 40);
@@ -276,7 +274,7 @@ public class PanelThongKe extends JPanel {
 	}
 
 	private JPanel createPanelWithLabelAndTextField(JLabel label, JLabel valueLabel, Color color) {
-		Icon img_dollar = new ImageIcon("src/img/dollar.png");
+		Icon img_dollar = new ImageIcon("src/main/java/img/dollar.png");
 		JPanel panel = new JPanel(new BorderLayout());
 		panel.setBackground(color);
 		label.setFont(new Font("Arial", Font.BOLD, 13));
@@ -349,7 +347,7 @@ public class PanelThongKe extends JPanel {
 		Double tienPhong = 5.5; //= daoCTHD.ThongKeTienPhongTheoNgay(date) * 0.9;
 		Double tienDV = 6.0; //= daoCTDVPhong.ThongKeTienDVTheoNgay(date) * 0.9;
 		loadData(daoBill.getBillsByDate(date), tableTG, tableModelTG);
-		addKetQua(dt, slhd, tienPhong, tienDV);
+		addKetQua(5.6, slhd, tienPhong, tienDV);
 		cardLayout.show(pnlCardTG, "TablePanel");
 	}
 
