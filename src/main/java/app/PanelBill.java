@@ -70,7 +70,8 @@ public class PanelBill extends JPanel {
 
 		createUI();
 		// Load data
-		getAllBills(listBill);
+		listBill = daoBill.getAllBills();
+		loadData(listBill);
 
 		// Sự kiện
 		btnTim.addActionListener(e -> {
@@ -95,7 +96,7 @@ public class PanelBill extends JPanel {
 			public void propertyChange(PropertyChangeEvent evt) {
 				if (dateKTTim.getDate() != null)
 					try {
-						getAllBills(daoBill.getBillsByTimeFrame(
+						loadData(daoBill.getBillsByTimeFrame(
 								dateBDTim.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate(),
 								dateKTTim.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate()));
 					} catch (RemoteException e) {
@@ -109,7 +110,7 @@ public class PanelBill extends JPanel {
 			public void propertyChange(PropertyChangeEvent evt) {
 				if (dateBDTim.getDate() != null) {
 					try {
-						getAllBills(daoBill.getBillsByTimeFrame(
+						loadData(daoBill.getBillsByTimeFrame(
 								dateBDTim.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate(),
 								dateKTTim.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate()));
 					} catch (RemoteException e) {
@@ -214,18 +215,15 @@ public class PanelBill extends JPanel {
 
 	}
 
-	public void getAllBills(List<Bill> listBills) throws RemoteException {
+	public void loadData(List<Bill> listBills) throws RemoteException {
 		// delete all
 		clearTable();
-		// Load data
-		listBills = daoBill.getAllBills();
 		for (Bill bill : listBills) {
 			tableModel.addRow(new Object[] { bill.getId(), dateFormat.format(bill.getPaymentDate()),
 					bill.getPaymentTime().toString(), bill.getCustomer().getCustomerName(),
 					bill.getEmployee().getName(), bill.getCustomer().getPhoneNumber(),
 					formatter.format(bill.getTotal()) });
 		}
-
 	}
 
 	private void clearTable() {
@@ -236,13 +234,13 @@ public class PanelBill extends JPanel {
 	private Object xuLyCBLuaChon() throws RemoteException {
 		// TODO Auto-generated method stub
 		if (cbLuaChon.getSelectedItem().equals("Tất cả"))
-			getAllBills(daoBill.getAllBills());
+			loadData(daoBill.getAllBills());
 		else if (cbLuaChon.getSelectedItem().equals("Ngày hiện tại"))
-			getAllBills(daoBill.getBillsWithinDay());
+			loadData(daoBill.getBillsWithinDay());
 		else if (cbLuaChon.getSelectedItem().equals("Tháng hiện tại"))
-			getAllBills(daoBill.getBillsByMonth());
+			loadData(daoBill.getBillsByMonth());
 		else if (cbLuaChon.getSelectedItem().equals("Năm hiện tại"))
-			getAllBills(daoBill.getBillsByYear());
+			loadData(daoBill.getBillsByYear());
 		return null;
 	}
 
@@ -250,9 +248,8 @@ public class PanelBill extends JPanel {
 		// TODO Auto-generated method stub
 		clearTable();
 		List<Bill> ds = daoBill.searchBills(txtTimMaHD.getText(), txtTimNV.getText(), txtTimKH.getText());
-		// Load data
 		if (ds.size() > 0) {
-			getAllBills(ds);
+			loadData(ds);
 			JOptionPane.showMessageDialog(null, "Đã tìm thấy hoá đơn!");
 		} else
 			JOptionPane.showMessageDialog(null, "Không tìm thấy hoá đơn!");

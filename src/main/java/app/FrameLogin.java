@@ -140,7 +140,7 @@ public class FrameLogin extends JFrame implements ActionListener {
 		btnForgetPass.addActionListener(this);
 
 		txtUser.setText("0386076296");
-		txtPass.setText("123");
+		txtPass.setText("123456789");
 		txtUser.setFont(new Font("Sanserif", Font.PLAIN, 15));
 		txtPass.setFont(new Font("Sanserif", Font.PLAIN, 15));
 	}
