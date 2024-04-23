@@ -20,8 +20,8 @@ public class RoomDAO extends UnicastRemoteObject implements RoomService {
 
 	public RoomDAO() throws RemoteException {
 		em = Persistence.createEntityManagerFactory("KaraokeOneDB").createEntityManager();
-	} 
- 
+	}
+
 	@Override
 	public boolean addRoom(Room room) {
 		// TODO Auto-generated method stub
@@ -41,7 +41,7 @@ public class RoomDAO extends UnicastRemoteObject implements RoomService {
 		}
 		return false;
 	}
- 
+
 	@Override
 	public boolean updateRoom(Room room) {
 		// TODO Auto-generated method stub
@@ -66,9 +66,11 @@ public class RoomDAO extends UnicastRemoteObject implements RoomService {
 		try {
 			tx.begin();
 			Room room = em.find(Room.class, roomID);
-			em.remove(room);
-			tx.commit();
-			return true;
+			if (room != null) {
+				em.remove(room);
+				tx.commit();
+				return true;
+			}
 		} catch (Exception e) {
 			tx.rollback();
 			e.printStackTrace();
@@ -79,34 +81,38 @@ public class RoomDAO extends UnicastRemoteObject implements RoomService {
 
 	@Override
 	public boolean updateRoomStatusByRoomID(String status, int roomID) {
-		// TODO Auto-generated method stub
-		EntityTransaction tx = em.getTransaction();
-		try {
-			tx.begin();
-			Room room = em.find(Room.class, roomID);
-			if (room != null) {
-				room.setRoomStatus(status);
-				tx.commit();
-				return true;
-			}
-		} catch (Exception e) {
-			// TODO: handle exception
-			e.printStackTrace();
-		}
-		return false;
+	    EntityTransaction tx = em.getTransaction();
+	    try {
+	        if (tx.isActive()) {
+	            tx.rollback(); // Rollback active transaction before starting a new one
+	        }
+	        tx.begin();
+	        Room room = em.find(Room.class, roomID);
+	        if (room != null) {
+	            room.setRoomStatus(status);
+	            tx.commit();
+	            return true;
+	        }
+	    } catch (Exception e) {
+	        if (tx != null && tx.isActive()) {
+	            tx.rollback();
+	        }
+	        e.printStackTrace();
+	    }
+	    return false;
 	}
+
 
 	@Override
 	public boolean updateRoomStatusByRoomName(String status, String nameRoom) {
 		EntityTransaction tx = em.getTransaction();
 		try {
-			tx.begin(); // Start the transaction
-
+			tx.begin();
 			Room room = em.createQuery("SELECT r FROM Room r WHERE r.roomName = :nameRoom", Room.class)
 					.setParameter("nameRoom", nameRoom).getSingleResult();
 			if (room != null) {
 				room.setRoomStatus(status);
-				tx.commit(); // Commit the transaction after updating the room status
+				tx.commit();
 				return true;
 			}
 		} catch (Exception e) {
@@ -124,16 +130,15 @@ public class RoomDAO extends UnicastRemoteObject implements RoomService {
 		// TODO Auto-generated method stub
 		String string = "Đã xóa";
 		return em.createQuery("SELECT r FROM Room r where r.roomStatus != :string", Room.class)
-				 .setParameter("string", string)
-				 .getResultList();
+				.setParameter("string", string).getResultList();
 	}
 
 	@Override
 	public List<Room> getRoomsByStatus(String status) {
 		// TODO Auto-generated method stub
 		if ("Tất cả".equals(status)) {
-	        return em.createQuery("SELECT r FROM Room r", Room.class).getResultList();
-	    }
+			return em.createQuery("SELECT r FROM Room r", Room.class).getResultList();
+		}
 		return em.createQuery("SELECT r FROM Room r WHERE r.roomStatus = :status", Room.class)
 				.setParameter("status", status).getResultList();
 	}
@@ -142,8 +147,8 @@ public class RoomDAO extends UnicastRemoteObject implements RoomService {
 	public List<Room> getRoomsByType(String type) {
 		// TODO Auto-generated method stub
 		if ("Tất cả".equals(type)) {
-	        return em.createQuery("SELECT r FROM Room r", Room.class).getResultList();
-	    }
+			return em.createQuery("SELECT r FROM Room r", Room.class).getResultList();
+		}
 		return em.createQuery("SELECT r FROM Room r WHERE LOWER(r.roomType.typeRoom) = LOWER(:type)", Room.class)
 				.setParameter("type", type).getResultList();
 	}
@@ -152,8 +157,8 @@ public class RoomDAO extends UnicastRemoteObject implements RoomService {
 	public List<Room> getRoomsByCapacity(String capacity) {
 		// TODO Auto-generated method stub
 		if ("Tất cả".equals(capacity)) {
-	        return em.createQuery("SELECT r FROM Room r", Room.class).getResultList();
-	    }
+			return em.createQuery("SELECT r FROM Room r", Room.class).getResultList();
+		}
 		int i = Integer.valueOf(capacity);
 		return em.createQuery("SELECT r FROM Room r WHERE r.roomType.capacity = :capacity", Room.class)
 				.setParameter("capacity", i).getResultList();
