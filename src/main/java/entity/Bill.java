@@ -22,7 +22,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "Bill")
-@NamedQueries(@NamedQuery(name = "getAllBills", query = "select b from Bill b"))
+@NamedQueries(@NamedQuery(name = "getAllBills", query = "select b from Bill b where b.paymentDate is not null and b.paymentTime is not null"))
 public class Bill implements Serializable {
 	/**
 	 * 
@@ -44,7 +44,10 @@ public class Bill implements Serializable {
 	private Customer customer;
 	@Column(name = "Total", nullable = true)
 	private Double total;
-
+	
+	@OneToMany(mappedBy = "bill")
+	Set<DetailServiceRoom> detailServiceRooms;
+	
 	@OneToMany(mappedBy = "bill")
 	Set<DetailBill> detailBills;
 
@@ -116,8 +119,8 @@ public class Bill implements Serializable {
 		return total;
 	}
 
-	public void setTotal(Double total) {
-		this.total = total;
+	public void setTotal() {
+		this.total = totalMoneyRoom() + totalMoneyService();
 	}
 
 	@Override
@@ -141,5 +144,29 @@ public class Bill implements Serializable {
 			return false;
 		Bill other = (Bill) obj;
 		return id == other.id;
+	}
+
+	public Set<DetailServiceRoom> getDetailServiceRooms() {
+		return detailServiceRooms;
+	}
+
+	public void setDetailServiceRooms(Set<DetailServiceRoom> detailServiceRooms) {
+		this.detailServiceRooms = detailServiceRooms;
+	}
+
+	public Set<DetailBill> getDetailBills() {
+		return detailBills;
+	}
+
+	public void setDetailBills(Set<DetailBill> detailBills) {
+		this.detailBills = detailBills;
+	}
+	
+	public double totalMoneyRoom() {
+		return detailBills.stream().mapToDouble(d -> d.translationRoomPrice()).sum();
+	}
+	
+	public double totalMoneyService() {
+		return detailServiceRooms.stream().mapToDouble(d -> d.calculateMoneyService()).sum();
 	}
 }

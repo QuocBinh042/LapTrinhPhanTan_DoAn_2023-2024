@@ -2,7 +2,6 @@ package service;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
-import java.util.ArrayList;
 import java.util.List;
 
 import entity.DetailBill;
@@ -20,5 +19,4 @@ public interface DetailBillService extends Remote{
 
 	public boolean updateCheckoutTime(DetailBill detailBill) throws RemoteException;
 	
-
 }

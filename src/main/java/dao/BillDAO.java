@@ -187,7 +187,7 @@ public class BillDAO extends UnicastRemoteObject implements BillService {
 	}
 
 	@Override
-	public List<Bill> searchBillsByBillID(String id) throws RemoteException {
+	public List<Bill> searchBillsByBillID(int id) throws RemoteException {
 		// TODO Auto-generated method stub
 		return em.createQuery("select b from Bill b where b.id = :id", Bill.class).setParameter("id", id)
 				.getResultList();
@@ -244,12 +244,10 @@ public class BillDAO extends UnicastRemoteObject implements BillService {
 
 	@Override
 	public List<Bill> getBillsByMonth(LocalDate month) throws RemoteException {
-	    // TODO Auto-generated method stub
-	    return em.createQuery("select b from Bill b where MONTH(b.paymentDate) = :month", Bill.class)
-	             .setParameter("month", month.getMonthValue())
-	             .getResultList();
+		// TODO Auto-generated method stub
+		return em.createQuery("select b from Bill b where MONTH(b.paymentDate) = :month", Bill.class)
+				.setParameter("month", month.getMonthValue()).getResultList();
 	}
-
 
 	@Override
 	public Double calculateTotalRevenue(LocalDate startDate, LocalDate endDate) throws RemoteException {
@@ -278,21 +276,18 @@ public class BillDAO extends UnicastRemoteObject implements BillService {
 
 	@Override
 	public long calculateNumberOfBillsByMonth(LocalDate month) throws RemoteException {
-	    try {
-	        int monthValue = month.getMonthValue();
-	        int yearValue = month.getYear();
-	        return em.createQuery("select count(b) from Bill b " +
-	                              "where function('MONTH', b.paymentDate) = :month " +
-	                              "and function('YEAR', b.paymentDate) = :year", Long.class)
-	                 .setParameter("month", monthValue)
-	                 .setParameter("year", yearValue)
-	                 .getSingleResult();
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	        return 0;
-	    }
+		try {
+			int monthValue = month.getMonthValue();
+			int yearValue = month.getYear();
+			return em
+					.createQuery("select count(b) from Bill b " + "where function('MONTH', b.paymentDate) = :month "
+							+ "and function('YEAR', b.paymentDate) = :year", Long.class)
+					.setParameter("month", monthValue).setParameter("year", yearValue).getSingleResult();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return 0;
+		}
 	}
-
 
 	@Override
 	public Map<String, Double> getMonthlyRevenueInRange(LocalDate startDate, LocalDate endDate) throws RemoteException {
@@ -352,6 +347,13 @@ public class BillDAO extends UnicastRemoteObject implements BillService {
 	public List<Bill> getBillsByDetailBillID(int id) throws RemoteException {
 		// TODO Auto-generated method stub
 		return em.createQuery("select b from Bill b join b.detailBills db where db.id = :id", Bill.class)
+				.setParameter("id", id).getResultList();
+	}
+
+	@Override
+	public List<Bill> getBillsByBillID(int id) throws RemoteException {
+		// TODO Auto-generated method stub
+		return em.createQuery("select b from Bill b where b.id = :id", Bill.class)
 				.setParameter("id", id).getResultList();
 	}
 

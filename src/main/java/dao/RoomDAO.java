@@ -122,7 +122,10 @@ public class RoomDAO extends UnicastRemoteObject implements RoomService {
 	@Override
 	public List<Room> getAllRooms() {
 		// TODO Auto-generated method stub
-		return em.createQuery("SELECT r FROM Room r", Room.class).getResultList();
+		String string = "Đã xóa";
+		return em.createQuery("SELECT r FROM Room r where r.roomStatus != :string", Room.class)
+				 .setParameter("string", string)
+				 .getResultList();
 	}
 
 	@Override
@@ -146,10 +149,14 @@ public class RoomDAO extends UnicastRemoteObject implements RoomService {
 	}
 
 	@Override
-	public List<Room> getRoomsByCapacity(int capacity) {
+	public List<Room> getRoomsByCapacity(String capacity) {
 		// TODO Auto-generated method stub
+		if ("Tất cả".equals(capacity)) {
+	        return em.createQuery("SELECT r FROM Room r", Room.class).getResultList();
+	    }
+		int i = Integer.valueOf(capacity);
 		return em.createQuery("SELECT r FROM Room r WHERE r.roomType.capacity = :capacity", Room.class)
-				.setParameter("capacity", capacity).getResultList();
+				.setParameter("capacity", i).getResultList();
 	}
 
 	@Override
@@ -164,6 +171,13 @@ public class RoomDAO extends UnicastRemoteObject implements RoomService {
 		// TODO Auto-generated method stub
 		return em.createQuery("SELECT r FROM Room r WHERE r.roomName = :nameRoom", Room.class)
 				.setParameter("nameRoom", nameRoom).getResultList();
+	}
+
+	@Override
+	public List<Room> getRoomsByPrice(Double price) throws RemoteException {
+		// TODO Auto-generated method stub
+		return em.createQuery("SELECT r FROM Room r WHERE r.roomType.price = :price", Room.class)
+				.setParameter("price", price).getResultList();
 	}
 
 }

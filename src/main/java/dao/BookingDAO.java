@@ -81,4 +81,10 @@ public class BookingDAO extends UnicastRemoteObject implements BookingSevice {
 				.setParameter("status", status).getResultList();
 	}
 
+	public List<Booking> getBookingsByPhoneNumber(String phoneNumber) throws RemoteException {
+		// TODO Auto-generated method stub
+		return (List<Booking>) em.createQuery("select b from Booking b where b.customer.phoneNumber = :phoneNumber", Booking.class)
+				.setParameter("phoneNumber", phoneNumber).getResultList();
+	}
+	
 }

@@ -17,15 +17,6 @@ public class DetailServiceDAO extends UnicastRemoteObject implements DetailServi
 		em = Persistence.createEntityManagerFactory("KaraokeOneDB").createEntityManager();
 	}
 	
-	public static void main(String[] args) throws RemoteException{
-		DetailServiceDAO dao = new DetailServiceDAO();
-//		dao.getAllCTDVPhong().forEach(e -> System.out.println(e));
-//		dao.searchDetailServiceRoomByBillID("2").forEach(e -> System.out.println(e));
-		dao.searchDetailServiceRoomByServiceName("2", "3").forEach(e -> System.out.println(e));
-		System.out.println(dao.updateAmountService(8, "2", "3"));
-		System.out.println(dao.delete("2", "3"));
-	}
-	
 	@Override
 	public boolean createCTDVPhong(DetailServiceRoom ctdvPhong) throws RemoteException {
 		// TODO Auto-generated method stub
@@ -42,20 +33,38 @@ public class DetailServiceDAO extends UnicastRemoteObject implements DetailServi
 		}
 		return false;
 	}
+	
+	@Override
+	public boolean updateDetailService(DetailServiceRoom detailServiceRoom) throws RemoteException {
+		// TODO Auto-generated method stub
+		EntityTransaction tx = em.getTransaction();
+		try {
+			tx.begin();
+			em.merge(detailServiceRoom);
+			tx.commit();
+			return true;
+		} catch (Exception e) {
+			// TODO: handle exception
+			tx.rollback();
+			e.printStackTrace();
+		}
+		return false;
+	}
+	
 	@Override
 	public ArrayList<DetailServiceRoom> getAllCTDVPhong() throws RemoteException {
 		// TODO Auto-generated method stub
 		return (ArrayList<DetailServiceRoom>) em.createQuery("select ds from DetailServiceRoom ds", DetailServiceRoom.class).getResultList();
 	}
 	@Override
-	public ArrayList<DetailServiceRoom> searchDetailServiceRoomByBillID(String billID) throws RemoteException {
+	public ArrayList<DetailServiceRoom> searchDetailServiceRoomByBillID(int billID) throws RemoteException {
 		// TODO Auto-generated method stub
 		return (ArrayList<DetailServiceRoom>) em.createQuery("select ds from DetailServiceRoom ds where ds.bill.id = :billID", DetailServiceRoom.class)
 				 .setParameter("billID", billID)
 				 .getResultList();
 	}
 	@Override
-	public ArrayList<DetailServiceRoom> searchDetailServiceRoomByServiceName(String billID, String serviceID)
+	public ArrayList<DetailServiceRoom> searchDetailServiceRoomByServiceName(int billID, int serviceID)
 			throws RemoteException {	
 		return (ArrayList<DetailServiceRoom>) em.createQuery("select ds from DetailServiceRoom ds where ds.bill.id = :billID and ds.service.id = :serviceID", DetailServiceRoom.class)
 				 .setParameter("billID", billID)
@@ -63,7 +72,7 @@ public class DetailServiceDAO extends UnicastRemoteObject implements DetailServi
 				 .getResultList();
 	}
 	@Override
-	public boolean updateAmountService(int quantity, String billID, String serviceID) throws RemoteException {
+	public boolean updateAmountService(int quantity, int billID, int serviceID) throws RemoteException {
 		// TODO Auto-generated method stub
 		EntityTransaction tx = em.getTransaction();
 		try {
@@ -85,7 +94,7 @@ public class DetailServiceDAO extends UnicastRemoteObject implements DetailServi
 		return false;
 	}
 	@Override
-	public boolean delete(String billID, String serviceID) throws RemoteException {
+	public boolean delete(int billID, int serviceID) throws RemoteException {
 		// TODO Auto-generated method stub
 		EntityTransaction tx = em.getTransaction();
 		try {

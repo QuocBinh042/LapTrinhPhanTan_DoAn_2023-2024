@@ -26,7 +26,6 @@ public class Card extends JFrame {
 	private PanelCustomer kh = new PanelCustomer();
 	private PanelBill hd = new PanelBill();
 	private PanelThongKe tk = new PanelThongKe();
-	private TroGiup tg = new TroGiup();
 	private JPanel pnlButton = new JPanel();
 	private int employeeID;
 	private EmployeeDAO eDAO = new EmployeeDAO();
@@ -103,7 +102,7 @@ public class Card extends JFrame {
 
 	private void createPanelLayout() {
 		pnl.add(tc, "tc");
-//		pnl.add(dp, "dp");
+		pnl.add(dp, "dp");
 		pnl.add(dv, "dv");
 		pnl.add(phong, "phong");
 		pnl.add(nv, "nv");

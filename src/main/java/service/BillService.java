@@ -10,13 +10,15 @@ import java.util.Map;
 import entity.Bill;
 import entity.DetailBill;
 
-public interface BillService extends Remote{
+public interface BillService extends Remote {
 	public boolean createBill(Bill bill) throws RemoteException;
 
 	public List<Bill> getAllBills() throws RemoteException;
 
-	public boolean updateBillAfterPayment(Bill bill) throws RemoteException;
+	public List<Bill> getBillsByBillID(int id) throws RemoteException;
 	
+	public boolean updateBillAfterPayment(Bill bill) throws RemoteException;
+
 	public List<Bill> getBillsByDetailBillID(int id) throws RemoteException;
 
 	public List<Bill> getBillsByTimeFrame(LocalDate startDate, LocalDate endDate) throws RemoteException;
@@ -37,9 +39,9 @@ public interface BillService extends Remote{
 
 	public List<Bill> searchBills(String billID, String employeeName, String phoneNumber) throws RemoteException;
 
-	public List<Bill> searchBillsByBillID(String id) throws RemoteException;
+	public List<Bill> searchBillsByBillID(int id) throws RemoteException;
 
-	public List<Bill> getBillsForStatistics(LocalDate date,LocalDate date2) throws RemoteException;
+	public List<Bill> getBillsForStatistics(LocalDate date, LocalDate date2) throws RemoteException;
 
 	public Double calculateDailyRevenue(LocalDate date) throws RemoteException;
 

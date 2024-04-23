@@ -4,7 +4,6 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.List;
 
-import entity.Bill;
 import entity.DetailBill;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
@@ -12,21 +11,14 @@ import jakarta.persistence.Persistence;
 import service.DetailBillService;
 
 public class DetailBillDAO extends UnicastRemoteObject implements DetailBillService{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -8785221690375712643L;
 	private EntityManager em;
 	
 	public DetailBillDAO() throws RemoteException{
 		em = Persistence.createEntityManagerFactory("KaraokeOneDB").createEntityManager();
-	}
-	
-	public static void main(String[] args) {
-		try {
-			DetailBillDAO dao = new DetailBillDAO();
-//			dao.findDetailBillByRoomID(2).forEach(e -> System.out.println(e));
-//			dao.findDetailBillByRoomName("102").forEach(e -> System.out.println(e));
-		} catch (Exception e) {
-			// TODO: handle exception
-			e.printStackTrace();
-		}
 	}
 	
 	@Override

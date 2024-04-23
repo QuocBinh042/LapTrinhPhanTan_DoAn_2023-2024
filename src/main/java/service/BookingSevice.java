@@ -17,4 +17,5 @@ public interface BookingSevice extends Remote {
 
 	public boolean updateBookingStatusByID(int status, int bookingID) throws RemoteException;
 
+	public List<Booking> getBookingsByPhoneNumber(String phoneNumber) throws RemoteException;
 }

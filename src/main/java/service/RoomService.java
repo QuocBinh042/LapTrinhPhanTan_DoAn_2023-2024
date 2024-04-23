@@ -2,7 +2,6 @@ package service;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
-import java.util.ArrayList;
 import java.util.List;
 
 import entity.Room;
@@ -25,10 +24,11 @@ public interface RoomService extends Remote {
 
 	public List<Room> getRoomsByType(String type) throws RemoteException;
 
-	public List<Room> getRoomsByCapacity(int capacity) throws RemoteException;
+	public List<Room> getRoomsByCapacity(String capacity) throws RemoteException;
 
 	public List<Room> getRoomsByRoomName(String nameRoom) throws RemoteException;
 	
 	public List<Room> getRoomsByRoomName2(String nameRoom) throws RemoteException;
-
+	
+	public List<Room> getRoomsByPrice(Double price) throws RemoteException;
 }

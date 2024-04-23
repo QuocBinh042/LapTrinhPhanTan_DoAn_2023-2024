@@ -2,6 +2,7 @@ package entity;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -37,6 +38,30 @@ public class DetailBill implements Serializable {
 	private LocalDateTime checkin;
 	@Column(name = "Checkout", nullable = true)
 	private LocalDateTime checkout;
+	
+	public Double translationRoomPrice() {
+		Double money;
+		money = room.getRoomType().getPrice() * (calculateTimeUsingRoomByMinute() / 60);
+		System.out.println(money);
+		double moneyExtra = calculateTimeUsingRoomByMinute() % 60;
+		System.out.println(calculateTimeUsingRoomByMinute());
+		System.out.println(moneyExtra);
+		if(calculateTimeUsingRoomByMinute() > 0) {
+			if(moneyExtra >= 0 && moneyExtra < 15) {
+				money += 0;
+			} else if (moneyExtra >= 15 && moneyExtra < 30) {
+				money += room.getRoomType().getPrice() * 0.5;
+			} else if (moneyExtra >= 30 && moneyExtra < 50) {
+				money += room.getRoomType().getPrice() * 0.75;
+			} else 
+				money += room.getRoomType().getPrice();
+		}
+		return money;	
+	}
+	
+	public long calculateTimeUsingRoomByMinute() {
+		return (checkout.atZone(ZoneId.systemDefault()).toEpochSecond() - checkin.atZone(ZoneId.systemDefault()).toEpochSecond()) / 60;
+	}
 
 	public DetailBill(int id, Room room, Bill bill, LocalDateTime checkin, LocalDateTime checkout) {
 		super();

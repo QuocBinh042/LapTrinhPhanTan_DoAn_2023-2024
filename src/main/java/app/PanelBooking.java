@@ -22,7 +22,9 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -46,16 +48,14 @@ import javax.swing.table.TableColumnModel;
 
 import com.github.lgooddatepicker.components.TimePicker;
 import com.toedter.calendar.JDateChooser;
-
-import app.PanelDatPhong.ChuyenPhong;
-import app.PanelDatPhong.PhongCho;
-import app.PanelDatPhong.ThuePhong;
 import dao.BillDAO;
 import dao.BookingDAO;
 import dao.CustomerDAO;
 import dao.DetailBillDAO;
+import dao.DetailServiceDAO;
 import dao.EmployeeDAO;
 import dao.RoomDAO;
+import dao.ServiceDAO;
 import entity.DetailServiceRoom;
 import entity.DetailBill;
 import entity.Service;
@@ -67,7 +67,7 @@ import entity.Employee;
 import entity.Booking;
 import entity.Room;
 
-public class PanelBooking extends JFrame {
+public class PanelBooking extends JPanel {
 	private JButton thuePBtn, phieuDatPhongBtn, datPBtn, chuyenPBtn, chiTietPBtn, dichVuPBtn, tinhTienPBtn, timKiemPBtn,
 			lamMoiBtn;
 	private JComboBox<String> tinhTrangB, soNguoiB, loaiPhongB;
@@ -87,7 +87,23 @@ public class PanelBooking extends JFrame {
 	private PhongCho phongCho;
 	private CustomerDAO customerDAO;
 	private DetailBillDAO detailBillDAO;
-
+	private ChiTietPhong chiTietPhong;
+	private DetailServiceDAO detailServiceDAO;
+	private ServiceDAO serviceDAO;
+	private DichVuPhong dichVuPhong;
+	private TinhTien tinhTien;
+	
+	Icon imgAdd = new ImageIcon("src/main/java/img/add2.png");
+	Icon imgDel = new ImageIcon("src/main/java/img/del.png");
+	Icon imgReset = new ImageIcon("src/main/java/img/refresh16.png");
+	Icon imgEdit = new ImageIcon("src/main/java/img/edit.png");
+	Icon imgOut = new ImageIcon("src/main/java/img/out.png");
+	Icon imgSearch = new ImageIcon("src/main/java/img/search.png");
+	Icon imgCheck = new ImageIcon("src/main/java/img/check16.png");
+	Icon imgCancel = new ImageIcon("src/main/java/img/cancel16.png");
+	Icon imgBack = new ImageIcon("src/main/java/img/back16.png");
+	Icon imgChange = new ImageIcon("src/img/change16.png");
+	
 	public static void main(String[] args) throws RemoteException {
 		new PanelBooking("1").setVisible(true);
 	}
@@ -101,25 +117,20 @@ public class PanelBooking extends JFrame {
 	}
 
 	public PanelBooking(String maNV) throws RemoteException {
-		setSize(1400, 720);
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setLocationRelativeTo(null);
+//		setSize(1400, 720);
+//		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//		setLocationRelativeTo(null);
 		roomDAO = new RoomDAO();
 		customerDAO = new CustomerDAO();
 		bookingDAO = new BookingDAO();
 		billDAO = new BillDAO();
 		employeeDAO = new EmployeeDAO();
 		detailBillDAO = new DetailBillDAO();
+		detailServiceDAO = new DetailServiceDAO();
+		serviceDAO = new ServiceDAO();
 		setManNV(maNV);
 
-		Icon imgAdd = new ImageIcon("src/main/java/img/add2.png");
-		Icon imgDel = new ImageIcon("src/main/java/img/del.png");
-		Icon imgReset = new ImageIcon("src/main/java/img/refresh16.png");
-		Icon imgEdit = new ImageIcon("src/main/java/img/edit.png");
-		Icon imgOut = new ImageIcon("src/main/java/img/out.png");
-		Icon imgSearch = new ImageIcon("src/main/java/img/search.png");
-		Icon imgCheck = new ImageIcon("src/main/java/img/check16.png");
-		Icon imgCancel = new ImageIcon("src/main/java/img/cancel16.png");
+		
 
 		JLabel tinhTrangLb, soNguoiLb, loaiPLb, phongLb, giaPLb, locTinhTrangLb, sdtLb;
 		JPanel mainPane, leftPane, rightPane, timePane, btnPane, panePhong, panePDP, paneBtnPhong, paneBtnPDP,
@@ -338,14 +349,16 @@ public class PanelBooking extends JFrame {
 		paneBtnPhong.setBackground(Color.decode("#D0BAFB"));
 
 		panePhong.add(paneBtnPhong, BorderLayout.NORTH);
-//		panePhong.setBorder(BorderFactory.createTitledBorder(blackLine, "Thông tin phòng"));
 		panePhong.setBackground(Color.decode("#D0BAFB"));
+		
+		setLayout(new BorderLayout());;
+		add(panePhong, BorderLayout.CENTER);
 
-		JPanel main = new JPanel();
-		main.setLayout(new BorderLayout());
-		main.add(panePhong, BorderLayout.CENTER);
+//		JPanel main = new JPanel();
+//		main.setLayout(new BorderLayout());
+//		main.add(panePhong, BorderLayout.CENTER);
 
-		this.getContentPane().add(main);
+//		this.getContentPane().add(main);
 		getAllDataRooms();
 
 		thuePBtn.setMnemonic(KeyEvent.VK_F1);
@@ -359,6 +372,8 @@ public class PanelBooking extends JFrame {
 		tinhTienPBtn.setMnemonic(KeyEvent.VK_F5);
 		tinhTienPBtn.setToolTipText("Click ALT F5");
 
+		chiTietPBtn.addActionListener(e -> xuLyChiTietPhong());
+		dichVuPBtn.addActionListener(e -> xuLyDichVuPhong());
 		tinhTrangB.addActionListener(e -> xuLyLocTheoTinhTrangPhong());
 		soNguoiB.addActionListener(e -> xuLyLocTheoSoNguoi());
 		loaiPhongB.addActionListener(e -> xuLyLocTheoLoaiPhong());
@@ -380,6 +395,7 @@ public class PanelBooking extends JFrame {
 				e1.printStackTrace();
 			}
 		});
+		tinhTienPBtn.addActionListener(e -> xuLyTinhTien());
 	}
 
 	private void getAllDataRooms() {
@@ -451,7 +467,7 @@ public class PanelBooking extends JFrame {
 
 	private void xuLyLocTheoSoNguoi() {
 		phongModel.setRowCount(0);
-		List<Room> dsP = roomDAO.getRoomsByCapacity(Integer.valueOf((String) soNguoiB.getSelectedItem()));
+		List<Room> dsP = roomDAO.getRoomsByCapacity((String) soNguoiB.getSelectedItem());
 		if (((String) soNguoiB.getSelectedItem()).equalsIgnoreCase("Tất cả")) {
 			getAllDataRooms();
 		}
@@ -462,7 +478,7 @@ public class PanelBooking extends JFrame {
 	}
 
 	private void xuLyThuePhong() {
-		Room room = roomDAO.getRoomsByRoomName((String) phongModel.getValueAt(phongTable.getSelectedRow(), 3)).get(0);
+		Room room = roomDAO.getRoomsByRoomName((String) phongModel.getValueAt(phongTable.getSelectedRow(), 0)).get(0);
 		if (phongTable.getSelectedRow() != -1) {
 			if (room.getRoomStatus().equalsIgnoreCase("Còn trống")) {
 				thuePhong = new ThuePhong();
@@ -497,6 +513,53 @@ public class PanelBooking extends JFrame {
 		phongCho.setVisible(true);
 		phongCho.setLocationRelativeTo(null);
 	}
+	
+	private void xuLyChiTietPhong() {
+		Room room = roomDAO.getRoomsByRoomName((String) phongModel.getValueAt(phongTable.getSelectedRow(), 0)).get(0);
+		if (phongTable.getSelectedRow() != -1) {
+			if (room.getRoomStatus().equalsIgnoreCase("Đang thuê")) {
+				chiTietPhong = new ChiTietPhong();
+				chiTietPhong.setVisible(true);
+				chiTietPhong.setAlwaysOnTop(true);
+				chiTietPhong.setLocationRelativeTo(null);
+			} else {
+				JOptionPane.showMessageDialog(this, "Bạn chỉ được xem chi tiết phòng đang thuê!!");
+			}
+		} else {
+			JOptionPane.showMessageDialog(this, "Hãy chọn phòng bạn muốn xem chi tiết!!");
+		}
+	}
+	
+	private void xuLyDichVuPhong() {
+		if (phongTable.getSelectedRow() != -1) {
+			if (((String) phongModel.getValueAt(phongTable.getSelectedRow(), 3)).equalsIgnoreCase("Đang thuê")) {
+				dichVuPhong = new DichVuPhong();
+				dichVuPhong.setVisible(true);
+				dichVuPhong.setAlwaysOnTop(true);
+				dichVuPhong.setLocationRelativeTo(null);
+			} else {
+				JOptionPane.showMessageDialog(this, "Bạn chỉ được thêm dịch vụ vào phòng đang thuê!!");
+			}
+		} else {
+			JOptionPane.showMessageDialog(this, "Hãy chọn phòng bạn muốn thêm dịch vụ!!");
+		}
+	}
+	
+	private void xuLyTinhTien() {
+		if (phongTable.getSelectedRow() != -1) {
+			if (((String) phongModel.getValueAt(phongTable.getSelectedRow(), 3)).equalsIgnoreCase("Đang thuê")) {
+				tinhTien = new TinhTien();
+				tinhTien.setVisible(true);
+				tinhTien.setAlwaysOnTop(true);
+				tinhTien.setLocationRelativeTo(null);
+			} else {
+				JOptionPane.showMessageDialog(this, "Bạn chỉ được thanh toán phòng đang thuê!!");
+			}
+		} else {
+			JOptionPane.showMessageDialog(this, "Hãy chọn phòng bạn muốn thanh toán!!");
+		}
+
+	}
 
 	public class ThuePhong extends JFrame {
 		private JTextField tenPhongF, loaiPhongF, giaPhongF, sucChuaF, tinhTrangF, sdtKhachF, tenKhachF, soLuongF;
@@ -513,16 +576,6 @@ public class PanelBooking extends JFrame {
 
 		public ThuePhong() {
 			setSize(700, 550);
-
-			Icon imgDel = new ImageIcon("src/main/java/img/del.png");
-			Icon imgReset = new ImageIcon("src/main/java/img/refresh16.png");
-			Icon imgEdit = new ImageIcon("src/main/java/img/edit.png");
-			Icon imgOut = new ImageIcon("src/main/java/img/out.png");
-			Icon imgSearch = new ImageIcon("src/main/java/img/search.png");
-			Icon imgCheck = new ImageIcon("src/main/java/img/check16.png");
-			Icon imgCancel = new ImageIcon("src/main/java/img/cancel16.png");
-			Icon imgBack = new ImageIcon("src/main/java/img/back16.png");
-			Icon imgAdd = new ImageIcon("src/main/java/img/add16.png");
 
 			JLabel luaChonLb, soLuongLb, tenPhongLb, loaiPhongLb, giaPhongLb, sucChuaLb, tinhTrangLb, sdtKhachLb,
 					tenKhachLb, ngayNhanPhongLb, gioNhanPhongLb, ghiChuLb, tieuDeLb;
@@ -821,7 +874,6 @@ public class PanelBooking extends JFrame {
 				gioNhanTP.setTime(LocalTime.now());
 
 			} else {
-
 			}
 		}
 
@@ -950,16 +1002,7 @@ public class PanelBooking extends JFrame {
 			setTenPhong(tenPhong);
 			setSize(1050, 500);
 			setLocationRelativeTo(null);
-			Icon imgDel = new ImageIcon("src/img/del.png");
-			Icon imgReset = new ImageIcon("src/img/refresh16.png");
-			Icon imgEdit = new ImageIcon("src/img/edit.png");
-			Icon imgOut = new ImageIcon("src/img/out.png");
-			Icon imgSearch = new ImageIcon("src/img/search.png");
-			Icon imgCheck = new ImageIcon("src/img/check16.png");
-			Icon imgCancel = new ImageIcon("src/img/cancel16.png");
-			Icon imgBack = new ImageIcon("src/img/back16.png");
-			Icon imgAdd = new ImageIcon("src/img/add16.png");
-			Icon imgChange = new ImageIcon("src/img/change16.png");
+			
 
 			JPanel mainPane, topPane, leftPane, rightPane, bottomPane, bottomPaneRight, bottomPaneLeft;
 			JLabel lbTieuDe;
@@ -1102,8 +1145,7 @@ public class PanelBooking extends JFrame {
 			btnLamMoi.setBackground(Color.decode("#6fa8dc"));
 			btnTimKiem.setBackground(Color.decode("#6fa8dc"));
 			lbPhong.setPreferredSize(lbGiaPhong.getPreferredSize());
-			btnLamMoi.setPreferredSize(btnTimKiem.getPreferredSize());
-
+			
 			boxBtn.add(paneTraCuuP);
 			JPanel paneForBoxBtn = new JPanel();
 			paneForBoxBtn.setBackground(Color.decode("#cccccc"));
@@ -1125,14 +1167,15 @@ public class PanelBooking extends JFrame {
 
 			bottomPaneRight = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 			bottomPaneRight.setBackground(Color.decode("#cccccc"));
-			bottomPaneRight.add(btnChuyenPhong = new ButtonGradient("Chuyển phòng", imgChange));
+			bottomPaneRight.add(btnChuyenPhong = new ButtonGradient("Chuyển phòng"));
+			btnChuyenPhong.setFont(new Font("sanserif", Font.BOLD, 12));
 			btnChuyenPhong.setBackground(Color.decode("#6fa8dc"));
 
 			bottomPaneLeft = new JPanel(new FlowLayout(FlowLayout.LEFT));
 			bottomPaneLeft.setBackground(Color.decode("#cccccc"));
-			bottomPaneLeft.add(btnQuayLai = new ButtonGradient("Quay lại", imgBack));
+			bottomPaneLeft.add(btnQuayLai = new ButtonGradient("Quay lại   ", imgBack));
 			btnQuayLai.setBackground(Color.decode("#6fa8dc"));
-
+			
 			bottomPane.add(bottomPaneLeft);
 			bottomPane.add(bottomPaneRight);
 
@@ -1140,6 +1183,9 @@ public class PanelBooking extends JFrame {
 			mainPane.add(leftPane, BorderLayout.WEST);
 			mainPane.add(rightPane, BorderLayout.CENTER);
 			mainPane.add(bottomPane, BorderLayout.SOUTH);
+			
+			btnChuyenPhong.setPreferredSize(btnQuayLai.getPreferredSize());
+			btnLamMoi.setPreferredSize(btnTimKiem.getPreferredSize());
 
 			tfTenPhong.setFont(new Font("Arial", Font.PLAIN, 16));
 			tfTenPhong.setBorder(null);
@@ -1177,7 +1223,14 @@ public class PanelBooking extends JFrame {
 				tfTenPhong.setText("");
 				tfPhong.requestFocus();
 			});
-			btnTimKiem.addActionListener(e -> xuLyTimKiem());
+			btnTimKiem.addActionListener(e -> {
+				try {
+					xuLyTimKiem();
+				} catch (NumberFormatException | RemoteException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			});
 			btnChuyenPhong.addActionListener(e -> {
 				try {
 					xuLyChuyenPhong();
@@ -1190,8 +1243,24 @@ public class PanelBooking extends JFrame {
 			cbSucChua.addActionListener(e -> xuLyLocTheoSucChua());
 		}
 
-		private void xuLyTimKiem() {
-
+		private void xuLyTimKiem() throws NumberFormatException, RemoteException {
+			if(!tfPhong.getText().equals("") || !tfGiaPhong.getText().equals("")) {
+				List<Room> rooms = new ArrayList<Room>();
+				modelPhongTrong.setRowCount(0);
+				if(!tfPhong.getText().equals("")) {
+					rooms = roomDAO.getRoomsByRoomName(tfPhong.getText().trim());
+					if(!tfGiaPhong.getText().equals("") && rooms.size() != 0) 
+					rooms = rooms.stream().filter(r -> r.getRoomType().getPrice() == Double.valueOf(tfGiaPhong.getText().trim()))
+								 .toList();
+				}
+				else
+					rooms = roomDAO.getRoomsByPrice(Double.valueOf(tfGiaPhong.getText().trim()));
+				
+				rooms.forEach(r -> {
+					modelPhongTrong.addRow(new Object[] {r.getId(), r.getName(), r.getRoomType().getTypeRoom(),
+							r.getRoomType().getCapacity(), r.getRoomType().getPrice()});
+				});
+			}
 		}
 
 		private void xuLyChuyenPhong() throws RemoteException {
@@ -1199,9 +1268,10 @@ public class PanelBooking extends JFrame {
 					.getRoomsByRoomName2((String) modelPhongTrong.getValueAt(tablePhongTrong.getSelectedRow(), 1))
 					.get(0);
 			DetailBill cthd = detailBillDAO.findDetailBillByRoomIDOrderByID(tenPhong).get(0);
+			cthd.setCheckout(LocalDateTime.now());
+			cthd.setCheckout(LocalDateTime.now());
 			Bill bill = billDAO.getBillsByDetailBillID(Integer.valueOf(cthd.getId())).get(0);
 			DetailBill chiTietHD = new DetailBill(0, p, bill, LocalDateTime.now(), null);
-			cthd.setCheckout(LocalDateTime.now());
 			try {
 				if (detailBillDAO.createDetailBill(chiTietHD) && detailBillDAO.updateCheckoutTime(cthd)) {
 					if (roomDAO.updateRoomStatusByRoomName("Còn trống", tenPhong)
@@ -1217,15 +1287,24 @@ public class PanelBooking extends JFrame {
 		}
 
 		private void xuLyLocTheoLoaiPhong() {
-
+			modelPhongTrong.setRowCount(0);
+			List<Room> rooms = roomDAO.getRoomsByType((String)cbLoaiPhong.getSelectedItem());
+			rooms.forEach(r -> {
+				modelPhongTrong.addRow(new Object[] {r.getId(), r.getName(), r.getRoomType().getTypeRoom(),
+						r.getRoomType().getCapacity(), r.getRoomType().getPrice()});
+			});
 		}
 
 		private void xuLyLocTheoSucChua() {
-
+			modelPhongTrong.setRowCount(0);
+			List<Room> rooms = roomDAO.getRoomsByCapacity((String) cbSucChua.getSelectedItem());
+			rooms.forEach(r -> {
+				modelPhongTrong.addRow(new Object[] {r.getId(), r.getName(), r.getRoomType().getTypeRoom(),
+						r.getRoomType().getCapacity(), r.getRoomType().getPrice()});
+			});
 		}
 
 		private void readDataToFieldsTTPhongDangThue() throws RemoteException {
-
 			Room phong = roomDAO.getRoomsByRoomName2(tenPhong).get(0);
 			DetailBill detailBill = detailBillDAO.findDetailBillByRoomIDOrderByID(phong.getName()).get(0);
 			Bill bill = billDAO.getBillsByDetailBillID(detailBill.getId()).get(0);
@@ -1237,7 +1316,7 @@ public class PanelBooking extends JFrame {
 					.setText(LocalDateTime.now().format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT)) + "");
 			double time = (LocalDateTime.now().atZone(ZoneId.systemDefault()).toEpochSecond()
 					- detailBill.getCheckin().atZone(ZoneId.systemDefault()).toEpochSecond()) / 60;
-			tfThoiGianSuDung.setText(time + "");
+			tfThoiGianSuDung.setText(time + " phút");
 		}
 
 		private void readDataToTablePhong(String status) {
@@ -1372,7 +1451,14 @@ public class PanelBooking extends JFrame {
 			huyPBtn.addActionListener(e -> xuLyHuyPhongCho());
 			nhanPBtn.addActionListener(e -> xuLyNhanPhong());
 			tinhTrangPhieuB.addActionListener(e -> xuLyLocTheoTinhTrangPDP());
-			timKiemSDTBtn.addActionListener(e -> xuLyTimKiemSDT());
+			timKiemSDTBtn.addActionListener(e -> {
+				try {
+					xuLyTimKiemSDT();
+				} catch (RemoteException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			});
 		}
 
 		private void readDateToTablePhongCho() throws RemoteException {
@@ -1416,8 +1502,1290 @@ public class PanelBooking extends JFrame {
 			}
 		}
 
-		private void xuLyTimKiemSDT() {
+		private void xuLyTimKiemSDT() throws RemoteException {
+			phieuDatPModel.setRowCount(0);
+			List<Booking> bookings = bookingDAO.getBookingsByPhoneNumber(sdtF.getText().trim());
+			bookings.forEach(b -> {
+				phieuDatPModel.addRow(new Object[] {b.getId(), b.getRoom().getName(), b.getBookingDateTime().toLocalDate()});
+			});
+		}
+	}
+	public class ChiTietPhong extends JFrame {
+		private JTextField tfMaHD, tfTenKhach, tfNgayNhanP, tfTenNhanVien, tfSDT, tfTenPhong, tfSucChua,
+				tfLoaiPhong, tfGiaPhong, tfGioThuePhong, tfGioHienTai, tfThoiGianSuDung, tfTienPhongCu,
+				tfTienPhongHienTai, tfTongTienPhong, tfTongTienDich, tfGiamGia, tfTongCong, tfThueVAT, tfThanhTien;
+		private JTable tableDichVu;
+		private DefaultTableModel model;
+		private JButton btnThemDV, btnChuyenPhong, btnQuayLai;
+		private DateTimeFormatter gioFormatForDate = DateTimeFormatter.ofPattern("HH:mm");
+
+		public ChiTietPhong() {
+			setSize(1000, 600);
+			setLocationRelativeTo(null);
+
+			Icon imgDel = new ImageIcon("src/img/del.png");
+			Icon imgReset = new ImageIcon("src/img/refresh16.png");
+			Icon imgEdit = new ImageIcon("src/img/edit.png");
+			Icon imgOut = new ImageIcon("src/img/out.png");
+			Icon imgSearch = new ImageIcon("src/img/search.png");
+			Icon imgCheck = new ImageIcon("src/img/check16.png");
+			Icon imgCancel = new ImageIcon("src/img/cancel16.png");
+			Icon imgBack = new ImageIcon("src/img/back16.png");
+			Icon imgAdd = new ImageIcon("src/img/add16.png");
+			Icon imgChange = new ImageIcon("src/img/change16.png");
+
+			JPanel mainPane, topPane, bottomPane, pDPPane, thongTinPhongPane, thongTinDVPane, thongTinPDPPane, btnPane;
+
+			JLabel lbMaPDP, lbTenKhach, lbNgayNhanP, lbTenNhanVien, lbSDT, lbGioNhan, lbTenPhong, lbSucChua,
+					lbLoaiPhong, lbGiaPhong, lbGioThuePhong, lbGioHienTai, lbThoiGianSuDung, lbTienPhongCu,
+					lbTienPhongHienTai, lbTongTienPhong, lbTongTienDich, lbGiamGia, lbTongCong, lbThueVAT, lbThanhTien,
+					lbTuaDe;
+
+			Border border = new LineBorder(Color.black);
+
+			// set Top Pane
+			topPane = new JPanel();
+			lbTuaDe = new JLabel("CHI TIẾT PHÒNG");
+			lbTuaDe.setFont(new Font("Arial", Font.BOLD, 24));
+			topPane.add(lbTuaDe);
+			topPane.setBackground(Color.decode("#6fa8dc"));
+
+			// set Bottom Pane
+			bottomPane = new JPanel(new BorderLayout());
+			pDPPane = new JPanel();
+			pDPPane.setBackground(Color.decode("#e6dbd1"));
+			Box boxForPDPPane = Box.createHorizontalBox();
+
+			// set up cột đầu tiên trong pane phiếu đặt phòng
+			Box box1 = Box.createVerticalBox();
+			Box boxForMaPDP = Box.createHorizontalBox();
+			boxForMaPDP.add(lbMaPDP = new JLabel("Mã Hóa Đơn: "));
+			boxForMaPDP.add(tfMaHD = new JTextField(15));
+			box1.add(boxForMaPDP);
+			box1.add(Box.createVerticalStrut(20));
+
+			Box boxForTenNhanVien = Box.createHorizontalBox();
+			boxForTenNhanVien.add(lbTenNhanVien = new JLabel("Tên Nhân Viên: "));
+			boxForTenNhanVien.add(tfTenNhanVien = new JTextField(15));
+			box1.add(boxForTenNhanVien);
+			boxForPDPPane.add(box1);
+			boxForPDPPane.add(Box.createHorizontalStrut(10));
+
+			// set up cột thứ hai trong pane phiếu đặt phòng
+			Box box2 = Box.createVerticalBox();
+			Box boxForTenKhach = Box.createHorizontalBox();
+			boxForTenKhach.add(lbTenKhach = new JLabel("Tên Khách Hàng: "));
+			boxForTenKhach.add(tfTenKhach = new JTextField(15));
+			box2.add(boxForTenKhach);
+			box2.add(Box.createVerticalStrut(20));
+
+			Box boxForSDT = Box.createHorizontalBox();
+			boxForSDT.add(lbSDT = new JLabel("Số Điện Thoại: "));
+			boxForSDT.add(tfSDT = new JTextField(15));
+			box2.add(boxForSDT);
+			boxForPDPPane.add(box2);
+			boxForPDPPane.add(Box.createHorizontalStrut(10));
+
+			// set up cột thứ ba trong pane phiếu đặt phòng
+			Box box3 = Box.createVerticalBox();
+			Box boxForNgayNhan = Box.createHorizontalBox();
+			boxForNgayNhan.add(lbNgayNhanP = new JLabel("Ngày Nhận Phòng: "));
+			boxForNgayNhan.add(tfNgayNhanP = new JTextField(15));
+			box3.add(boxForNgayNhan);
+			box3.add(Box.createVerticalStrut(20));
+
+			// Thong tin phong hien tai, thong tin dich vu
+			JPanel pane = new JPanel(new BorderLayout());
+			thongTinPhongPane = new JPanel();
+			Box boxForThongTinPhong = Box.createVerticalBox();
+
+			Box boxForTenPhong = Box.createHorizontalBox();
+			boxForTenPhong.add(lbTenPhong = new JLabel("Tên Phòng:"));
+			boxForTenPhong.add(Box.createHorizontalStrut(5));
+			boxForTenPhong.add(tfTenPhong = new JTextField(15));
+
+			Box boxForSucChua = Box.createHorizontalBox();
+			boxForSucChua.add(lbSucChua = new JLabel("Sức Chứa:"));
+			boxForSucChua.add(Box.createHorizontalStrut(5));
+			boxForSucChua.add(tfSucChua = new JTextField(15));
+
+			Box boxForLoaiPhong = Box.createHorizontalBox();
+			boxForLoaiPhong.add(lbLoaiPhong = new JLabel("Loại Phòng:"));
+			boxForLoaiPhong.add(Box.createHorizontalStrut(5));
+			boxForLoaiPhong.add(tfLoaiPhong = new JTextField(15));
+
+			Box boxForGiaPhong = Box.createHorizontalBox();
+			boxForGiaPhong.add(lbGiaPhong = new JLabel("Giá Phòng:"));
+			boxForGiaPhong.add(Box.createHorizontalStrut(5));
+			boxForGiaPhong.add(tfGiaPhong = new JTextField(15));
+
+			Box boxForGioThuePhong = Box.createHorizontalBox();
+			boxForGioThuePhong.add(lbGioThuePhong = new JLabel("Giờ Thuê Phòng:"));
+			boxForGioThuePhong.add(Box.createHorizontalStrut(5));
+			boxForGioThuePhong.add(tfGioThuePhong = new JTextField(15));
+
+			Box boxForGioHienTai = Box.createHorizontalBox();
+			boxForGioHienTai.add(lbGioHienTai = new JLabel("Giờ Hiện Tại:"));
+			boxForGioHienTai.add(Box.createHorizontalStrut(5));
+			boxForGioHienTai.add(tfGioHienTai = new JTextField(15));
+
+			Box boxForThoiGian = Box.createHorizontalBox();
+			boxForThoiGian.add(lbThoiGianSuDung = new JLabel("Thời Gian Sử Dụng: "));
+			// boxForThoiGian.add(Box.createHorizontalStrut(5));
+			boxForThoiGian.add(tfThoiGianSuDung = new JTextField(15));
+
+			boxForThongTinPhong.add(Box.createVerticalStrut(5));
+			boxForThongTinPhong.add(boxForTenPhong);
+			boxForThongTinPhong.add(Box.createVerticalStrut(20));
+			boxForThongTinPhong.add(boxForSucChua);
+			boxForThongTinPhong.add(Box.createVerticalStrut(20));
+			boxForThongTinPhong.add(boxForLoaiPhong);
+			boxForThongTinPhong.add(Box.createVerticalStrut(20));
+			boxForThongTinPhong.add(boxForGiaPhong);
+			boxForThongTinPhong.add(Box.createVerticalStrut(20));
+			boxForThongTinPhong.add(boxForGioThuePhong);
+			boxForThongTinPhong.add(Box.createVerticalStrut(20));
+			boxForThongTinPhong.add(boxForGioHienTai);
+			boxForThongTinPhong.add(Box.createVerticalStrut(20));
+			boxForThongTinPhong.add(boxForThoiGian);
+			boxForThongTinPhong.add(Box.createVerticalStrut(20));
+
+			thongTinPhongPane.add(boxForThongTinPhong);
+			thongTinPhongPane.setBackground(Color.decode("#cccccc"));
+			thongTinPhongPane.setBorder(BorderFactory.createTitledBorder(border, "Thông tin phòng hiện tại"));
+			pane.add(thongTinPhongPane, BorderLayout.WEST);
+
+			// set thong tin dich vu
+			String[] headersDichVu = { "STT", "Tên dịch vụ", "Đơn vị", "Số lượng", "Đơn giá" };
+			model = new DefaultTableModel(headersDichVu, 20);
+			tableDichVu = new JTable(model);
+			tableDichVu.setRowHeight(25);
+			JScrollPane scroll = new JScrollPane(tableDichVu, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+					JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+			scroll.setBackground(Color.decode("#cccccc"));
+			scroll.setBorder(BorderFactory.createTitledBorder(border, "Thông tin dịch vụ"));
+			pane.add(scroll, BorderLayout.CENTER);
+
+			// set tổng tiền phiếu đặt phòng
+			thongTinPDPPane = new JPanel();
+			btnPane = new JPanel();
+
+			Box boxForTTPDP = Box.createHorizontalBox();
+			Box boxForCot1 = Box.createVerticalBox();
+			Box boxForCot2 = Box.createVerticalBox();
+
+			Box boxForTienPhongCu = Box.createHorizontalBox();
+			boxForTienPhongCu.add(lbTienPhongCu = new JLabel("Tên Phòng Cũ (nếu có): "));
+			boxForTienPhongCu.add(tfTienPhongCu = new JTextField(15));
+
+			Box boxForTienPhongHienTai = Box.createHorizontalBox();
+			boxForTienPhongHienTai.add(lbTienPhongHienTai = new JLabel("Tiền Phòng Hiện Tại:"));
+			boxForTienPhongHienTai.add(Box.createHorizontalStrut(5));
+			boxForTienPhongHienTai.add(tfTienPhongHienTai = new JTextField(15));
+
+			Box boxForTongTienPhong = Box.createHorizontalBox();
+			boxForTongTienPhong.add(lbTongTienPhong = new JLabel("Tổng Tiền Phòng:"));
+			boxForTongTienPhong.add(Box.createHorizontalStrut(5));
+			boxForTongTienPhong.add(tfTongTienPhong = new JTextField(15));
+
+			Box boxForTongTienDich = Box.createHorizontalBox();
+			boxForTongTienDich.add(lbTongTienDich = new JLabel("Tổng Tiền Dịch:"));
+			boxForTongTienDich.add(Box.createHorizontalStrut(5));
+			boxForTongTienDich.add(tfTongTienDich = new JTextField(15));
+
+			boxForCot1.add(boxForTienPhongCu);
+			boxForCot1.add(Box.createVerticalStrut(10));
+			boxForCot1.add(boxForTienPhongHienTai);
+			boxForCot1.add(Box.createVerticalStrut(10));
+			boxForCot1.add(boxForTongTienPhong);
+			boxForCot1.add(Box.createVerticalStrut(10));
+			boxForCot1.add(boxForTongTienDich);
+
+			boxForTTPDP.add(Box.createHorizontalStrut(20));
+			boxForTTPDP.add(boxForCot1);
+			boxForTTPDP.add(Box.createHorizontalStrut(100));
+
+			Box boxForGiamGia = Box.createHorizontalBox();
+			boxForGiamGia.add(lbGiamGia = new JLabel("Giảm Giá:"));
+			boxForGiamGia.add(Box.createHorizontalStrut(5));
+			boxForGiamGia.add(tfGiamGia = new JTextField(15));
+
+			Box boxForTongCong = Box.createHorizontalBox();
+			boxForTongCong.add(lbTongCong = new JLabel("Tổng Cộng:"));
+			boxForTongCong.add(Box.createHorizontalStrut(5));
+			boxForTongCong.add(tfTongCong = new JTextField(15));
+
+			Box boxForThue = Box.createHorizontalBox();
+			boxForThue.add(lbThueVAT = new JLabel("Thuế VAT:"));
+			boxForThue.add(Box.createHorizontalStrut(5));
+			boxForThue.add(tfThueVAT = new JTextField(15));
+
+			Box boxForThanhTien = Box.createHorizontalBox();
+			boxForThanhTien.add(lbThanhTien = new JLabel("Thành Tiền: "));
+			boxForThanhTien.add(tfThanhTien = new JTextField(15));
+
+			boxForCot2.add(boxForGiamGia);
+			boxForCot2.add(Box.createVerticalStrut(10));
+			boxForCot2.add(boxForTongCong);
+			boxForCot2.add(Box.createVerticalStrut(10));
+			boxForCot2.add(boxForThue);
+			boxForCot2.add(Box.createVerticalStrut(10));
+			boxForCot2.add(boxForThanhTien);
+
+			boxForTTPDP.add(boxForCot2);
+			boxForTTPDP.add(Box.createHorizontalStrut(20));
+
+			thongTinPDPPane.add(boxForTTPDP);
+			thongTinPDPPane.setBackground(Color.decode("#cccccc"));
+			thongTinPDPPane.setBorder(BorderFactory.createTitledBorder(border, "Tổng Tiền Phiếu Đặt Phòng"));
+
+			JPanel pane2 = new JPanel(new BorderLayout());
+			pane2.add(thongTinPDPPane, BorderLayout.WEST);
+
+			// set pane button
+			btnPane = new JPanel();
+			Box boxForBtnPane = Box.createVerticalBox();
+			boxForBtnPane.add(Box.createVerticalStrut(10));
+			boxForBtnPane.add(btnThemDV = new ButtonGradient("Thêm dịch vụ", imgAdd));
+			boxForBtnPane.add(Box.createVerticalStrut(20));
+			boxForBtnPane.add(btnChuyenPhong = new ButtonGradient("Chuyển phòng", imgChange));
+			boxForBtnPane.add(Box.createVerticalStrut(20));
+			boxForBtnPane.add(btnQuayLai = new ButtonGradient("Quay lại", imgBack));
+			boxForBtnPane.add(Box.createVerticalStrut(10));
+			btnPane.add(boxForBtnPane);
+			btnPane.setBackground(Color.decode("#e6dbd1"));
+
+			btnQuayLai.setBackground(Color.decode("#6fa8dc"));
+			btnChuyenPhong.setBackground(Color.decode("#6fa8dc"));
+			btnThemDV.setBackground(Color.decode("#6fa8dc"));
+
+			Dimension maxButtonSize = new Dimension(Integer.MAX_VALUE, btnChuyenPhong.getPreferredSize().height);
+			btnThemDV.setMaximumSize(maxButtonSize);
+			btnQuayLai.setMaximumSize(maxButtonSize);
+
+			pane2.add(btnPane, BorderLayout.CENTER);
+
+			// set text field của pdp pane
+			tfMaHD.setBorder(null);
+			tfMaHD.setEditable(false);
+			tfMaHD.setBackground(Color.decode("#e6dbd1"));
+			tfTenNhanVien.setBorder(null);
+			tfTenNhanVien.setEditable(false);
+			tfTenNhanVien.setBackground(Color.decode("#e6dbd1"));
+			tfTenKhach.setBorder(null);
+			tfTenKhach.setEditable(false);
+			tfTenKhach.setBackground(Color.decode("#e6dbd1"));
+			tfSDT.setBorder(null);
+			tfSDT.setEditable(false);
+			tfSDT.setBackground(Color.decode("#e6dbd1"));
+			tfNgayNhanP.setBorder(null);
+			tfNgayNhanP.setEditable(false);
+			tfNgayNhanP.setBackground(Color.decode("#e6dbd1"));
+			tfTenPhong.setBorder(null);
+			tfTenPhong.setEditable(false);
+			tfTenPhong.setBackground(Color.decode("#cccccc"));
+			tfSucChua.setBorder(null);
+			tfSucChua.setEditable(false);
+			tfSucChua.setBackground(Color.decode("#cccccc"));
+			tfLoaiPhong.setBorder(null);
+			tfLoaiPhong.setEditable(false);
+			tfLoaiPhong.setBackground(Color.decode("#cccccc"));
+			tfGiaPhong.setBorder(null);
+			tfGiaPhong.setEditable(false);
+			tfGiaPhong.setBackground(Color.decode("#cccccc"));
+			tfGioThuePhong.setBorder(null);
+			tfGioThuePhong.setEditable(false);
+			tfGioThuePhong.setBackground(Color.decode("#cccccc"));
+			tfGioHienTai.setBorder(null);
+			tfGioHienTai.setEditable(false);
+			tfGioHienTai.setBackground(Color.decode("#cccccc"));
+			tfThoiGianSuDung.setBorder(null);
+			tfThoiGianSuDung.setEditable(false);
+			tfThoiGianSuDung.setBackground(Color.decode("#cccccc"));
+
+			tfTienPhongCu.setBorder(null);
+			tfTienPhongCu.setEditable(false);
+			tfTienPhongCu.setBackground(Color.decode("#cccccc"));
+			tfTienPhongHienTai.setBorder(null);
+			tfTienPhongHienTai.setEditable(false);
+			tfTienPhongHienTai.setBackground(Color.decode("#cccccc"));
+			tfTongTienPhong.setBorder(null);
+			tfTongTienPhong.setEditable(false);
+			tfTongTienPhong.setBackground(Color.decode("#cccccc"));
+			tfGiamGia.setBorder(null);
+			tfGiamGia.setEditable(false);
+			tfGiamGia.setBackground(Color.decode("#cccccc"));
+			tfTongCong.setBorder(null);
+			tfTongCong.setEditable(false);
+			tfTongCong.setBackground(Color.decode("#cccccc"));
+			tfThueVAT.setBorder(null);
+			tfThueVAT.setEditable(false);
+			tfThueVAT.setBackground(Color.decode("#cccccc"));
+			tfThanhTien.setBorder(null);
+			tfThanhTien.setEditable(false);
+			tfThanhTien.setBackground(Color.decode("#cccccc"));
+			tfTongTienDich.setBorder(null);
+			tfTongTienDich.setEditable(false);
+			tfTongTienDich.setBackground(Color.decode("#cccccc"));
+
+			pDPPane.add(boxForPDPPane);
+			bottomPane.add(pDPPane, BorderLayout.NORTH);
+			bottomPane.add(pane, BorderLayout.CENTER);
+			bottomPane.add(pane2, BorderLayout.SOUTH);
+			// main Pane
+			mainPane = new JPanel(new BorderLayout());
+			mainPane.add(topPane, BorderLayout.NORTH);
+			mainPane.add(bottomPane, BorderLayout.CENTER);
+			mainPane.setBackground(Color.decode("#6fa8dc"));
+			this.getContentPane().add(mainPane);
+
+			btnQuayLai.addActionListener(e -> this.dispose());
+			btnChuyenPhong.addActionListener(e -> xuLyChuyenPhong());
+			btnThemDV.addActionListener(e -> xuLyThemDVPhong());
+
+			tfTenNhanVien.setFont(new Font("sanserif", Font.PLAIN, 14));
+			tfMaHD.setFont(new Font("sanserif", Font.PLAIN, 14));
+			tfTenKhach.setFont(new Font("sanserif", Font.PLAIN, 14));
+			tfSDT.setFont(new Font("sanserif", Font.PLAIN, 14));
+			tfNgayNhanP.setFont(new Font("sanserif", Font.PLAIN, 14));
+			lbMaPDP.setFont(new Font("sanserif", Font.BOLD, 14));
+			lbTenNhanVien.setFont(new Font("sanserif", Font.BOLD, 14));
+			lbTenKhach.setFont(new Font("sanserif", Font.BOLD, 14));
+			lbSDT.setFont(new Font("sanserif", Font.BOLD, 14));
+			lbNgayNhanP.setFont(new Font("sanserif", Font.BOLD, 14));
+			lbSDT.setPreferredSize(lbTenKhach.getPreferredSize());
+			lbMaPDP.setPreferredSize(lbTenNhanVien.getPreferredSize());
+
+			tfTenPhong.setFont(new Font("sanserif", Font.PLAIN, 13));
+			tfSucChua.setFont(new Font("sanserif", Font.PLAIN, 13));
+			tfLoaiPhong.setFont(new Font("sanserif", Font.PLAIN, 13));
+			tfGiaPhong.setFont(new Font("sanserif", Font.PLAIN, 13));
+			tfGioThuePhong.setFont(new Font("sanserif", Font.PLAIN, 13));
+			tfGioHienTai.setFont(new Font("sanserif", Font.PLAIN, 13));
+			tfThoiGianSuDung.setFont(new Font("sanserif", Font.PLAIN, 13));
+			lbTenPhong.setFont(new Font("sanserif", Font.BOLD, 13));
+			lbSucChua.setFont(new Font("sanserif", Font.BOLD, 13));
+			lbLoaiPhong.setFont(new Font("sanserif", Font.BOLD, 13));
+			lbGiaPhong.setFont(new Font("sanserif", Font.BOLD, 13));
+			lbGioThuePhong.setFont(new Font("sanserif", Font.BOLD, 13));
+			lbGioHienTai.setFont(new Font("sanserif", Font.BOLD, 13));
+			lbThoiGianSuDung.setFont(new Font("sanserif", Font.BOLD, 13));
+
+			lbTenPhong.setPreferredSize(lbThoiGianSuDung.getPreferredSize());
+			lbSucChua.setPreferredSize(lbThoiGianSuDung.getPreferredSize());
+			lbLoaiPhong.setPreferredSize(lbThoiGianSuDung.getPreferredSize());
+			lbGiaPhong.setPreferredSize(lbThoiGianSuDung.getPreferredSize());
+			lbGioThuePhong.setPreferredSize(lbThoiGianSuDung.getPreferredSize());
+			lbGioHienTai.setPreferredSize(lbThoiGianSuDung.getPreferredSize());
+
+			tfThueVAT.setFont(new Font("sanserif", Font.PLAIN, 14));
+			tfTongTienPhong.setFont(new Font("sanserif", Font.PLAIN, 14));
+			tfTongTienDich.setFont(new Font("sanserif", Font.PLAIN, 14));
+			tfTienPhongHienTai.setFont(new Font("sanserif", Font.PLAIN, 14));
+			tfTienPhongCu.setFont(new Font("sanserif", Font.PLAIN, 14));
+			tfTongCong.setFont(new Font("sanserif", Font.PLAIN, 14));
+			tfThanhTien.setFont(new Font("sanserif", Font.PLAIN, 14));
+
+			lbThueVAT.setFont(new Font("sanserif", Font.BOLD, 14));
+			lbTongTienPhong.setFont(new Font("sanserif", Font.BOLD, 14));
+			lbTongTienDich.setFont(new Font("sanserif", Font.BOLD, 14));
+			lbTienPhongHienTai.setFont(new Font("sanserif", Font.BOLD, 14));
+			lbTienPhongCu.setFont(new Font("sanserif", Font.BOLD, 14));
+			lbTongCong.setFont(new Font("sanserif", Font.BOLD, 14));
+			lbThanhTien.setFont(new Font("sanserif", Font.BOLD, 14));
+			lbGiamGia.setFont(new Font("sanserif", Font.BOLD, 14));
+
+			lbTienPhongHienTai.setPreferredSize(lbTienPhongCu.getPreferredSize());
+			lbTongTienPhong.setPreferredSize(lbTienPhongCu.getPreferredSize());
+			lbTongTienDich.setPreferredSize(lbTienPhongCu.getPreferredSize());
+			lbGiamGia.setPreferredSize(lbThanhTien.getPreferredSize());
+			lbTongCong.setPreferredSize(lbThanhTien.getPreferredSize());
+			lbThueVAT.setPreferredSize(lbThanhTien.getPreferredSize());
+			
+			try {
+				readDataToFieldThongTin();
+			} catch (NumberFormatException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (RemoteException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			
+			try {
+				readDataToTableDichVu();
+			} catch (RemoteException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			
+			try {
+				readDataToFieldThanhToan();
+			} catch (NumberFormatException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (RemoteException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		}
+
+		private void readDataToFieldThongTin() throws RemoteException {
+			List<DetailBill> detailBills = detailBillDAO
+					.findDetailBillByRoomName((String) phongModel.getValueAt(phongTable.getSelectedRow(), 0));
+			DetailBill detailBill = detailBills.get(detailBills.size() - 1);
+			List<Bill> bills = billDAO.getBillsByDetailBillID(detailBill.getId());
+			Bill bill = bills.get(bills.size() - 1);
+			bill.getDetailBills().forEach(e -> System.out.println(e));
+			tfTenNhanVien.setText(bill.getEmployee().getName());
+			tfMaHD.setText(bill.getId() + "");
+			tfTenKhach.setText(bill.getCustomer().getCustomerName());
+			tfSDT.setText(bill.getCustomer().getPhoneNumber());
+			tfNgayNhanP.setText(detailBill.getCheckin().toLocalDate().format(DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT)));
+			tfTenPhong.setText(detailBill.getRoom().getName());
+			tfSucChua.setText(detailBill.getRoom().getRoomType().getCapacity() + "");
+			tfLoaiPhong.setText(detailBill.getRoom().getRoomType().getTypeRoom());
+			tfGiaPhong.setText(detailBill.getRoom().getRoomType().getPrice() + "");
+			
+			long l1 = (LocalDateTime.now().atZone(ZoneId.systemDefault()).toEpochSecond() - detailBill.getCheckin().atZone(ZoneId.systemDefault()).toEpochSecond()) / 60;
+			
+			tfGioThuePhong.setText(detailBill.getCheckin().toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")));
+			tfGioHienTai.setText(LocalTime.now().format(gioFormatForDate));
+			tfThoiGianSuDung.setText(l1 + " phút");
+		}
+		
+		
+
+		private void readDataToTableDichVu() throws RemoteException {
+			model.setRowCount(0);
+			List<DetailServiceRoom> detailServiceRooms = detailServiceDAO.searchDetailServiceRoomByBillID(Integer.valueOf(tfMaHD.getText()));
+			int i = 0;
+			for (DetailServiceRoom dr : detailServiceRooms) {
+				model.addRow(new Object[] { ++i, dr.getService().getName(), dr.getService().getUnit(),
+						dr.getQuantity(), dr.getService().getPrice(), 0});
+			}
+		}
+		
+		private void readDataToFieldThanhToan() throws NumberFormatException, RemoteException {
+			tfThueVAT.setText("10%");
+			List<DetailBill> detailBills = detailBillDAO.findDetailBillByBillID(Integer.valueOf(tfMaHD.getText().trim()))
+													    .stream()
+													    .sorted(Comparator.comparingInt(DetailBill::getId))
+													    .toList();
+			DetailBill detailBill = detailBills.get((int) (detailBills.stream().count() - 1));
+			
+			detailBill.setCheckout(LocalDateTime.now());
+			detailBillDAO.updateCheckoutTime(detailBill);
+			Bill bill = billDAO.getBillsByBillID(Integer.valueOf(tfMaHD.getText().trim())).get(0);
+			double totalMoneyRoom = bill.totalMoneyRoom();
+			double totalCurrentRoomPrice = detailBill.translationRoomPrice();
+			double totalMoneyOldRoom = detailBills.get((int) (detailBills.stream().count() - 2)).translationRoomPrice();
+			tfTienPhongCu.setText(" " + formatter.format(totalMoneyOldRoom) + "");																									
+			tfTongTienPhong.setText(formatter.format(totalMoneyRoom) + "");
+			double totalMoneyService = bill.totalMoneyService();
+			tfTongTienDich.setText(formatter.format(totalMoneyService) + "");
+			double tong = totalMoneyRoom + totalMoneyService;
+			double thanhTien = tong + tong * 0.01;
+			tfTienPhongHienTai.setText(formatter.format(totalCurrentRoomPrice) + "");
+			tfTongCong.setText(formatter.format(tong) + "");
+			tfThanhTien.setText(formatter.format(thanhTien) + "");
+		}
+
+		private void xuLyChuyenPhong() {
 
 		}
+
+		private void xuLyThemDVPhong() {
+
+		}
+	}
+	
+	public class DichVuPhong extends JFrame {
+		private JTextField tfMaHD, tfTenKH, tfSDT, tfTenPhong, tfTimKiemDV1, tfTimKiemDV2;
+		private JButton btnQuayLai, btnThem, btnCapNhat, btnXoa;
+		private JTable tableDVKho, tableDVPhong;
+		private DefaultTableModel model1, model2;
+
+		public DichVuPhong() {
+			// TODO Auto-generated constructor stub
+			setSize(1200, 600);
+			setLocationRelativeTo(null);
+
+			Icon imgDel = new ImageIcon("src/img/del.png");
+			Icon imgReset = new ImageIcon("src/img/refresh16.png");
+			Icon imgEdit = new ImageIcon("src/img/edit.png");
+			Icon imgOut = new ImageIcon("src/img/out.png");
+			Icon imgSearch = new ImageIcon("src/img/search.png");
+			Icon imgCheck = new ImageIcon("src/img/check16.png");
+			Icon imgCancel = new ImageIcon("src/img/cancel16.png");
+			Icon imgBack = new ImageIcon("src/img/back16.png");
+			Icon imgAdd = new ImageIcon("src/img/add16.png");
+			Icon imgChange = new ImageIcon("src/img/change16.png");
+
+			JPanel mainPane, topPane, bottomPane, thongTinPane;
+			JPanel paneForTableDV, paneForTableDVPhong;
+			Box boxForTable;
+			JLabel lbMaPDP, lbTenKH, lbSDT, lbTenPhong, lbTieuDe, lbTimKiemDV1, lbTimKiemDV2;
+			Font font = new Font("Arial", Font.BOLD, 24);
+			Border border = new LineBorder(Color.black);
+
+			// set top Pane
+			lbTieuDe = new JLabel("DỊCH VỤ PHÒNG");
+			lbTieuDe.setFont(font);
+			topPane = new JPanel();
+			topPane.setBackground(Color.decode("#990447"));
+			topPane.add(lbTieuDe);
+
+			// Thông tin phiếu đặt phòng
+			bottomPane = new JPanel(new BorderLayout());
+			thongTinPane = new JPanel(new BorderLayout());
+			Box boxForThongTin = Box.createHorizontalBox();
+
+			Box box1 = Box.createVerticalBox();
+			Box boxForMaPDP = Box.createHorizontalBox();
+			boxForMaPDP.add(lbMaPDP = new JLabel("Mã Hóa Đơn: "));
+			boxForMaPDP.add(tfMaHD = new JTextField(15));
+			Box boxForTenPhong = Box.createHorizontalBox();
+			boxForTenPhong.add(lbTenPhong = new JLabel("Tên Phòng:"));
+			boxForTenPhong.add(tfTenPhong = new JTextField(15));
+			box1.add(Box.createVerticalStrut(10));
+			box1.add(boxForMaPDP);
+			box1.add(Box.createVerticalStrut(20));
+			box1.add(boxForTenPhong);
+			box1.add(Box.createVerticalStrut(10));
+
+			Box box2 = Box.createVerticalBox();
+			Box boxForTenKH = Box.createHorizontalBox();
+			boxForTenKH.add(lbTenKH = new JLabel("Tên Khách Hàng:  "));
+			boxForTenKH.add(tfTenKH = new JTextField(15));
+			Box boxForSDT = Box.createHorizontalBox();
+			boxForSDT.add(lbSDT = new JLabel("Số Điện Thoại:"));
+			boxForSDT.add(tfSDT = new JTextField(15));
+			box2.add(Box.createVerticalStrut(10));
+			box2.add(boxForTenKH);
+			box2.add(Box.createVerticalStrut(20));
+			box2.add(boxForSDT);
+			box2.add(Box.createVerticalStrut(10));
+
+			tfMaHD.setBackground(Color.decode("#D0BAFB"));
+			tfMaHD.setBorder(null);
+			tfMaHD.setEditable(false);
+			tfTenPhong.setBackground(Color.decode("#D0BAFB"));
+			tfTenPhong.setBorder(null);
+			tfTenPhong.setEditable(false);
+			tfTenKH.setBackground(Color.decode("#D0BAFB"));
+			tfTenKH.setBorder(null);
+			tfTenKH.setEditable(false);
+			tfSDT.setBackground(Color.decode("#D0BAFB"));
+			tfSDT.setBorder(null);
+			tfSDT.setEditable(false);
+
+			boxForThongTin.add(Box.createHorizontalStrut(10));
+			boxForThongTin.add(box1);
+			boxForThongTin.add(Box.createHorizontalStrut(50));
+			boxForThongTin.add(box2);
+			boxForThongTin.add(Box.createHorizontalStrut(50));
+
+			JPanel paneForBackBtn = new JPanel();
+			paneForBackBtn.setBackground(Color.decode("#D0BAFB"));
+			paneForBackBtn.add(btnQuayLai = new ButtonGradient("Quay Lại", imgBack));
+			btnQuayLai.setBackground(Color.decode("#6fa8dc"));
+
+			thongTinPane.add(boxForThongTin, BorderLayout.CENTER);
+			thongTinPane.add(paneForBackBtn, BorderLayout.EAST);
+			thongTinPane.setBackground(Color.decode("#D0BAFB"));
+			bottomPane.add(thongTinPane, BorderLayout.NORTH);
+
+			// Pane for table
+			boxForTable = Box.createHorizontalBox();
+
+			// Table dịch vụ kho
+			paneForTableDV = new JPanel(new BorderLayout());
+			paneForTableDV.setBorder(BorderFactory.createTitledBorder(border, "Danh Sách Dịch Vụ"));
+			paneForTableDV.setBackground(Color.decode("#D0BAFB"));
+			JPanel paneForBtnTableDV = new JPanel();
+			Box boxForPaneForBtnTableDV = Box.createHorizontalBox();
+			JPanel paneForTimKiemDV1 = new JPanel();
+			paneForTimKiemDV1.setBackground(Color.decode("#D0BAFB"));
+			paneForTimKiemDV1.add(lbTimKiemDV1 = new JLabel("Tìm Kiếm Dịch Vụ: "));
+			paneForTimKiemDV1.add(tfTimKiemDV1 = new JTextField(15));
+			boxForPaneForBtnTableDV.add(paneForTimKiemDV1);
+			boxForPaneForBtnTableDV.add(Box.createHorizontalStrut(100));
+			boxForPaneForBtnTableDV.add(btnThem = new ButtonGradient("Thêm", imgAdd));
+			btnThem.setBackground(Color.decode("#6fa8dc"));
+			paneForBtnTableDV.add(boxForPaneForBtnTableDV);
+			paneForBtnTableDV.setBackground(Color.decode("#D0BAFB"));
+
+			String[] headers1 = { "STT", "Tên Dịch Vụ", "Đơn Giá", "Đơn Vị", "Số Lượng Tồn" };
+			model1 = new DefaultTableModel(headers1, 0);
+			tableDVKho = new JTable(model1);
+			tableDVKho.setRowHeight(25);
+			tableDVKho.getColumnModel().getColumn(1).setPreferredWidth(200);
+
+			JScrollPane scroll1 = new JScrollPane(tableDVKho, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+					JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+			paneForTableDV.add(paneForBtnTableDV, BorderLayout.NORTH);
+			paneForTableDV.add(scroll1, BorderLayout.CENTER);
+
+			// Table dịch vụ phòng
+			paneForTableDVPhong = new JPanel(new BorderLayout());
+			paneForTableDVPhong.setBorder(BorderFactory.createTitledBorder(border, "Dịch Vụ Đã Thêm"));
+			paneForTableDVPhong.setBackground(Color.decode("#D0BAFB"));
+			JPanel paneForBtnTableDVP = new JPanel();
+			Box boxForPaneForBtnTableDVP = Box.createHorizontalBox();
+			JPanel paneForTimKiemDV2 = new JPanel();
+			paneForTimKiemDV2.add(lbTimKiemDV2 = new JLabel("Tìm Kiếm Dịch Vụ: "));
+			paneForTimKiemDV2.add(tfTimKiemDV2 = new JTextField(15));
+			paneForTimKiemDV2.setBackground(Color.decode("#D0BAFB"));
+			boxForPaneForBtnTableDVP.add(paneForTimKiemDV2);
+			boxForPaneForBtnTableDVP.add(Box.createHorizontalStrut(100));
+			boxForPaneForBtnTableDVP.add(btnXoa = new ButtonGradient("Xóa", imgDel));
+			btnXoa.setBackground(Color.decode("#6fa8dc"));
+			paneForBtnTableDVP.add(boxForPaneForBtnTableDVP);
+			paneForBtnTableDVP.setBackground(Color.decode("#D0BAFB"));
+
+			String[] headers2 = { "STT", "Tên Dịch Vụ", "Đơn Giá", "Số Lượng", "Thành Tiền" };
+			model2 = new DefaultTableModel(headers2, 0);
+			tableDVPhong = new JTable(model2);
+			tableDVPhong.setRowHeight(25);
+
+			tableDVPhong.getColumnModel().getColumn(1).setPreferredWidth(200);
+
+			TableColumnModel colModelDVPhong = tableDVPhong.getColumnModel();
+			TableColumn colTableDVPhong = colModelDVPhong.getColumn(3);
+			colTableDVPhong.setCellEditor(new MySpinnerEditor());
+
+			JScrollPane scroll2 = new JScrollPane(tableDVPhong, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+					JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+			paneForTableDVPhong.add(paneForBtnTableDVP, BorderLayout.NORTH);
+			paneForTableDVPhong.add(scroll2, BorderLayout.CENTER);
+
+			boxForTable.add(paneForTableDV);
+			boxForTable.add(paneForTableDVPhong);
+			bottomPane.add(boxForTable);
+
+			mainPane = new JPanel(new BorderLayout());
+			mainPane.add(topPane, BorderLayout.NORTH);
+			mainPane.add(bottomPane, BorderLayout.CENTER);
+			this.getContentPane().add(mainPane);
+
+			tfTenPhong.setFont(new Font("sanserif", Font.PLAIN, 15));
+			tfTenKH.setFont(new Font("sanserif", Font.PLAIN, 15));
+			tfMaHD.setFont(new Font("sanserif", Font.PLAIN, 15));
+			tfSDT.setFont(new Font("sanserif", Font.PLAIN, 15));
+			lbMaPDP.setFont(new Font("sanserif", Font.BOLD, 15));
+			lbTenKH.setFont(new Font("sanserif", Font.BOLD, 15));
+			lbSDT.setFont(new Font("sanserif", Font.BOLD, 15));
+			lbTenPhong.setFont(new Font("sanserif", Font.BOLD, 15));
+
+			lbTenPhong.setPreferredSize(lbTenKH.getPreferredSize());
+			lbMaPDP.setPreferredSize(lbTenKH.getPreferredSize());
+			lbSDT.setPreferredSize(lbTenKH.getPreferredSize());
+
+			
+			try {
+				readDataToFieldThongTin();
+				readDataToTableDichVu();
+				readDataToTableDichVuPhong();
+			} catch (RemoteException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			tableDVPhong.addMouseListener(new MouseListener() {
+
+				@Override
+				public void mouseReleased(MouseEvent e) {
+					// TODO Auto-generated method stub
+
+				}
+
+				@Override
+				public void mousePressed(MouseEvent e) {
+					// TODO Auto-generated method stub
+				}
+
+				@Override
+				public void mouseExited(MouseEvent e) {
+					// TODO Auto-generated method stub
+				}
+
+				@Override
+				public void mouseEntered(MouseEvent e) {
+					// TODO Auto-generated method stub
+				}
+
+				@Override
+				public void mouseClicked(MouseEvent e) {
+					// TODO Auto-generated method stub
+					try {
+						xuLyTangGiamSoLuongDichVuKho();
+					} catch (RemoteException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				}
+			});
+			btnThem.addActionListener(e -> {
+				try {
+					xuLyThemDVPhong();
+				} catch (RemoteException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			});
+			
+			btnXoa.addActionListener(e -> {
+				try {
+					xuLyXoaDVPhong();
+				} catch (RemoteException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			});
+			btnQuayLai.addActionListener(e -> this.dispose());
+		}
+		
+		private void xuLyThemDVPhong() throws RemoteException {
+			int id = Integer.valueOf(tfMaHD.getText().trim());
+			if (tableDVKho.getSelectedRow() != -1) {
+				Service service = serviceDAO.getServiceByName(((String) model1.getValueAt(tableDVKho.getSelectedRow(), 1))).get(0);
+				service.setInventoryNumber(service.getInventoryNumber() - 1);
+				serviceDAO.updateService(service);
+				List<DetailServiceRoom> detailServiceRooms = detailServiceDAO.searchDetailServiceRoomByBillID(id);
+				List<Service> services = detailServiceRooms.stream().map(d -> d.getService()).toList();
+				try {
+					if(!services.contains(service)) {
+						if (detailServiceDAO.createCTDVPhong(new DetailServiceRoom(0,
+								billDAO.getBillsByBillID(Integer.valueOf(tfMaHD.getText().trim())).get(0), service, 1))) {
+							JOptionPane.showMessageDialog(this, "Thêm dịch vụ thành công!!!");
+						}
+					}
+					else {
+						DetailServiceRoom detailServiceRoom = detailServiceDAO.searchDetailServiceRoomByServiceName(id, service.getId()).get(0);
+						detailServiceRoom.setQuantity(detailServiceRoom.getQuantity() + 1);
+						if(detailServiceDAO.updateDetailService(detailServiceRoom)) {
+							JOptionPane.showMessageDialog(this, "Cập nhật số lượng dịch vụ phòng thành công!!!");
+						}
+					}
+					readDataToTableDichVu();
+					readDataToTableDichVuPhong();
+				} catch (Exception e) {
+					// TODO: handle exception
+					JOptionPane.showMessageDialog(this, "Thêm dịch vụ không thành công!!!");
+				}
+			} else {
+				JOptionPane.showMessageDialog(this, "Hãy chọn dịch vụ bạn muốn thêm vào phòng!!!");
+			}
+		}
+		
+		private void xuLyXoaDVPhong() throws RemoteException {
+			if (tableDVPhong.getSelectedRow() != -1) {
+				Service service = serviceDAO.getServiceByName((String) model2.getValueAt(tableDVPhong.getSelectedRow(), 1)).get(0);
+				try {
+					int soLuong = (int) model2.getValueAt(tableDVPhong.getSelectedRow(), 3);
+					System.out.println(soLuong);
+					int soLuongBanDau = service.getInventoryNumber();
+					service.setInventoryNumber(soLuong + soLuongBanDau);
+					if(serviceDAO.updateService(service)) {
+						if (detailServiceDAO.delete(Integer.valueOf(tfMaHD.getText().trim()), service.getId())) {
+							readDataToTableDichVuPhong();
+							readDataToTableDichVu();
+							JOptionPane.showMessageDialog(this, "Xóa dịch vụ phòng thành công!!!");
+						}
+					}
+				} catch (Exception e) {
+					// TODO: handle exception
+					JOptionPane.showMessageDialog(this, "Xóa dịch vụ phòng không thành công!!!");
+					e.printStackTrace();
+				}
+			}
+			
+		}
+		
+		private void readDataToFieldThongTin() throws RemoteException {
+			Room r = roomDAO
+					.getRoomsByRoomName((String) phongModel.getValueAt(phongTable.getSelectedRow(), 0))
+					.get(0);
+			List<DetailBill> detailBills = detailBillDAO.findDetailBillByRoomName((String) phongModel.getValueAt(phongTable.getSelectedRow(), 0));
+			DetailBill detailBill = detailBills.get(detailBills.size() - 1);
+			List<Bill> bills = billDAO.getBillsByBillID(detailBill.getBill().getId());
+			Bill hd = bills.get(bills.size() - 1);
+			tfMaHD.setText(detailBill.getBill().getId() + "");
+			tfTenPhong.setText(r.getName());
+			tfTenKH.setText(hd.getCustomer().getCustomerName());
+			tfSDT.setText(hd.getCustomer().getPhoneNumber());
+		}
+		
+		private void readDataToTableDichVu() throws RemoteException {
+			model1.setRowCount(0);
+			List<Service> services = serviceDAO.getAllServices();
+			int i = 0;
+			for (Service service : services) {
+				System.out.println(service.getInventoryNumber());
+				if (service.getInventoryNumber() > 0)
+					model1.addRow(new Object[] { ++i, service.getName(), service.getPrice(), service.getUnit(), service.getInventoryNumber() });
+			}
+		}
+		
+		private void readDataToTableDichVuPhong() throws NumberFormatException, RemoteException {
+			model2.setRowCount(0);
+			List<DetailServiceRoom> detailServiceRooms = detailServiceDAO.searchDetailServiceRoomByBillID(Integer.valueOf(tfMaHD.getText().trim()));
+			int i = 0;
+			for (DetailServiceRoom d : detailServiceRooms) {
+				model2.addRow(new Object[] { ++i, d.getService().getName(), d.getService().getPrice(),
+						d.getQuantity(), d.calculateMoneyService()});
+			}
+		}
+		
+		private void xuLyTangGiamSoLuongDichVuKho() throws RemoteException {
+			Service service = serviceDAO.getServiceByName((String) model2.getValueAt(tableDVPhong.getSelectedRow(), 1))
+					.get(0);
+			DetailServiceRoom detailServiceRoom = detailServiceDAO.searchDetailServiceRoomByServiceName(Integer.valueOf(tfMaHD.getText().trim()), service.getId())
+					.get(0);
+			int soLuongBanDau = detailServiceRoom.getQuantity();
+			int soLuongCapNhat = (int) model2.getValueAt(tableDVPhong.getSelectedRow(), 3);
+			int soLuongTinhToan = service.getInventoryNumber() + (soLuongBanDau - soLuongCapNhat);
+			
+			detailServiceRoom.setQuantity(soLuongCapNhat);
+			service.setInventoryNumber(soLuongTinhToan);
+			
+			if (soLuongCapNhat > 0) {
+				if (soLuongTinhToan >= 0) {
+					try {
+						serviceDAO.updateService(service);
+						detailServiceDAO.updateDetailService(detailServiceRoom);
+						readDataToTableDichVu();
+						readDataToTableDichVuPhong();
+
+					} catch (Exception e) {
+						// TODO: handle exception
+						e.printStackTrace();
+					}
+				} else {
+					JOptionPane.showMessageDialog(this, "Số lượng dịch vụ trong kho không đủ!!!");
+					model2.setValueAt(detailServiceRoom.getQuantity(), tableDVPhong.getSelectedRow(), 3);
+				}
+			} else {
+				JOptionPane.showMessageDialog(this, "Số lượng phải lớn hơn 0 !!!");
+				model2.setValueAt(detailServiceRoom.getQuantity(), tableDVPhong.getSelectedRow(), 3);
+			}
+		}
+	}
+	
+	public class TinhTien extends JFrame {
+		private JTextField tfMaHD, tfTenKH, tfNgayThanhToan, tfTenNhanVien, tfSDTKhach, tfGioThanhToan, tfTienNhan,
+				tfTienThua, tfTienPhong, tfTienDichVu, tfGiamGia, tfTongCong, tfThue, tfThanhTien;
+		private JButton btnQuayLai, btnInHD, btnThanhToan;
+		private JTable tablePhong, tableDichVu;
+		private DefaultTableModel modelPhong, modelDichVu;
+		private SimpleDateFormat gioFormat = new SimpleDateFormat("hh:mm");
+		private DateTimeFormatter gioFormatForDate = DateTimeFormatter.ofPattern("HH:mm");
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm");
+
+		public TinhTien() {
+			// TODO Auto-generated constructor stub
+			setSize(650, 700);
+			setLocationRelativeTo(null);
+			dateFormat.setTimeZone(TimeZone.getTimeZone("Asia/Ho_Chi_Minh"));
+			Icon imgDel = new ImageIcon("src/img/del.png");
+			Icon imgReset = new ImageIcon("src/img/refresh16.png");
+			Icon imgEdit = new ImageIcon("src/img/edit.png");
+			Icon imgOut = new ImageIcon("src/img/out.png");
+			Icon imgSearch = new ImageIcon("src/img/search.png");
+			Icon imgCheck = new ImageIcon("src/img/check16.png");
+			Icon imgCancel = new ImageIcon("src/img/cancel16.png");
+			Icon imgBack = new ImageIcon("src/img/back16.png");
+			Icon imgAdd = new ImageIcon("src/img/add16.png");
+			Icon imgChange = new ImageIcon("src/img/change16.png");
+
+			JLabel lbMaHD, lbTenKH, lbNgayThanhToan, lbTenNhanVien, lbSDTKhach, lbGioThanhToan, lbTienNhan, lbTienThua,
+					lbTienPhong, lbTienDichVu, lbGiamGia, lbTongCong, lbThue, lbThanhTien, lbTieuDe, lbTablePhong,
+					lbTableDichVu;
+
+			JPanel mainPane, topPane, bottomPane, thongTinHDPane, tablePhongPane, tableDVPane, leftBottomPane,
+					rightBottomPane;
+			Font font = new Font("Arial", Font.BOLD, 24);
+			Border border = new LineBorder(Color.black);
+
+			// Tieu De
+			mainPane = new JPanel(new BorderLayout());
+			topPane = new JPanel();
+			topPane.setBackground(Color.decode("#990447"));
+			lbTieuDe = new JLabel("Tính Tiền");
+			lbTieuDe.setFont(font);
+			topPane.add(lbTieuDe);
+
+			bottomPane = new JPanel(new BorderLayout());
+			// Thông tin hóa đơn
+			thongTinHDPane = new JPanel();
+			Box box = Box.createVerticalBox();
+			JPanel paneForThongTinHD = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+
+			Box boxForThongTinHDLeft = Box.createVerticalBox();
+			Box boxForMaHD = Box.createHorizontalBox();
+			boxForMaHD.add(lbMaHD = new JLabel("Mã Hóa Đơn: "));
+			boxForMaHD.add(tfMaHD = new JTextField(15));
+			Box boxForTenKH = Box.createHorizontalBox();
+			boxForTenKH.add(lbTenKH = new JLabel("Tên Khách Hàng: "));
+			boxForTenKH.add(tfTenKH = new JTextField(15));
+			Box boxForNgayThanhToan = Box.createHorizontalBox();
+			boxForNgayThanhToan.add(lbNgayThanhToan = new JLabel("Ngày Thanh Toán: "));
+			boxForNgayThanhToan.add(tfNgayThanhToan = new JTextField(15));
+
+			boxForThongTinHDLeft.add(Box.createVerticalStrut(10));
+			boxForThongTinHDLeft.add(boxForMaHD);
+			boxForThongTinHDLeft.add(Box.createVerticalStrut(10));
+			boxForThongTinHDLeft.add(boxForTenKH);
+			boxForThongTinHDLeft.add(Box.createVerticalStrut(10));
+			boxForThongTinHDLeft.add(boxForNgayThanhToan);
+			boxForThongTinHDLeft.add(Box.createVerticalStrut(10));
+
+			Box boxForThongTinHDRight = Box.createVerticalBox();
+			Box boxForTenNV = Box.createHorizontalBox();
+			boxForTenNV.add(lbTenNhanVien = new JLabel("Tên Nhân Viên: "));
+			boxForTenNV.add(tfTenNhanVien = new JTextField(15));
+			Box boxForSDTK = Box.createHorizontalBox();
+			boxForSDTK.add(lbSDTKhach = new JLabel("Số Điện Thoại Khách: "));
+			boxForSDTK.add(tfSDTKhach = new JTextField(15));
+			Box boxForGioThanhToan = Box.createHorizontalBox();
+			boxForGioThanhToan.add(lbGioThanhToan = new JLabel("Ngày vào hát: "));
+			boxForGioThanhToan.add(tfGioThanhToan = new JTextField(15));
+
+			boxForThongTinHDRight.add(Box.createVerticalStrut(10));
+			boxForThongTinHDRight.add(boxForTenNV);
+			boxForThongTinHDRight.add(Box.createVerticalStrut(10));
+			boxForThongTinHDRight.add(boxForSDTK);
+			boxForThongTinHDRight.add(Box.createVerticalStrut(10));
+			boxForThongTinHDRight.add(boxForGioThanhToan);
+			boxForThongTinHDRight.add(Box.createVerticalStrut(10));
+
+			lbTenNhanVien.setPreferredSize(lbSDTKhach.getPreferredSize());
+			lbGioThanhToan.setPreferredSize(lbSDTKhach.getPreferredSize());
+			lbMaHD.setPreferredSize(lbSDTKhach.getPreferredSize());
+			lbTenKH.setPreferredSize(lbSDTKhach.getPreferredSize());
+			lbNgayThanhToan.setPreferredSize(lbSDTKhach.getPreferredSize());
+
+			tfMaHD.setBorder(null);
+			tfMaHD.setEditable(false);
+			tfMaHD.setBackground(Color.white);
+			tfTenKH.setBorder(null);
+			tfTenKH.setEditable(false);
+			tfTenKH.setBackground(Color.white);
+			tfNgayThanhToan.setBorder(null);
+			tfNgayThanhToan.setEditable(false);
+			tfNgayThanhToan.setBackground(Color.white);
+			tfTenNhanVien.setBorder(null);
+			tfTenNhanVien.setEditable(false);
+			tfTenNhanVien.setBackground(Color.white);
+			tfSDTKhach.setBorder(null);
+			tfSDTKhach.setEditable(false);
+			tfSDTKhach.setBackground(Color.white);
+			tfGioThanhToan.setBorder(null);
+			tfGioThanhToan.setEditable(false);
+			tfGioThanhToan.setBackground(Color.white);
+			tfMaHD.setFont(new Font("sanserif", Font.PLAIN, 13));
+			tfTenKH.setFont(new Font("sanserif", Font.PLAIN, 13));
+			tfNgayThanhToan.setFont(new Font("sanserif", Font.PLAIN, 13));
+			tfTenNhanVien.setFont(new Font("sanserif", Font.PLAIN, 13));
+			tfSDTKhach.setFont(new Font("sanserif", Font.PLAIN, 13));
+			tfGioThanhToan.setFont(new Font("sanserif", Font.PLAIN, 13));
+			lbMaHD.setFont(new Font("sanserif", Font.BOLD, 13));
+			lbTenKH.setFont(new Font("sanserif", Font.BOLD, 13));
+			lbNgayThanhToan.setFont(new Font("sanserif", Font.BOLD, 13));
+			lbTenNhanVien.setFont(new Font("sanserif", Font.BOLD, 13));
+			lbSDTKhach.setFont(new Font("sanserif", Font.BOLD, 13));
+			lbGioThanhToan.setFont(new Font("sanserif", Font.BOLD, 13));
+
+			paneForThongTinHD.setBackground(Color.white);
+			paneForThongTinHD.add(boxForThongTinHDLeft);
+			paneForThongTinHD.add(boxForThongTinHDRight);
+			thongTinHDPane.setBackground(Color.white);
+			thongTinHDPane.add(paneForThongTinHD);
+
+			// Thông tin Phòng
+			tablePhongPane = new JPanel(new BorderLayout());
+			JPanel titleTablePhongPane = new JPanel();
+			titleTablePhongPane.setBackground(Color.white);
+			lbTablePhong = new JLabel("Thông tin chi tiết sử dụng phòng");
+			lbTablePhong.setFont(new Font("sanserif", Font.PLAIN, 18));
+			titleTablePhongPane.add(lbTablePhong);
+			String[] headerTablePhong = { "Tên Phòng", "Loại Phòng", "Giờ Nhận", "Giờ Trả", "Thời Lượng(phút)",
+					"Giá Phòng", "Thành Tiền" };
+			modelPhong = new DefaultTableModel(headerTablePhong, 0);
+			tablePhong = new JTable(modelPhong);
+			tablePhong.setRowHeight(25);
+			tablePhong.getColumnModel().getColumn(4).setPreferredWidth(120);
+			tablePhong.getColumnModel().getColumn(6).setPreferredWidth(150);
+
+			JScrollPane scrollTablePhong = new JScrollPane(tablePhong, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+					JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+			tablePhongPane.add(scrollTablePhong, BorderLayout.CENTER);
+			tablePhongPane.add(titleTablePhongPane, BorderLayout.NORTH);
+
+			// Thông tin dịch vụ
+			tableDVPane = new JPanel(new BorderLayout());
+			JPanel titleTableDVPane = new JPanel();
+			titleTableDVPane.setBackground(Color.white);
+			lbTableDichVu = new JLabel("Thông tin chi tiết dịch vụ");
+			lbTableDichVu.setFont(new Font("sanserif", Font.PLAIN, 18));
+			titleTableDVPane.add(lbTableDichVu);
+			String[] headerTableDV = { "STT", "Tên Dịch Vụ", "Đơn Vị", "Số Lượng", "Đơn Giá", "Thành Tiền" };
+			modelDichVu = new DefaultTableModel(headerTableDV, 0);
+			tableDichVu = new JTable(modelDichVu);
+			tableDichVu.setRowHeight(25);
+			JScrollPane scrollTableDichVu = new JScrollPane(tableDichVu, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+					JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+			tableDVPane.add(scrollTableDichVu, BorderLayout.CENTER);
+			tableDVPane.add(titleTableDVPane, BorderLayout.NORTH);
+
+			box.add(thongTinHDPane);
+			box.add(tablePhongPane);
+			box.add(tableDVPane);
+			bottomPane.add(box, BorderLayout.CENTER);
+
+			// Thông tin tiền
+			Box box2 = Box.createHorizontalBox();
+			leftBottomPane = new JPanel(new BorderLayout());
+			Box boxForTienNhan = Box.createHorizontalBox();
+			boxForTienNhan.add(lbTienNhan = new JLabel("Tiền Nhận:   "));
+			boxForTienNhan.add(tfTienNhan = new JTextField(15));
+
+			JPanel paneForTienNhan = new JPanel();
+			paneForTienNhan.add(boxForTienNhan);
+			paneForTienNhan.setBackground(Color.white);
+
+			Box boxForTienThua = Box.createHorizontalBox();
+			boxForTienThua.add(lbTienThua = new JLabel("Tiền Thừa: "));
+			boxForTienThua.add(tfTienThua = new JTextField(15));
+
+			JPanel paneForTienThua = new JPanel();
+			paneForTienThua.add(boxForTienThua);
+			paneForTienThua.setBackground(Color.white);
+
+			Box boxForTienNhanThua = Box.createVerticalBox();
+			boxForTienNhanThua.add(Box.createVerticalStrut(50));
+			boxForTienNhanThua.add(paneForTienNhan);
+			boxForTienNhanThua.add(Box.createVerticalStrut(20));
+			boxForTienNhanThua.add(paneForTienThua);
+			boxForTienNhanThua.setBackground(Color.white);
+
+			tfTienThua.setEditable(false);
+			lbTienThua.setPreferredSize(lbTienNhan.getPreferredSize());
+
+			JPanel paneForBtnBack = new JPanel(new FlowLayout(FlowLayout.LEFT));
+			paneForBtnBack.setBackground(Color.white);
+			paneForBtnBack.add(btnQuayLai = new ButtonGradient("Quay lại", imgBack));
+			btnQuayLai.setBackground(Color.decode("#6fa8dc"));
+
+			JPanel paneForBoxForTienNhanThua = new JPanel();
+			paneForBoxForTienNhanThua.setBackground(Color.white);
+			paneForBoxForTienNhanThua.add(boxForTienNhanThua);
+			leftBottomPane.add(paneForBoxForTienNhanThua, BorderLayout.NORTH);
+			leftBottomPane.add(paneForBtnBack, BorderLayout.SOUTH);
+			box2.add(leftBottomPane);
+
+			//
+			rightBottomPane = new JPanel(new BorderLayout());
+			rightBottomPane.setBackground(Color.white);
+
+			Box boxForTienPhong = Box.createHorizontalBox();
+			boxForTienPhong.add(lbTienPhong = new JLabel("Tiền Phòng: "));
+			boxForTienPhong.add(tfTienPhong = new JTextField(15));
+
+			Box boxForTienDichVu = Box.createHorizontalBox();
+			boxForTienDichVu.add(lbTienDichVu = new JLabel("Tiền Dịch Vụ: "));
+			boxForTienDichVu.add(tfTienDichVu = new JTextField(15));
+
+			Box boxForGiamGia = Box.createHorizontalBox();
+			boxForGiamGia.add(lbGiamGia = new JLabel("Giảm Giá: "));
+			boxForGiamGia.add(tfGiamGia = new JTextField(15));
+
+			Box boxForTongCong = Box.createHorizontalBox();
+			boxForTongCong.add(lbTongCong = new JLabel("Tổng Cộng: "));
+			boxForTongCong.add(tfTongCong = new JTextField(15));
+
+			Box boxForThue = Box.createHorizontalBox();
+			boxForThue.add(lbThue = new JLabel("Thuế VAT: "));
+			boxForThue.add(tfThue = new JTextField(15));
+
+			Box boxForThanhTien = Box.createHorizontalBox();
+			boxForThanhTien.add(lbThanhTien = new JLabel("Thành Tiền: "));
+			boxForThanhTien.add(tfThanhTien = new JTextField(15));
+
+			lbTienPhong.setPreferredSize(lbTienDichVu.getPreferredSize());
+			lbGiamGia.setPreferredSize(lbTienDichVu.getPreferredSize());
+			lbTongCong.setPreferredSize(lbTienDichVu.getPreferredSize());
+			lbTongCong.setPreferredSize(lbTienDichVu.getPreferredSize());
+			lbThue.setPreferredSize(lbTienDichVu.getPreferredSize());
+			lbThanhTien.setPreferredSize(lbTienDichVu.getPreferredSize());
+
+			tfTienPhong.setBorder(null);
+			tfTienPhong.setEditable(false);
+			tfTienPhong.setBackground(Color.white);
+			tfTienDichVu.setBorder(null);
+			tfTienDichVu.setEditable(false);
+			tfTienDichVu.setBackground(Color.white);
+			tfGiamGia.setBorder(null);
+			tfGiamGia.setEditable(false);
+			tfGiamGia.setBackground(Color.white);
+			tfTongCong.setBorder(null);
+			tfTongCong.setEditable(false);
+			tfTongCong.setBackground(Color.white);
+			tfThue.setBorder(null);
+			tfThue.setEditable(false);
+			tfThue.setBackground(Color.white);
+			tfThanhTien.setBorder(null);
+			tfThanhTien.setEditable(false);
+			tfThanhTien.setBackground(Color.white);
+
+			Box boxForRight = Box.createVerticalBox();
+			boxForRight.add(boxForTienPhong);
+			boxForRight.add(Box.createVerticalStrut(10));
+			boxForRight.add(boxForTienDichVu);
+			boxForRight.add(Box.createVerticalStrut(10));
+			boxForRight.add(boxForGiamGia);
+			boxForRight.add(Box.createVerticalStrut(10));
+			boxForRight.add(boxForTongCong);
+			boxForRight.add(Box.createVerticalStrut(10));
+			boxForRight.add(boxForThue);
+			boxForRight.add(Box.createVerticalStrut(10));
+			boxForRight.add(boxForThanhTien);
+
+			JPanel paneForBtnThanhToan = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+			paneForBtnThanhToan.setBackground(Color.white);
+			paneForBtnThanhToan.add(btnInHD = new ButtonGradient("In Hóa Đơn"));
+			btnInHD.setBackground(Color.decode("#6fa8dc"));
+			paneForBtnThanhToan.add(Box.createHorizontalStrut(20));
+			paneForBtnThanhToan.add(btnThanhToan = new ButtonGradient("Thanh Toán"));
+			btnThanhToan.setBackground(Color.decode("#6fa8dc"));
+
+			JPanel paneForBoxForRight = new JPanel();
+			paneForBoxForRight.add(boxForRight);
+			rightBottomPane.add(paneForBoxForRight, BorderLayout.CENTER);
+			paneForBoxForRight.setBackground(Color.white);
+			rightBottomPane.add(paneForBtnThanhToan, BorderLayout.SOUTH);
+
+			box2.add(rightBottomPane);
+
+			bottomPane.add(box2, BorderLayout.SOUTH);
+			box2.setBackground(Color.white);
+
+			mainPane.add(topPane, BorderLayout.NORTH);
+			mainPane.add(bottomPane, BorderLayout.CENTER);
+			this.getContentPane().add(mainPane);
+
+			try {
+				readDataToFieldThongTin();
+				readDataToTablePhong();
+				readDataToTableDichVu();
+				xuLyTinhTienDienVaoThongTin();
+			} catch (RemoteException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			btnQuayLai.addActionListener(e -> this.dispose());
+			btnThanhToan.addActionListener(e -> {
+				try {
+					xuLyThanhToan();
+				} catch (RemoteException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			});
+			btnInHD.addActionListener(e -> xuLyInHD());
+
+		}
+
+		private void xuLyThanhToan() throws RemoteException {
+			String roomName = (String) phongModel.getValueAt(phongTable.getSelectedRow(), 0);
+			Room r = roomDAO.getRoomsByRoomName(roomName).get(0);
+			List<DetailBill> detailBills = detailBillDAO.findDetailBillByRoomName(roomName);
+			DetailBill detailBill = detailBills.get(detailBills.size() - 1);
+			List<Bill> bills = billDAO.searchBillsByBillID(detailBill.getBill().getId());
+			Bill bill = bills.get(bills.size() - 1);
+			bill.setPaymentTime(LocalTime.now());
+			bill.setTotal();
+			r.setRoomStatus("Còn trống");
+			try {
+				if (billDAO.updateBillAfterPayment(bill)) {
+					if (roomDAO.updateRoom(r)) {
+						JOptionPane.showMessageDialog(this, "Thanh toán thành công");
+					}
+				} else {
+					JOptionPane.showMessageDialog(this, "Thanh toán không thành công");
+				}
+			} catch (Exception e) {
+				// TODO: handle exception
+				e.printStackTrace();
+			}
+		}
+
+		private void xuLyInHD() {
+
+		}
+
+		private void readDataToFieldThongTin() throws RemoteException {
+			List<DetailBill> detailBills = detailBillDAO
+					.findDetailBillByRoomName((String) phongModel.getValueAt(phongTable.getSelectedRow(), 0));
+			DetailBill detailBill = detailBills.get(detailBills.size() - 1);
+			List<Bill> bills = billDAO.getBillsByBillID(detailBill.getBill().getId());
+			Bill bill = bills.get(bills.size() - 1);
+			bill.setPaymentDate(LocalDate.now());
+			if(billDAO.updateBillAfterPayment(bill)) {
+				tfMaHD.setText(bill.getId() + "");
+				tfTenNhanVien.setText(bill.getEmployee().getName());
+				tfTenKH.setText(bill.getCustomer().getCustomerName());
+				tfSDTKhach.setText(bill.getCustomer().getPhoneNumber());
+				tfNgayThanhToan.setText(bill.getPaymentDate().format(DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT)));
+				tfGioThanhToan.setText(detailBill.getCheckin().toLocalDate().format(DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT)));
+			}
+		}
+
+		private void readDataToTablePhong() throws NumberFormatException, RemoteException {
+			modelDichVu.setRowCount(0);
+			List<DetailBill> detailBills = detailBillDAO.findDetailBillByBillID(Integer.valueOf(tfMaHD.getText().trim())).stream()
+					.sorted(Comparator.comparing(DetailBill::getId))
+					.toList();
+			DetailBill detailBill = detailBills.get(detailBills.size() - 1);
+			detailBill.setCheckout(LocalDateTime.now());
+			detailBillDAO.updateCheckoutTime(detailBill);
+			try {
+				for (DetailBill d : detailBills) {
+					modelPhong.addRow(new Object[] { d.getRoom().getName(),
+							d.getRoom().getRoomType().getTypeRoom(), d.getCheckin().toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")),
+							d.getCheckout().toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")), d.calculateTimeUsingRoomByMinute(),
+							d.getRoom().getRoomType().getPrice(), formatter.format(d.translationRoomPrice())});
+				}
+			} catch (Exception e) {
+				// TODO: handle exception
+				e.printStackTrace();
+			}
+		}
+
+		private void xuLyTinhTienDienVaoThongTin() throws NumberFormatException, RemoteException {
+			tfThue.setText("10%");
+			Bill bill = billDAO.getBillsByBillID(Integer.valueOf(tfMaHD.getText().trim())).get(0);
+			double tongTienPhong = bill.totalMoneyRoom();
+			tfTienPhong.setText(formatter.format(tongTienPhong) + "");
+			double tongTienDV = bill.totalMoneyService();
+			tfTienDichVu.setText(formatter.format(tongTienDV) + "");
+			double tong = tongTienPhong + tongTienDV;
+			double thanhTien = tong + tong * 0.01;
+			tfTongCong.setText(formatter.format(tong) + "");
+			tfThanhTien.setText(formatter.format(thanhTien) + "");
+		}
+
+		private void readDataToTableDichVu() throws NumberFormatException, RemoteException {
+			modelDichVu.setRowCount(0);
+			List<DetailServiceRoom> detailServiceRooms = detailServiceDAO.searchDetailServiceRoomByBillID(Integer.valueOf(tfMaHD.getText().trim()));
+			int i = 0;
+			for (DetailServiceRoom d : detailServiceRooms) {
+				modelDichVu.addRow(new Object[] { ++i, d.getService().getName(), d.getService().getUnit(),
+						d.getQuantity(), d.getService().getPrice(), formatter.format(d.calculateMoneyService())});
+			}
+		}
+
 	}
 }

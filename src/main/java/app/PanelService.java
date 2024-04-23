@@ -356,7 +356,7 @@ public class PanelService extends JPanel implements MouseListener {
 	            dv.getName(), 
 	            formatter.format(dv.getPrice()), 
 	            dv.getUnit(), 
-	            dv.getQuantity(), 
+	            dv.getInventoryNumber(), 
 	            dv.getStatus() 
 	        };
 	        tableModel.addRow(rowData);
@@ -381,7 +381,7 @@ public class PanelService extends JPanel implements MouseListener {
 	            s.getName(), 
 	            formatter.format(s.getPrice()), 
 	            s.getUnit(), 
-	            s.getQuantity(), 
+	            s.getInventoryNumber(), 
 	            s.getStatus() 
 	        };
 	        tableModel.addRow(rowData);
