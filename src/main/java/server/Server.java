@@ -14,11 +14,12 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import app.FrameLogin;
+import appService.FrameLoginService;
 import dao.BillDAO;
 import dao.BookingDAO;
 import dao.CustomerDAO;
 import dao.DetailBillDAO;
-import dao.DetailServiceDAO;
+import dao.DetailServiceRoomDAO;
 import dao.EmployeeDAO;
 import dao.RoomDAO;
 import dao.ServiceDAO;
@@ -42,13 +43,14 @@ public class Server {
 	private EmployeeService employeeDAO;
 	private ServiceService serviceDAO;
 	private RoomService roomDAO;
+	private FrameLoginService frameLogin;
 	public Server() throws RemoteException, NamingException{
 		Context context = new InitialContext();
 		billDAO = new BillDAO();
 		bookingDAO = new BookingDAO();
 		customerDAO = new CustomerDAO();
 		detailBillDAO = new DetailBillDAO();
-		detailServiceDAO = new DetailServiceDAO();
+		detailServiceDAO = new DetailServiceRoomDAO();
 		employeeDAO = new EmployeeDAO();
 		roomDAO = new RoomDAO();
 		serviceDAO = new ServiceDAO();
@@ -62,6 +64,7 @@ public class Server {
 		context.bind(URL + "employeeDAO", employeeDAO);
 		context.bind(URL + "roomDAO", roomDAO);
 		context.bind(URL + "serviceDAO", serviceDAO);
+		context.bind(URL + "frameLogin", frameLogin);
 		System.out.println("Server is running ...");
 	}
 	

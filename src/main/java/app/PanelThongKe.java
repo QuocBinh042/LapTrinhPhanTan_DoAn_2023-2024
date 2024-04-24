@@ -56,8 +56,9 @@ import com.toedter.calendar.JDateChooser;
 
 import dao.BillDAO;
 import dao.DetailBillDAO;
-import dao.DetailServiceDAO;
+import dao.DetailServiceRoomDAO;
 import entity.Bill;
+import entity.DetailServiceRoom;
 
 public class PanelThongKe extends JPanel {
 	private JTable tableTG, tableKH, tableP, tableDV;
@@ -79,7 +80,7 @@ public class PanelThongKe extends JPanel {
 	private BillDAO daoBill = new BillDAO();
 	private List<Bill> dsHD = new ArrayList<>();
 	private DetailBillDAO daoDetailBill = new DetailBillDAO();
-	private DetailServiceDAO daoDetailService = new DetailServiceDAO();
+	private DetailServiceRoomDAO daoDetailServiceRoom = new DetailServiceRoomDAO();
 	private DecimalFormat formatter = new DecimalFormat("###,###,### VNĐ");
 	private DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 	private CategoryDataset dataset;
@@ -338,13 +339,11 @@ public class PanelThongKe extends JPanel {
 		LocalDate date = dcChonNgay.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 		Double dt = daoBill.calculateDailyRevenue(date);
 		long slhd = daoBill.calculateNumberOfBillsByDate(date);
-		Double tienPhong = 5.5; // = daoCTHD.ThongKeTienPhongTheoNgay(date) * 0.9;
-		Double tienDV = 6.0; // = daoCTDVPhong.ThongKeTienDVTheoNgay(date) * 0.9;
+		Double tienDV = daoDetailServiceRoom.calculateServiceCostByDay(date)*0.9;		
 		loadData(daoBill.getBillsByDate(date), tableTG, tableModelTG);
 		if (dt != null) {
+			Double tienPhong = dt - tienDV;	
 			addKetQua(dt, slhd, tienPhong, tienDV);
-		} else {
-			addKetQua(0.0, slhd, tienPhong, tienDV);
 		}
 		cardLayout.show(pnlCardTG, "TablePanel");
 	}
@@ -353,14 +352,12 @@ public class PanelThongKe extends JPanel {
 		LocalDate date = dcChonThang.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 		Double dt = daoBill.calculateMonthlyRevenue(date);
 		long slhd = daoBill.calculateNumberOfBillsByMonth(date);
-		Double tienPhong = 5.5; // = daoCTHD.ThongKeTienPhongTheoThang(date) * 0.9;
-		Double tienDV = 6.0; // daoCTDVPhong.ThongKeTienDVTheoThang(date) * 0.9;
+		Double tienDV = daoDetailServiceRoom.calculateServiceCostByMonth(date)*0.9;		
 		loadData(daoBill.getBillsByMonth(date), tableTG, tableModelTG);
 		if (dt != null) {
+			Double tienPhong = dt - tienDV;	
 			addKetQua(dt, slhd, tienPhong, tienDV);
-		} else {
-			addKetQua(0.0, slhd, tienPhong, tienDV);
-		}
+		} 
 		pnlCardTG.add(createChartPanel(createDatasetMonth(date), "Ngày"), "ChartPanel");
 		cardLayout.show(pnlCardTG, "ChartPanel");
 	}
@@ -369,8 +366,8 @@ public class PanelThongKe extends JPanel {
 		String year = cbChonNam.getSelectedItem().toString();
 		Double dt = daoBill.calculateYearlyRevenue(year);
 		long slhd = daoBill.calculateNumberOfBillsByYear(year);
-		Double tienPhong = 5.5;// daoCTHD.ThongKeTienPhongTheoNam(year) * 0.9;
-		Double tienDV = 6.0; // daoCTDVPhong.ThongKeTienDVTheoNam(year) * 0.9;
+		Double tienDV = daoDetailServiceRoom.calculateServiceCostByYear(year)*0.9;
+		Double tienPhong = dt - tienDV;		
 		loadData(daoBill.getBillsByYear(Integer.valueOf(year)), tableTG, tableModelTG);
 		addKetQua(dt, slhd, tienPhong, tienDV);
 		pnlCardTG.add(createChartPanel(createDatasetYear(Integer.valueOf(year)), "Tháng"), "ChartPanel");
@@ -418,9 +415,11 @@ public class PanelThongKe extends JPanel {
 		clearTable(table);
 		Collections.sort(ds, Comparator.comparing(Bill::getTotal, Comparator.reverseOrder()));
 		for (Bill bill : ds) {
-			tableModel.addRow(
-					new Object[] { bill.getId(), bill.getCustomer().getCustomerName(), bill.getEmployee().getName(),
-							dateFormat.format(bill.getPaymentDate()), formatter.format(bill.getTotal()) });
+			if(bill.getTotal() != null) {
+				tableModel.addRow(
+						new Object[] { bill.getId(), bill.getCustomer().getCustomerName(), bill.getEmployee().getName(),
+								dateFormat.format(bill.getPaymentDate()), formatter.format(bill.getTotal()) });
+			}
 		}
 	}
 

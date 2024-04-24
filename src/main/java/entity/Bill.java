@@ -42,8 +42,8 @@ public class Bill implements Serializable {
 	@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@JoinColumn(name = "CustomerID", referencedColumnName = "CustomerID")
 	private Customer customer;
-	@Column(name = "Total", nullable = true)
-	private Double total;
+	@Column(name = "Total", nullable = false)
+	private Double total = 0.0;
 	
 	@OneToMany(mappedBy = "bill")
 	Set<DetailServiceRoom> detailServiceRooms;

@@ -48,11 +48,14 @@ import javax.swing.table.TableColumnModel;
 
 import com.github.lgooddatepicker.components.TimePicker;
 import com.toedter.calendar.JDateChooser;
+
+import AppEvent.PanelBookingEvent;
+import appService.PanelBookingService;
 import dao.BillDAO;
 import dao.BookingDAO;
 import dao.CustomerDAO;
 import dao.DetailBillDAO;
-import dao.DetailServiceDAO;
+import dao.DetailServiceRoomDAO;
 import dao.EmployeeDAO;
 import dao.RoomDAO;
 import dao.ServiceDAO;
@@ -88,10 +91,11 @@ public class PanelBooking extends JPanel {
 	private CustomerDAO customerDAO;
 	private DetailBillDAO detailBillDAO;
 	private ChiTietPhong chiTietPhong;
-	private DetailServiceDAO detailServiceDAO;
+	private DetailServiceRoomDAO detailServiceDAO;
 	private ServiceDAO serviceDAO;
 	private DichVuPhong dichVuPhong;
 	private TinhTien tinhTien;
+	private PanelBookingService bookingEvent = new PanelBookingEvent();
 	
 	Icon imgAdd = new ImageIcon("src/main/java/img/add2.png");
 	Icon imgDel = new ImageIcon("src/main/java/img/del.png");
@@ -126,7 +130,7 @@ public class PanelBooking extends JPanel {
 		billDAO = new BillDAO();
 		employeeDAO = new EmployeeDAO();
 		detailBillDAO = new DetailBillDAO();
-		detailServiceDAO = new DetailServiceDAO();
+		detailServiceDAO = new DetailServiceRoomDAO();
 		serviceDAO = new ServiceDAO();
 		setManNV(maNV);
 
@@ -2676,10 +2680,11 @@ public class PanelBooking extends JPanel {
 			this.getContentPane().add(mainPane);
 
 			try {
-				readDataToFieldThongTin();
-				readDataToTablePhong();
-				readDataToTableDichVu();
-				xuLyTinhTienDienVaoThongTin();
+				bookingEvent.readDataToFieldThongTin(phongModel, phongTable, tfMaHD, tfTenNhanVien, tfTenKH, tfSDTKhach, tfNgayThanhToan, tfGioThanhToan);
+				bookingEvent.readDataToTablePhong(modelDichVu, modelPhong, tfMaHD);
+				bookingEvent.readDataToTableDichVu(modelDichVu, tfMaHD);
+				bookingEvent.xuLyTinhTienDienVaoThongTin(tfThue, tfTienPhong, tfTienDichVu, tfTongCong, tfThanhTien, tfMaHD);
+				
 			} catch (RemoteException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -2688,7 +2693,7 @@ public class PanelBooking extends JPanel {
 			btnQuayLai.addActionListener(e -> this.dispose());
 			btnThanhToan.addActionListener(e -> {
 				try {
-					xuLyThanhToan();
+					bookingEvent.xuLyThanhToan(phongModel, phongTable, tinhTien);
 				} catch (RemoteException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
@@ -2698,94 +2703,8 @@ public class PanelBooking extends JPanel {
 
 		}
 
-		private void xuLyThanhToan() throws RemoteException {
-			String roomName = (String) phongModel.getValueAt(phongTable.getSelectedRow(), 0);
-			Room r = roomDAO.getRoomsByRoomName(roomName).get(0);
-			List<DetailBill> detailBills = detailBillDAO.findDetailBillByRoomName(roomName);
-			DetailBill detailBill = detailBills.get(detailBills.size() - 1);
-			List<Bill> bills = billDAO.searchBillsByBillID(detailBill.getBill().getId());
-			Bill bill = bills.get(bills.size() - 1);
-			bill.setPaymentTime(LocalTime.now());
-			bill.setTotal();
-			r.setRoomStatus("Còn trống");
-			try {
-				if (billDAO.updateBillAfterPayment(bill)) {
-					if (roomDAO.updateRoom(r)) {
-						JOptionPane.showMessageDialog(this, "Thanh toán thành công");
-					}
-				} else {
-					JOptionPane.showMessageDialog(this, "Thanh toán không thành công");
-				}
-			} catch (Exception e) {
-				// TODO: handle exception
-				e.printStackTrace();
-			}
-		}
-
 		private void xuLyInHD() {
 
 		}
-
-		private void readDataToFieldThongTin() throws RemoteException {
-			List<DetailBill> detailBills = detailBillDAO
-					.findDetailBillByRoomName((String) phongModel.getValueAt(phongTable.getSelectedRow(), 0));
-			DetailBill detailBill = detailBills.get(detailBills.size() - 1);
-			List<Bill> bills = billDAO.getBillsByBillID(detailBill.getBill().getId());
-			Bill bill = bills.get(bills.size() - 1);
-			bill.setPaymentDate(LocalDate.now());
-			if(billDAO.updateBillAfterPayment(bill)) {
-				tfMaHD.setText(bill.getId() + "");
-				tfTenNhanVien.setText(bill.getEmployee().getName());
-				tfTenKH.setText(bill.getCustomer().getCustomerName());
-				tfSDTKhach.setText(bill.getCustomer().getPhoneNumber());
-				tfNgayThanhToan.setText(bill.getPaymentDate().format(DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT)));
-				tfGioThanhToan.setText(detailBill.getCheckin().toLocalDate().format(DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT)));
-			}
-		}
-
-		private void readDataToTablePhong() throws NumberFormatException, RemoteException {
-			modelDichVu.setRowCount(0);
-			List<DetailBill> detailBills = detailBillDAO.findDetailBillByBillID(Integer.valueOf(tfMaHD.getText().trim())).stream()
-					.sorted(Comparator.comparing(DetailBill::getId))
-					.toList();
-			DetailBill detailBill = detailBills.get(detailBills.size() - 1);
-			detailBill.setCheckout(LocalDateTime.now());
-			detailBillDAO.updateCheckoutTime(detailBill);
-			try {
-				for (DetailBill d : detailBills) {
-					modelPhong.addRow(new Object[] { d.getRoom().getName(),
-							d.getRoom().getRoomType().getTypeRoom(), d.getCheckin().toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")),
-							d.getCheckout().toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")), d.calculateTimeUsingRoomByMinute(),
-							d.getRoom().getRoomType().getPrice(), formatter.format(d.translationRoomPrice())});
-				}
-			} catch (Exception e) {
-				// TODO: handle exception
-				e.printStackTrace();
-			}
-		}
-
-		private void xuLyTinhTienDienVaoThongTin() throws NumberFormatException, RemoteException {
-			tfThue.setText("10%");
-			Bill bill = billDAO.getBillsByBillID(Integer.valueOf(tfMaHD.getText().trim())).get(0);
-			double tongTienPhong = bill.calTotalMoneyRoom();
-			tfTienPhong.setText(formatter.format(tongTienPhong) + "");
-			double tongTienDV = bill.calTotalMoneyService();
-			tfTienDichVu.setText(formatter.format(tongTienDV) + "");
-			double tong = tongTienPhong + tongTienDV;
-			double thanhTien = tong + tong * 0.01;
-			tfTongCong.setText(formatter.format(tong) + "");
-			tfThanhTien.setText(formatter.format(thanhTien) + "");
-		}
-
-		private void readDataToTableDichVu() throws NumberFormatException, RemoteException {
-			modelDichVu.setRowCount(0);
-			List<DetailServiceRoom> detailServiceRooms = detailServiceDAO.searchDetailServiceRoomByBillID(Integer.valueOf(tfMaHD.getText().trim()));
-			int i = 0;
-			for (DetailServiceRoom d : detailServiceRooms) {
-				modelDichVu.addRow(new Object[] { ++i, d.getService().getName(), d.getService().getUnit(),
-						d.getQuantity(), d.getService().getPrice(), formatter.format(d.calculateMoneyService())});
-			}
-		}
-
 	}
 }

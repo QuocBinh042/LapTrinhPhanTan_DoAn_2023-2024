@@ -2,13 +2,16 @@ package app;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+
+import appService.PanelTrangChuService;
+
 import javax.swing.ImageIcon;
 
 import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.Toolkit;
 
-public class PanelTrangChu extends JPanel {
+public class PanelTrangChu extends JPanel implements PanelTrangChuService{
 	public PanelTrangChu() {
 		ImageIcon icon = new ImageIcon("src/main/java/img/trangChu.jpg");
 		Image image = icon.getImage();
@@ -17,6 +20,11 @@ public class PanelTrangChu extends JPanel {
 		Image scaledImage = image.getScaledInstance(screenSize.width, screenSize.height, Image.SCALE_SMOOTH);
 		label.setIcon(new ImageIcon(scaledImage));
 		add(label);
+	}
 
+	@Override
+	public void getPanelTrangChu() {
+		// TODO Auto-generated method stub
+		new PanelTrangChu();
 	}
 }

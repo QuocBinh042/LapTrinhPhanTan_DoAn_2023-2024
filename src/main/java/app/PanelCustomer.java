@@ -4,6 +4,9 @@ import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.table.DefaultTableModel;
 
+import AppEvent.PanelCustomerEvent;
+import appService.PanelCustomerService;
+
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -13,7 +16,7 @@ import java.util.List;
 import dao.CustomerDAO;
 import entity.Customer;
 
-public class PanelCustomer extends JPanel implements MouseListener {
+public class PanelCustomer extends JPanel implements MouseListener{
 	/**
 	 * 
 	 */
@@ -27,6 +30,7 @@ public class PanelCustomer extends JPanel implements MouseListener {
 	private DefaultTableModel tableModel;
 	private CustomerDAO daoCustomer = new CustomerDAO();
 	private List<Customer> listCustomer;
+	private PanelCustomerEvent customerEvent = new PanelCustomerEvent();
 
 	public PanelCustomer() throws RemoteException {
 		try {
@@ -46,12 +50,12 @@ public class PanelCustomer extends JPanel implements MouseListener {
 		}
 
 		createUI();
-		getAllCustomers();
+		customerEvent.getAllCustomers(table, tableModel);
 		// sự kiện
-		btnLamMoi.addActionListener(e -> refesh());
+		btnLamMoi.addActionListener(e -> customerEvent.refesh(txtMaKH, txtCustomerName, txtPhoneNumber, txaNote));
 		btnThemMoi.addActionListener(e -> {
 			try {
-				processAddCustomer();
+				customerEvent.processAddCustomer(txtCustomerName, txtPhoneNumber, txtCustomerName, tableModel);
 			} catch (RemoteException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
@@ -59,18 +63,18 @@ public class PanelCustomer extends JPanel implements MouseListener {
 		});
 		btnCapNhat.addActionListener(e -> {
 			try {
-				processUpdate();
+				customerEvent.processUpdate(table, txtCustomerName, txtPhoneNumber, txaNote);
 			} catch (RemoteException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 		});
-		btnTim.addActionListener(e -> processSearch());
+		btnTim.addActionListener(e -> customerEvent.processSearch(txtTimSDT, table));
 		table.addMouseListener(this);
 
 	}
 
-	private void createUI() {
+	public void createUI() {
 		Icon img_add = new ImageIcon("src/main/java/img/add16.png");
 		Icon img_del = new ImageIcon("src/main/java/img/bin.png");
 		Icon img_reset = new ImageIcon("src/main/java/img/refresh16.png");
@@ -83,10 +87,10 @@ public class PanelCustomer extends JPanel implements MouseListener {
 		// Thông tin kháchh hàng
 		JPanel pnlInput = new JPanel();
 		pnlInput.setLayout(new GridLayout(3, 2, 40, 0));
-		pnlInput.add(createPanel(lblMaKH = new JLabel("Mã khách hàng"), txtMaKH = new JTextField()));
-		pnlInput.add(createPanel(lblTenKhachHang = new JLabel("Tên khách hàng"), txtCustomerName = new JTextField()));
-		pnlInput.add(createPanel(lblSoDienThoai = new JLabel("Số điện thoại"), txtPhoneNumber = new JTextField()));
-		pnlInput.add(createPanel(lblGhiChu = new JLabel("Ghi chú"), txaNote = new JTextArea()));
+		pnlInput.add(customerEvent.createPanel(lblMaKH = new JLabel("Mã khách hàng"), txtMaKH = new JTextField()));
+		pnlInput.add(customerEvent.createPanel(lblTenKhachHang = new JLabel("Tên khách hàng"), txtCustomerName = new JTextField()));
+		pnlInput.add(customerEvent.createPanel(lblSoDienThoai = new JLabel("Số điện thoại"), txtPhoneNumber = new JTextField()));
+		pnlInput.add(customerEvent.createPanel(lblGhiChu = new JLabel("Ghi chú"), txaNote = new JTextArea()));
 
 		// Nút chức năng
 		JPanel pnlChucNang = new JPanel();
@@ -153,133 +157,10 @@ public class PanelCustomer extends JPanel implements MouseListener {
 		pnlThongTinKH.setBackground(Color.decode("#D0BAFB"));
 	}
 
-	private JPanel createPanel(JLabel label, JComponent component) {
-		JPanel panel = new JPanel();
-		panel.setLayout(new FlowLayout(FlowLayout.LEFT));
-		panel.add(label);
-		panel.add(component);
-		label.setFont(new Font("Sanserif", Font.BOLD, 13));
-		panel.setBackground(Color.decode("#D0BAFB"));
-		return panel;
-	}
-
-	private void processAddCustomer() throws RemoteException {
-		if (!validateInput()) {
-			JOptionPane.showMessageDialog(null, "Vui lòng nhập đầy đủ thông tin khách hàng!");
-			return;
-		}
-
-		String customerID = Integer.toString(daoCustomer.getAllCustomers().size() + 1);
-		String customerName = txtCustomerName.getText();
-		String phoneNumber = txtPhoneNumber.getText();
-		String note = txaNote.getText();
-
-		Customer customer = new Customer(Integer.parseInt(customerID), customerName, phoneNumber, note);
-
-		int confirmation = JOptionPane.showConfirmDialog(null, "Bạn có chắc chắn muốn thêm mới khách hàng không ?",
-				"Chú ý!", JOptionPane.YES_OPTION);
-		if (confirmation == JOptionPane.YES_OPTION && daoCustomer.addCustomer(customer)) {
-			Object[] rowData = { customerID, customerName, phoneNumber, note };
-			tableModel.addRow(rowData);
-			JOptionPane.showMessageDialog(null, "Thêm mới khách hàng thành công!");
-		} else {
-			JOptionPane.showMessageDialog(null, "Thêm mới khách hàng không thành công!");
-		}
-	}
 
 	// Xoa toan bo khach hang
-	private void clearTable() {
-		DefaultTableModel tableModel = (DefaultTableModel) table.getModel();
-		tableModel.setRowCount(0);
-	}
-
-	// Lay toan bo khach hang
-	private void getAllCustomers() throws RemoteException {
-		clearTable();
-		listCustomer = daoCustomer.getAllCustomers();
-		listCustomer.forEach(c -> {
-			tableModel.addRow(new Object[] { 
-					c.getId(), 
-					c.getCustomerName(), 
-					c.getPhoneNumber(), 
-					c.getNote() 
-				});
-
-		});
-	}
 
 	// Kiem tra rang buoc
-	private boolean validateInput() {
-		String tenKH = txtCustomerName.getText();
-		String sdt = txtPhoneNumber.getText();
-		Pattern p = Pattern.compile("[a-zA-Z]+");
-		if (!(p.matcher(tenKH).find())) {
-			JOptionPane.showMessageDialog(null, "Tên khách hàng không hợp lệ!");
-			return false;
-		}
-
-		Pattern p1 = Pattern.compile("[0-9]{10}");
-		if (!(p1.matcher(sdt).find())) {
-			JOptionPane.showMessageDialog(null, "Số điện thoại chỉ được nhập chữ số!");
-			return false;
-		}
-
-		return true;
-	}
-
-	private void processUpdate() throws RemoteException {
-		int selectedRow = table.getSelectedRow();
-		if (selectedRow == -1) {
-			JOptionPane.showMessageDialog(null, "Vui lòng chọn khách hàng cần cập nhật!");
-			return;
-		}
-
-		if (!validateInput()) {
-			JOptionPane.showMessageDialog(null, "Vui lòng kiểm tra lại thông tin đã nhập!");
-			return;
-		}
-
-		int confirmation = JOptionPane.showConfirmDialog(null, "Có chắc chắn muốn cập nhật thông tin khách hàng không?",
-				"Chú ý", JOptionPane.YES_NO_OPTION);
-		if (confirmation != JOptionPane.YES_OPTION) {
-			return;
-		}
-
-		String customerName = txtCustomerName.getText();
-		String phoneNumber = txtPhoneNumber.getText();
-		String note = txaNote.getText();
-
-		table.setValueAt(customerName, selectedRow, 1);
-		table.setValueAt(phoneNumber, selectedRow, 2);
-		table.setValueAt(note, selectedRow, 3);
-
-		String customerId = table.getValueAt(selectedRow, 0).toString();
-		Customer customer = new Customer(Integer.parseInt(customerId), customerName, phoneNumber, note);
-		daoCustomer.updateCustomer(customer);
-
-		JOptionPane.showMessageDialog(null, "Cập nhật thông tin khách hàng thành công!");
-	}
-
-	private void refesh() {
-		// TODO Auto-generated method stub
-		txtMaKH.setText("");
-		txtCustomerName.setText("");
-		txtPhoneNumber.setText("");
-		txaNote.setText("");
-	}
-
-	private boolean processSearch() {
-		String phoneNumber = txtTimSDT.getText();
-		for (int i = 0; i < table.getRowCount(); i++) {
-			if (table.getValueAt(i, 2).equals(phoneNumber)) {
-				table.setRowSelectionInterval(i, i);
-				JOptionPane.showMessageDialog(null, "Khách hàng được tìm thấy!");
-				return true;
-			}
-		}
-		JOptionPane.showMessageDialog(null, "Không tìm thấy số điện thoại!");
-		return false;
-	}
 
 	@Override
 	public void mousePressed(MouseEvent e) {

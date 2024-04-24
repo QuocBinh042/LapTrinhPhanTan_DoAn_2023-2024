@@ -4,6 +4,7 @@ import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.table.DefaultTableModel;
 
+import AppEvent.PanelRoomEvent;
 import dao.RoomDAO;
 import entity.*;
 
@@ -24,12 +25,12 @@ public class PanelRoom extends JPanel implements MouseListener {
 	private JTextField txtRoomName, txtCapacity, txtPrice, txtTimPhong, txtRoomType, txtRoomID, txtStatus;
 	private JTextArea txaDescription;
 	private JButton btnThemMoi, btnCapNhat, btnXoa, btnLamMoi, btnTim, btnLuu;
-	private JComboBox cbRoomType, cbStatus;
+	private JComboBox<String> cbRoomType, cbStatus;
 	private JTable table;
 	private DefaultTableModel tableModel;
-	private RoomDAO daoRoom = new RoomDAO();;
 	private List<Room> listRoom;
 	private DecimalFormat formatter = new DecimalFormat("###");
+	private PanelRoomEvent roomEvent = new PanelRoomEvent();
 
 	public PanelRoom() throws RemoteException {
 		try {
@@ -50,19 +51,68 @@ public class PanelRoom extends JPanel implements MouseListener {
 
 		createUI();
 //		// add event button
-		fetchAllRooms();
-		cbStatus.addActionListener(e -> filterRoomsByStatus());
-		cbRoomType.addActionListener(e -> filterRoomsByType());
-		btnLamMoi.addActionListener(e -> processRefesh());
-		btnThemMoi.addActionListener(e -> processAdd());
-		btnXoa.addActionListener(e -> processDelete());
-		btnCapNhat.addActionListener(e -> processUpdate());
-		btnTim.addActionListener(e -> processSearch());
+		roomEvent.fetchAllRooms(tableModel);;
+		cbStatus.addActionListener(e -> {
+			try {
+				roomEvent.filterRoomsByStatus(cbStatus, tableModel, table);
+			} catch (RemoteException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		});
+		cbRoomType.addActionListener(e -> {
+			try {
+				roomEvent.filterRoomsByType(table, cbRoomType, tableModel);
+			} catch (RemoteException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		});
+		btnLamMoi.addActionListener(e -> {
+			try {
+				roomEvent.processRefesh(cbRoomType, cbStatus, txtRoomID, txtRoomName, txtRoomType, txtPrice, txtCapacity, txtStatus, txtCapacity);
+			} catch (RemoteException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		});
+		btnThemMoi.addActionListener(e -> {
+			try {
+				roomEvent.processAdd(txtRoomID, txtRoomName, txtRoomType, txtCapacity, txtPrice, txaDescription, tableModel);
+			} catch (RemoteException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		});
+		btnXoa.addActionListener(e -> {
+			try {
+				roomEvent.processDelete(table, tableModel);
+			} catch (RemoteException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		});
+		btnCapNhat.addActionListener(e -> {
+			try {
+				roomEvent.processUpdate(table, txtRoomName, txtRoomType, txtCapacity, txtPrice, txaDescription);
+			} catch (RemoteException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		});
+		btnTim.addActionListener(e -> {
+			try {
+				roomEvent.processSearch(txtTimPhong, table);
+			} catch (RemoteException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		});
 		table.addMouseListener(this);
 
 	}
 
-	private void createUI() {
+	private void createUI() throws RemoteException {
 		// TODO Auto-generated method stub
 		Icon img_add = new ImageIcon("src/main/java/img/add16.png");
 		Icon img_del = new ImageIcon("src/main/java/img/bin.png");
@@ -74,13 +124,13 @@ public class PanelRoom extends JPanel implements MouseListener {
 		// Thông tin phòng
 		JPanel pnlInput = new JPanel();
 		pnlInput.setLayout(new GridLayout(4, 2, 30, 0));
-		pnlInput.add(createPanel(lblMaPhong = new JLabel("Mã phòng"), txtRoomID = new JTextField()));
-		pnlInput.add(createPanel(lblTenPhong = new JLabel("Tên phòng"), txtRoomName = new JTextField()));
-		pnlInput.add(createPanel(lblLoaiPhong = new JLabel("Loại phòng"), txtRoomType = new JTextField()));
-		pnlInput.add(createPanel(lblMoTa = new JLabel("Mô tả"), txaDescription = new JTextArea()));
-		pnlInput.add(createPanel(lblGiaPhong = new JLabel("Giá phòng"), txtPrice = new JTextField()));
-		pnlInput.add(createPanel(lblTinhTrang = new JLabel("Tình trạng"), txtStatus = new JTextField()));
-		pnlInput.add(createPanel(lblSucChua = new JLabel("Sức chứa"), txtCapacity = new JTextField()));
+		pnlInput.add(roomEvent.createPanel(lblMaPhong = new JLabel("Mã phòng"), txtRoomID = new JTextField()));
+		pnlInput.add(roomEvent.createPanel(lblTenPhong = new JLabel("Tên phòng"), txtRoomName = new JTextField()));
+		pnlInput.add(roomEvent.createPanel(lblLoaiPhong = new JLabel("Loại phòng"), txtRoomType = new JTextField()));
+		pnlInput.add(roomEvent.createPanel(lblMoTa = new JLabel("Mô tả"), txaDescription = new JTextArea()));
+		pnlInput.add(roomEvent.createPanel(lblGiaPhong = new JLabel("Giá phòng"), txtPrice = new JTextField()));
+		pnlInput.add(roomEvent.createPanel(lblTinhTrang = new JLabel("Tình trạng"), txtStatus = new JTextField()));
+		pnlInput.add(roomEvent.createPanel(lblSucChua = new JLabel("Sức chứa"), txtCapacity = new JTextField()));
 
 		// Nút chức năng
 		JPanel pnlChucNang = new JPanel();
@@ -175,205 +225,6 @@ public class PanelRoom extends JPanel implements MouseListener {
 		pnlChucNang.setBackground(Color.decode("#D0BAFB"));
 		pnlThongTinPhong.setBackground(Color.decode("#D0BAFB"));
 	}
-
-	private JPanel createPanel(JLabel label, JComponent component) {
-		JPanel panel = new JPanel();
-		panel.setLayout(new FlowLayout(FlowLayout.LEFT));
-		panel.add(label);
-		panel.add(component);
-		label.setFont(new Font("Sanserif", Font.BOLD, 13));
-		panel.setBackground(Color.decode("#D0BAFB"));
-		return panel;
-	}
-
-	// Lay toan bo danh sach phong
-	private void fetchAllRooms() {
-		listRoom = daoRoom.getAllRooms();
-		listRoom.forEach(r -> {
-			tableModel.addRow(new Object[] { 
-				    r.getId(), 
-				    r.getName(), 
-				    r.getRoomType().getTypeRoom(),
-				    r.getRoomType().getCapacity(),  
-				    r.getRoomType().getPrice(),    				    			    
-				    r.getRoomStatus(), 	
-				    r.getDescribe(),
-				   
-				});
-		});
-	}
-
-	// Xu ly them moi phong
-	private void processAdd() {		    
-		if (!validateInput()) {
-			JOptionPane.showMessageDialog(null, "Vui lòng nhập đầy đủ thông tin phòng!");
-			return;
-		}
-		txtRoomID.setText((daoRoom.getAllRooms().size() + 1) + "");
-		String roomID = txtRoomID.getText();
-		String roomName = txtRoomName.getText();
-		String roomType = txtRoomType.getText();
-		int capacity = Integer.parseInt(txtCapacity.getText());
-		double price = Double.parseDouble(txtPrice.getText());
-		String description = txaDescription.getText();
-		RoomType typeRoom = new RoomType(roomType, capacity, price);
-		Room room = new Room(Integer.parseInt(roomID), roomName, "Còn trống", description, typeRoom);
-
-		int confirmation = JOptionPane.showConfirmDialog(null, "Bạn có chắc chắn muốn thêm mới phòng không ?", "Chú ý!",
-				JOptionPane.YES_OPTION);
-		if (confirmation == JOptionPane.YES_OPTION && daoRoom.addRoom(room)) {
-			Object[] rowData = { roomID, roomName, roomType, capacity, price, "Còn trống", description };
-			tableModel.addRow(rowData);
-			JOptionPane.showMessageDialog(null, "Thêm mới phòng thành công!");
-		}
-	}
-
-	// Xu ly cap nhat thong tin phong
-	private void processUpdate() {
-		int selectedRow = table.getSelectedRow();
-		if (selectedRow == -1) {
-			JOptionPane.showMessageDialog(null, "Vui lòng chọn phòng cần cập nhật!");
-			return;
-		}
-
-		if (!validateInput()) {
-			JOptionPane.showMessageDialog(null, "Vui lòng nhập đầy đủ thông tin phòng!");
-			return;
-		}
-
-		int confirmation = JOptionPane.showConfirmDialog(null, "Bạn có chắc chắn muốn cập nhật phòng?", "Chú ý!",
-				JOptionPane.YES_NO_OPTION);
-		if (confirmation != JOptionPane.YES_OPTION) {
-			return;
-		}
-
-		String roomName = txtRoomName.getText();
-		String roomType = txtRoomType.getText();
-		int capacity = Integer.parseInt(txtCapacity.getText());
-		double price = Double.parseDouble(txtPrice.getText());
-		String description = txaDescription.getText();
-
-		table.setValueAt(roomName, selectedRow, 1);
-		table.setValueAt(roomType, selectedRow, 2);
-		table.setValueAt(capacity, selectedRow, 3);
-		table.setValueAt(formatter.format(price), selectedRow, 4);
-		table.setValueAt(description, selectedRow, 6);
-
-		String currentStatus = table.getValueAt(selectedRow, 5).toString();
-		RoomType roomTypeObject = new RoomType(roomType, capacity, price);
-		Room room = new Room(Integer.valueOf(table.getValueAt(selectedRow, 0).toString()), roomName, currentStatus,
-				description, roomTypeObject);
-		daoRoom.updateRoom(room);
-
-		JOptionPane.showMessageDialog(null, "Cập nhật thông tin phòng thành công!");
-	}
-
-	// Xu ly lam moi
-	private void processRefesh() {
-		cbRoomType.setSelectedIndex(0);
-		cbStatus.setSelectedIndex(0);
-		txtRoomID.setText("");
-		txtRoomName.setText("");
-		txtRoomType.setText("");
-		txtPrice.setText("");
-		txtCapacity.setText("");
-		txtStatus.setText("");
-		txaDescription.setText("");
-	}
-
-	// Xu ly xoa phong
-	private void processDelete() {
-		int row = table.getSelectedRow();
-		if (row == -1) {
-			JOptionPane.showMessageDialog(null, "Vui lòng chọn phòng cần xóa!");
-			return;
-		}
-
-		int confirmation = JOptionPane.showConfirmDialog(null, "Bạn có chắc chắn muốn xóa phòng không?", "Chú ý!",
-				JOptionPane.YES_NO_OPTION);
-		if (confirmation != JOptionPane.YES_OPTION) {
-			return;
-		}
-
-		int roomID = Integer.parseInt(table.getValueAt(row, 0).toString());
-		daoRoom.deleteRoom(roomID);
-		tableModel.removeRow(row);
-		JOptionPane.showMessageDialog(null, "Xóa phòng thành công!");
-	}
-
-	private boolean validateInput() {
-		String roomName = txtRoomName.getText();
-		String roomType = txtRoomType.getText();
-		String capacity = txtCapacity.getText();
-		String price = txtPrice.getText();
-		if (roomName.equals("") || roomType.equals("") || capacity.equals("") || price.equals("")) {
-			JOptionPane.showMessageDialog(null, "Vui lòng nhập đầy đủ thông tin phòng!");
-			return false;
-		}
-		return true;
-	}
-
-	// Xu ly tim kiem phong
-	private boolean processSearch() {
-		String roomIDToSearch = txtTimPhong.getText();
-		for (int i = 0; i < table.getRowCount(); i++) {
-			if (table.getValueAt(i, 1).equals(roomIDToSearch)) {
-				table.setRowSelectionInterval(i, i);
-				JOptionPane.showMessageDialog(null, "Phòng được tìm thấy!");
-				return true;
-			}
-		}
-		JOptionPane.showMessageDialog(null, "Phòng không tồn tại!");
-		return false;
-	} 
-
-	// Xoa toan bo loai phong
-	private void clearTable() {
-		DefaultTableModel tableModel = (DefaultTableModel) table.getModel();
-		tableModel.setRowCount(0);
-	}
-
-	// Xu ly combobox loc theo tinh trang
-	private void filterRoomsByStatus() {
-		clearTable();
-		String selectedStatus = cbStatus.getSelectedItem().toString();
-		List<Room> listRooms = daoRoom.getRoomsByStatus(selectedStatus);
-		listRooms.forEach(room -> {
-			RoomType roomType = room.getRoomType();
-			Object[] rowData = new Object[] { 
-					room.getId(), 
-					room.getName(), 
-					roomType.getTypeRoom(),
-					roomType.getCapacity(), 
-					formatter.format(roomType.getPrice()), 
-					room.getRoomStatus(),
-					room.getDescribe() 
-			};
-			tableModel.addRow(rowData);
-		});
-	}
- 
-	// Xu ly combobox loc theo loai phong
-	private void filterRoomsByType() {
-	    clearTable();
-	    String selectedRoomType = cbRoomType.getSelectedItem().toString();
-	    List<Room> listRooms = daoRoom.getRoomsByType(selectedRoomType);
-	    
-	    for (Room room : listRooms) {
-	        RoomType roomType = room.getRoomType();
-	        Object[] rowData = new Object[] { 
-	            room.getId(), 
-	            room.getName(), 
-	            roomType.getTypeRoom(),
-	            roomType.getCapacity(),  
-	            formatter.format(roomType.getPrice()),    
-	            room.getRoomStatus(), 				    
-	            room.getDescribe() 
-	        };
-	        tableModel.addRow(rowData);
-	    }
-	}
-
 
 	@Override
 	public void mousePressed(MouseEvent e) {

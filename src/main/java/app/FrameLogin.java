@@ -21,10 +21,11 @@ import javax.swing.JTextField;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
+import appService.FrameLoginService;
 import dao.EmployeeDAO;
 import service.EmployeeService;
 
-public class FrameLogin extends JFrame implements ActionListener {
+public class FrameLogin extends JFrame implements ActionListener{
 	private JLabel lblUser, lblPass, lblPicture;
 	private JTextField txtUser;
 	private JPasswordField txtPass;
@@ -145,6 +146,8 @@ public class FrameLogin extends JFrame implements ActionListener {
 		txtUser.setFont(new Font("Sanserif", Font.PLAIN, 15));
 		txtPass.setFont(new Font("Sanserif", Font.PLAIN, 15));
 	}
+	
+	
 
 	@Override
 	public void actionPerformed(ActionEvent e) {

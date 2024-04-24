@@ -219,10 +219,12 @@ public class PanelBill extends JPanel {
 		// delete all
 		clearTable();
 		for (Bill bill : listBills) {
-			tableModel.addRow(new Object[] { bill.getId(), dateFormat.format(bill.getPaymentDate()),
-					bill.getPaymentTime().toString(), bill.getCustomer().getCustomerName(),
-					bill.getEmployee().getName(), bill.getCustomer().getPhoneNumber(),
-					formatter.format(bill.getTotal()) });
+			if(bill.getTotal() != null) {
+				tableModel.addRow(new Object[] { bill.getId(), dateFormat.format(bill.getPaymentDate()),
+						bill.getPaymentTime().toString(), bill.getCustomer().getCustomerName(),
+						bill.getEmployee().getName(), bill.getCustomer().getPhoneNumber(),
+						formatter.format(bill.getTotal())});
+			}
 		}
 	}
 
