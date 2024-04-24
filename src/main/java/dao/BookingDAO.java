@@ -11,9 +11,9 @@ import entity.Booking;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.Persistence;
-import service.BookingSevice;
+import service.BookingService;
 
-public class BookingDAO extends UnicastRemoteObject implements BookingSevice {
+public class BookingDAO extends UnicastRemoteObject implements BookingService {
 	private EntityManager em;
 
 	public BookingDAO() throws RemoteException {

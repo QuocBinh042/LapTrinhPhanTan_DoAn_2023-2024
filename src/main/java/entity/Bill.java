@@ -120,7 +120,7 @@ public class Bill implements Serializable {
 	}
 
 	public void setTotal() {
-		this.total = totalMoneyRoom() + totalMoneyService();
+		this.total = calTotalMoneyRoom() + calTotalMoneyService();
 	}
 
 	@Override
@@ -162,11 +162,11 @@ public class Bill implements Serializable {
 		this.detailBills = detailBills;
 	}
 	
-	public double totalMoneyRoom() {
+	public double calTotalMoneyRoom() {
 		return detailBills.stream().mapToDouble(d -> d.translationRoomPrice()).sum();
 	}
 	
-	public double totalMoneyService() {
+	public double calTotalMoneyService() {
 		return detailServiceRooms.stream().mapToDouble(d -> d.calculateMoneyService()).sum();
 	}
 }

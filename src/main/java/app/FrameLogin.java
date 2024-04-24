@@ -22,20 +22,21 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
 import dao.EmployeeDAO;
+import service.EmployeeService;
 
 public class FrameLogin extends JFrame implements ActionListener {
 	private JLabel lblUser, lblPass, lblPicture;
 	private JTextField txtUser;
 	private JPasswordField txtPass;
 	private JButton btnLogin, btnExit, btnShowPass, btnHidePass, btnForgetPass;
-	private EmployeeDAO eDAO = new EmployeeDAO();
+	private EmployeeService eDAO = new EmployeeDAO();
 //	private DialogQuenMatKhau forgotPassword;
 
-	public FrameLogin() {
+	public FrameLogin() throws RemoteException{
 		createGUI();
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args)  throws RemoteException{
 		new FrameLogin().setVisible(true);
 	}
 

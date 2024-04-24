@@ -6,7 +6,7 @@ import java.util.List;
 
 import entity.Booking;
 
-public interface BookingSevice extends Remote {
+public interface BookingService extends Remote {
 	public boolean createBooking(Booking booking) throws RemoteException;
 
 	public List<Booking> getAllBooking() throws RemoteException;

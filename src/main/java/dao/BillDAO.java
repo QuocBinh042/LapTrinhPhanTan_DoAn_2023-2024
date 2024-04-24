@@ -113,12 +113,12 @@ public class BillDAO extends UnicastRemoteObject implements BillService {
 		return false;
 	}
 
-	@Override
-	public List<Bill> getBillsByYear(int year) throws RemoteException {
-		// TODO Auto-generated method stub
-		return em.createQuery("select b from Bill b where YEAR(b.paymentDate)  = :year", Bill.class)
-				.setParameter("year", year).getResultList();
-	}
+		@Override
+		public List<Bill> getBillsByYear(int year) throws RemoteException {
+			// TODO Auto-generated method stub
+			return em.createQuery("select b from Bill b where YEAR(b.paymentDate)  = :year", Bill.class)
+					.setParameter("year", year).getResultList();
+		}
 
 	@Override
 	public List<Bill> getBillsWithinDay() throws RemoteException {
@@ -356,5 +356,4 @@ public class BillDAO extends UnicastRemoteObject implements BillService {
 		return em.createQuery("select b from Bill b where b.id = :id", Bill.class)
 				.setParameter("id", id).getResultList();
 	}
-
 }

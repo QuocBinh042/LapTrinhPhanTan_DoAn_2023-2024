@@ -185,7 +185,14 @@ public class Card extends JFrame {
 		btnThongKe.addActionListener(e -> xuLyThongKe());
 		btnTroGiup.addActionListener(e -> xuLyTroGiup());
 		btnTrangChu.addActionListener(e -> xuLyTrangChu());
-		btnDangXuat.addActionListener(e -> xuLyDangXuat());
+		btnDangXuat.addActionListener(e -> {
+			try {
+				xuLyDangXuat();
+			} catch (RemoteException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		});
 	}
 
 	private void xuLyPhong() {
@@ -241,12 +248,12 @@ public class Card extends JFrame {
 		card.show(pnl, "tc");
 	}
 
-	private void xuLyDangXuat() {
+	private void xuLyDangXuat() throws RemoteException {
 		int result = JOptionPane.showConfirmDialog(null, "Bạn có chắc chắn muốn đăng xuất khỏi hệ thống không?",
 				"Chú ý", JOptionPane.YES_NO_OPTION);
 		if (result == JOptionPane.YES_OPTION) {
 			dispose();
-			new app.FrameLogin().setVisible(true);
+			new FrameLogin().setVisible(true);
 		}
 	}
 }

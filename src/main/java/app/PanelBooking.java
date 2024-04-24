@@ -1977,12 +1977,12 @@ public class PanelBooking extends JPanel {
 			detailBill.setCheckout(LocalDateTime.now());
 			detailBillDAO.updateCheckoutTime(detailBill);
 			Bill bill = billDAO.getBillsByBillID(Integer.valueOf(tfMaHD.getText().trim())).get(0);
-			double totalMoneyRoom = bill.totalMoneyRoom();
+			double totalMoneyRoom = bill.calTotalMoneyRoom();
 			double totalCurrentRoomPrice = detailBill.translationRoomPrice();
 			double totalMoneyOldRoom = detailBills.get((int) (detailBills.stream().count() - 2)).translationRoomPrice();
 			tfTienPhongCu.setText(" " + formatter.format(totalMoneyOldRoom) + "");																									
 			tfTongTienPhong.setText(formatter.format(totalMoneyRoom) + "");
-			double totalMoneyService = bill.totalMoneyService();
+			double totalMoneyService = bill.calTotalMoneyService();
 			tfTongTienDich.setText(formatter.format(totalMoneyService) + "");
 			double tong = totalMoneyRoom + totalMoneyService;
 			double thanhTien = tong + tong * 0.01;
@@ -2767,9 +2767,9 @@ public class PanelBooking extends JPanel {
 		private void xuLyTinhTienDienVaoThongTin() throws NumberFormatException, RemoteException {
 			tfThue.setText("10%");
 			Bill bill = billDAO.getBillsByBillID(Integer.valueOf(tfMaHD.getText().trim())).get(0);
-			double tongTienPhong = bill.totalMoneyRoom();
+			double tongTienPhong = bill.calTotalMoneyRoom();
 			tfTienPhong.setText(formatter.format(tongTienPhong) + "");
-			double tongTienDV = bill.totalMoneyService();
+			double tongTienDV = bill.calTotalMoneyService();
 			tfTienDichVu.setText(formatter.format(tongTienDV) + "");
 			double tong = tongTienPhong + tongTienDV;
 			double thanhTien = tong + tong * 0.01;
