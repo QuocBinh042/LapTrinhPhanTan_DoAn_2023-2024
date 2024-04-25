@@ -19,7 +19,10 @@ public class Room implements Serializable {
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = -4961161052563227659L;
+	/**
+	 * 
+	 */
 	@Id
 	@Column(name = "RoomID")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

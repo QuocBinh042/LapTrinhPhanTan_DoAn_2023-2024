@@ -66,5 +66,7 @@ public interface BillService extends Remote {
 	public Map<Integer, Double> getYearlyRevenueTotal(int year) throws RemoteException;
 
 	public Map<Integer, Double> getDailyRevenueForMonth(LocalDate month) throws RemoteException;
+	
+	public Map<Integer, Double> getMonthlyRevenueInRange(LocalDate month) throws RemoteException;
 
 }

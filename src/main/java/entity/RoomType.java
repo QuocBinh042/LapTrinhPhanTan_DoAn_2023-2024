@@ -1,10 +1,16 @@
 package entity;
 
+import java.io.Serializable;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 
 @Embeddable
-public class RoomType {
+public class RoomType implements Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -1348974394433574892L;
 	@Column(name = "TypeRoom", columnDefinition = "nvarchar(250)", nullable = false)
 	private String typeRoom;
 	@Column(name = "Capacity", nullable = false)

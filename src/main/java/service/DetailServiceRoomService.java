@@ -2,6 +2,7 @@ package service;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 
 import entity.DetailServiceRoom;
@@ -20,4 +21,10 @@ public interface DetailServiceRoomService extends Remote {
 	public boolean delete(int billID, int serviceID) throws RemoteException;
 
 	public boolean updateDetailService(DetailServiceRoom detailServiceRoom) throws RemoteException;
+	
+	public Double calculateServiceCostByYear(String yearString) throws RemoteException;
+	
+	public Double calculateServiceCostByMonth(LocalDate date) throws RemoteException;
+	
+	public Double calculateServiceCostByDay(LocalDate date) throws RemoteException;
 }

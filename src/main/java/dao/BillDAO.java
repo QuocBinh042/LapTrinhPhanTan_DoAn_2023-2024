@@ -5,6 +5,7 @@ import java.rmi.server.UnicastRemoteObject;
 import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.YearMonth;
 import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 import java.util.Collections;
@@ -12,6 +13,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import entity.Bill;
@@ -301,24 +303,94 @@ public class BillDAO extends UnicastRemoteObject implements BillService {
 						t -> ((Number) t.get("total")).doubleValue()));
 	}
 
-	@Override
-	public Map<Integer, Double> getYearlyRevenueTotal(int year) throws RemoteException {
-		// TODO Auto-generated method stub
-		return em
-				.createQuery("SELECT YEAR(b.paymentDate) as year, SUM(b.total) as total " + "FROM Bill b "
-						+ "WHERE YEAR(b.paymentDate) = :year " + "GROUP BY YEAR(b.paymentDate)", Tuple.class)
-				.setParameter("year", year).getResultList().stream().collect(Collectors
-						.toMap(t -> ((Number) t.get("year")).intValue(), t -> ((Number) t.get("total")).doubleValue()));
-	}
+//	@Override
+//	public Map<Integer, Double> getYearlyRevenueTotal(int year) throws RemoteException {
+//		// TODO Auto-generated method stub
+//		return em
+//				.createQuery("SELECT YEAR(b.paymentDate) as year, SUM(b.total) as total " + "FROM Bill b "
+//						+ "WHERE YEAR(b.paymentDate) = :year " + "GROUP BY YEAR(b.paymentDate)", Tuple.class)
+//				.setParameter("year", year).getResultList().stream().collect(Collectors
+//						.toMap(t -> ((Number) t.get("year")).intValue(), t -> ((Number) t.get("total")).doubleValue()));
+//	}
 
 	@Override
 	public Map<Integer, Double> getDailyRevenueForMonth(LocalDate month) throws RemoteException {
 		// TODO Auto-generated method stub
-		return em
-				.createQuery("SELECT DAY(b.paymentDate) as day, SUM(b.total) as total " + "FROM Bill b "
-						+ "WHERE MONTH(b.paymentDate) = :month " + "GROUP BY DAY(b.paymentDate)", Tuple.class)
-				.setParameter("month", month.getMonthValue()).getResultList().stream().collect(Collectors
-						.toMap(t -> ((Number) t.get("day")).intValue(), t -> ((Number) t.get("total")).doubleValue()));
+		  Map<Integer, Double> monthlyTotal = new TreeMap<>();
+
+		    try {
+		        int year = month.getYear();
+		        int monthValue = month.getMonthValue();
+		        YearMonth yearMonth = YearMonth.from(month);
+		        for (int day = 1; day <= yearMonth.lengthOfMonth(); day++) {
+		            LocalDate date = LocalDate.of(year, monthValue, day);
+
+		            Double total = em.createQuery(
+		                    "SELECT SUM(b.total) FROM Bill b " +
+		                            "WHERE b.paymentDate = :date", Double.class)
+		                    .setParameter("date", date)
+		                    .getSingleResult();
+
+		            monthlyTotal.put(day, total != null ? total : 0.0);
+		        }
+		    } catch (Exception e) {
+		        e.printStackTrace();
+		    }
+		    return monthlyTotal;
+	}
+	
+	@Override
+	public Map<Integer, Double> getMonthlyRevenueInRange(LocalDate month) throws RemoteException {
+	    Map<Integer, Double> monthlyTotal = new TreeMap<>();
+
+	    try {
+	        int year = month.getYear();
+	        int monthValue = month.getMonthValue();
+	        YearMonth yearMonth = YearMonth.from(month);
+	        for (int day = 1; day <= yearMonth.lengthOfMonth(); day++) {
+	            LocalDate date = LocalDate.of(year, monthValue, day);
+
+	            Double total = em.createQuery(
+	                    "SELECT SUM(b.total) FROM Bill b " +
+	                            "WHERE b.paymentDate = :date", Double.class)
+	                    .setParameter("date", date)
+	                    .getSingleResult();
+
+	            monthlyTotal.put(day, total != null ? total : 0.0);
+	        }
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	    return monthlyTotal;
+	}
+
+
+
+	@Override
+	public Map<Integer, Double> getYearlyRevenueTotal(int year) throws RemoteException {
+	    Map<Integer, Double> yearlyTotal = new HashMap<>();
+	    try {
+	        List<Object[]> resultList = em.createQuery(
+	                "SELECT MONTH(b.paymentDate), SUM(b.total) " +
+	                        "FROM Bill b " +
+	                        "WHERE YEAR(b.paymentDate) = :year " +
+	                        "GROUP BY MONTH(b.paymentDate)", Object[].class)
+	                .setParameter("year", year)
+	                .getResultList();
+
+	        for (Object[] result : resultList) {
+	            Integer month = (Integer) result[0];
+	            Double total = (Double) result[1];
+	            yearlyTotal.put(month, total);
+	        }
+
+	        for (int month = 1; month <= 12; month++) {
+	            yearlyTotal.putIfAbsent(month, 0.0);
+	        }
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	    return yearlyTotal;
 	}
 
 	@Override

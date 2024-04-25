@@ -8,22 +8,18 @@ import entity.Room;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.Persistence;
-import jakarta.persistence.TypedQuery;
 import service.RoomService;
 
 public class RoomDAO extends UnicastRemoteObject implements RoomService {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	private EntityManager em;
 
+	private EntityManager em;
 	public RoomDAO() throws RemoteException {
 		em = Persistence.createEntityManagerFactory("KaraokeOneDB").createEntityManager();
+		em.close();
 	}
 
 	@Override
-	public boolean addRoom(Room room) {
+	public boolean addRoom(Room room) throws RemoteException{
 		// TODO Auto-generated method stub
 		EntityTransaction tx = em.getTransaction();
 		try {
@@ -43,7 +39,7 @@ public class RoomDAO extends UnicastRemoteObject implements RoomService {
 	}
 
 	@Override
-	public boolean updateRoom(Room room) {
+	public boolean updateRoom(Room room) throws RemoteException{
 		// TODO Auto-generated method stub
 		EntityTransaction tx = em.getTransaction();
 		try {
@@ -60,7 +56,7 @@ public class RoomDAO extends UnicastRemoteObject implements RoomService {
 	}
 
 	@Override
-	public boolean deleteRoom(int roomID) {
+	public boolean deleteRoom(int roomID) throws RemoteException{
 		// TODO Auto-generated method stub
 		EntityTransaction tx = em.getTransaction();
 		try {
@@ -80,7 +76,7 @@ public class RoomDAO extends UnicastRemoteObject implements RoomService {
 	}
 
 	@Override
-	public boolean updateRoomStatusByRoomID(String status, int roomID) {
+	public boolean updateRoomStatusByRoomID(String status, int roomID) throws RemoteException{
 	    EntityTransaction tx = em.getTransaction();
 	    try {
 	        if (tx.isActive()) {
@@ -104,7 +100,7 @@ public class RoomDAO extends UnicastRemoteObject implements RoomService {
 
 
 	@Override
-	public boolean updateRoomStatusByRoomName(String status, String nameRoom) {
+	public boolean updateRoomStatusByRoomName(String status, String nameRoom) throws RemoteException{
 		EntityTransaction tx = em.getTransaction();
 		try {
 			tx.begin();
@@ -126,15 +122,14 @@ public class RoomDAO extends UnicastRemoteObject implements RoomService {
 	}
 
 	@Override
-	public List<Room> getAllRooms() {
+	public List<Room> getAllRooms() throws RemoteException {
 		// TODO Auto-generated method stub
-		String string = "Đã xóa";
-		return em.createQuery("SELECT r FROM Room r where r.roomStatus != :string", Room.class)
-				.setParameter("string", string).getResultList();
+		return em.createQuery("SELECT r FROM Room r", Room.class)
+				 .getResultList();
 	}
 
 	@Override
-	public List<Room> getRoomsByStatus(String status) {
+	public List<Room> getRoomsByStatus(String status) throws RemoteException{
 		// TODO Auto-generated method stub
 		if ("Tất cả".equals(status)) {
 			return em.createQuery("SELECT r FROM Room r", Room.class).getResultList();
@@ -144,7 +139,7 @@ public class RoomDAO extends UnicastRemoteObject implements RoomService {
 	}
 
 	@Override
-	public List<Room> getRoomsByType(String type) {
+	public List<Room> getRoomsByType(String type) throws RemoteException{
 		// TODO Auto-generated method stub
 		if ("Tất cả".equals(type)) {
 			return em.createQuery("SELECT r FROM Room r", Room.class).getResultList();
@@ -154,7 +149,7 @@ public class RoomDAO extends UnicastRemoteObject implements RoomService {
 	}
 
 	@Override
-	public List<Room> getRoomsByCapacity(String capacity) {
+	public List<Room> getRoomsByCapacity(String capacity) throws RemoteException{
 		// TODO Auto-generated method stub
 		if ("Tất cả".equals(capacity)) {
 			return em.createQuery("SELECT r FROM Room r", Room.class).getResultList();
@@ -165,7 +160,7 @@ public class RoomDAO extends UnicastRemoteObject implements RoomService {
 	}
 
 	@Override
-	public List<Room> getRoomsByRoomName(String nameRoom) {
+	public List<Room> getRoomsByRoomName(String nameRoom) throws RemoteException{
 		// TODO Auto-generated method stub
 		return em.createQuery("SELECT r FROM Room r WHERE r.roomName like :nameRoom", Room.class)
 				.setParameter("nameRoom", "%" + nameRoom + "%").getResultList();
