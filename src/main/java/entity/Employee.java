@@ -15,10 +15,11 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "Employee")
 public class Employee implements Serializable {
+	
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 7846569179933431829L;
 	@Id
 	@Column(name = "EmployeeID")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

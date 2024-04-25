@@ -45,10 +45,10 @@ public class Bill implements Serializable {
 	@Column(name = "Total", nullable = false)
 	private Double total = 0.0;
 	
-	@OneToMany(mappedBy = "bill")
+	@OneToMany(mappedBy = "bill", fetch = FetchType.EAGER)
 	Set<DetailServiceRoom> detailServiceRooms;
 	
-	@OneToMany(mappedBy = "bill")
+	@OneToMany(mappedBy = "bill", fetch = FetchType.EAGER)
 	Set<DetailBill> detailBills;
 
 	public Bill(int id, LocalDate paymentDate, LocalTime paymentTime, Employee employee, Customer customer) {
@@ -121,6 +121,10 @@ public class Bill implements Serializable {
 
 	public void setTotal() {
 		this.total = calTotalMoneyRoom() + calTotalMoneyService();
+	}
+	
+	public void setTotal2(double total) {
+		this.total = total;
 	}
 
 	@Override

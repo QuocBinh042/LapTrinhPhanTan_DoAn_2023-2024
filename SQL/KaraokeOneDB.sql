@@ -1,5 +1,6 @@
 ﻿--DROP DATABASE KaraokeOneDB
 --CREATE DATABASE KaraokeOneDB
+USE KaraokeOneDB
 go
 SET IDENTITY_INSERT [dbo].[Room] ON
 INSERT INTO [dbo].[Room] ([RoomID], [RoomName], [TypeRoom], [Capacity], [Price], [RoomStatus], [Describe])
@@ -287,43 +288,43 @@ INSERT INTO [dbo].[DetailBill] ([DetailBillID],[RoomID], [BillID], [Checkin], [C
 VALUES  (15,20, 15, '2023-11-21 10:00', '2023-11-21 12:30');
 go
 SET IDENTITY_INSERT [dbo].[DetailBill] OFF
-
-INSERT INTO [dbo].[DetailServiceBill] ([BillID], [ServiceID], [Quantity])
-VALUES  (1, 1, 2)
-INSERT INTO [dbo].[DetailServiceBill] ([BillID], [ServiceID], [Quantity]) 
-VALUES  (1, 2, 1)
-INSERT INTO [dbo].[DetailServiceBill] ([BillID], [ServiceID], [Quantity]) 
-VALUES  (2, 3, 1)
-INSERT INTO [dbo].[DetailServiceBill] ([BillID], [ServiceID], [Quantity]) 
-VALUES  (2, 4, 1)
-INSERT INTO [dbo].[DetailServiceBill] ([BillID], [ServiceID], [Quantity]) 
-VALUES  (3, 5, 5)
-INSERT INTO [dbo].[DetailServiceBill] ([BillID], [ServiceID], [Quantity]) 
-VALUES  (3, 6, 2)
-INSERT INTO [dbo].[DetailServiceBill] ([BillID], [ServiceID], [Quantity]) 
-VALUES  (4, 1, 1)
-INSERT INTO [dbo].[DetailServiceBill] ([BillID], [ServiceID], [Quantity]) 
-VALUES  (4, 3, 2)
-INSERT INTO [dbo].[DetailServiceBill] ([BillID], [ServiceID], [Quantity]) 
-VALUES  (5, 2, 10)
-INSERT INTO [dbo].[DetailServiceBill] ([BillID], [ServiceID], [Quantity]) 
-VALUES  (5, 4, 1)
-INSERT INTO [dbo].[DetailServiceBill] ([BillID], [ServiceID], [Quantity]) 
-VALUES  (6, 5, 15)
-INSERT INTO [dbo].[DetailServiceBill] ([BillID], [ServiceID], [Quantity]) 
-VALUES  (6, 6, 5)
-INSERT INTO [dbo].[DetailServiceBill] ([BillID], [ServiceID], [Quantity]) 
-VALUES  (7, 2, 5)
-INSERT INTO [dbo].[DetailServiceBill] ([BillID], [ServiceID], [Quantity]) 
-VALUES  (7, 4, 1)
-INSERT INTO [dbo].[DetailServiceBill] ([BillID], [ServiceID], [Quantity]) 
-VALUES  (8, 1, 4)
-INSERT INTO [dbo].[DetailServiceBill] ([BillID], [ServiceID], [Quantity]) 
-VALUES  (8, 3, 1)
-INSERT INTO [dbo].[DetailServiceBill] ([BillID], [ServiceID], [Quantity]) 
-VALUES  (9, 2, 15)
-INSERT INTO [dbo].[DetailServiceBill] ([BillID], [ServiceID], [Quantity]) 
-VALUES  (9, 5, 1)
+SET IDENTITY_INSERT [dbo].[DetailServiceRoom] ON
+INSERT INTO [dbo].[DetailServiceRoom] ([DetailServiceBillID], [BillID], [ServiceID], [Quantity])
+VALUES  (1,1, 1, 2)
+INSERT INTO [dbo].[DetailServiceRoom] ([DetailServiceBillID], [BillID], [ServiceID], [Quantity])
+VALUES  (2,1, 2, 1)
+INSERT INTO [dbo].[DetailServiceRoom] ([DetailServiceBillID], [BillID], [ServiceID], [Quantity])
+VALUES  (3,2, 3, 1)
+INSERT INTO [dbo].[DetailServiceRoom] ([DetailServiceBillID], [BillID], [ServiceID], [Quantity])
+VALUES  (4,2, 4, 1)
+INSERT INTO [dbo].[DetailServiceRoom] ([DetailServiceBillID], [BillID], [ServiceID], [Quantity])
+VALUES  (5,3, 5, 5)
+INSERT INTO [dbo].[DetailServiceRoom] ([DetailServiceBillID], [BillID], [ServiceID], [Quantity])
+VALUES  (6,3, 6, 2)
+INSERT INTO [dbo].[DetailServiceRoom] ([DetailServiceBillID], [BillID], [ServiceID], [Quantity])
+VALUES  (7,4, 1, 1)
+INSERT INTO [dbo].[DetailServiceRoom] ([DetailServiceBillID], [BillID], [ServiceID], [Quantity])
+VALUES  (8,4, 3, 2)
+INSERT INTO [dbo].[DetailServiceRoom] ([DetailServiceBillID], [BillID], [ServiceID], [Quantity])
+VALUES  (9,5, 2, 10)
+INSERT INTO [dbo].[DetailServiceRoom] ([DetailServiceBillID], [BillID], [ServiceID], [Quantity])
+VALUES  (10,5, 4, 1)
+INSERT INTO [dbo].[DetailServiceRoom] ([DetailServiceBillID], [BillID], [ServiceID], [Quantity])
+VALUES  (11,6, 5, 15)
+INSERT INTO [dbo].[DetailServiceRoom] ([DetailServiceBillID], [BillID], [ServiceID], [Quantity])
+VALUES  (12,6, 6, 5)
+INSERT INTO [dbo].[DetailServiceRoom] ([DetailServiceBillID], [BillID], [ServiceID], [Quantity])
+VALUES  (13,7, 2, 5)
+INSERT INTO [dbo].[DetailServiceRoom] ([DetailServiceBillID], [BillID], [ServiceID], [Quantity])
+VALUES  (14,7, 4, 1)
+INSERT INTO [dbo].[DetailServiceRoom] ([DetailServiceBillID], [BillID], [ServiceID], [Quantity])
+VALUES  (15,8, 1, 4)
+INSERT INTO [dbo].[DetailServiceRoom] ([DetailServiceBillID], [BillID], [ServiceID], [Quantity])
+VALUES  (16,8, 3, 1)
+INSERT INTO [dbo].[DetailServiceRoom] ([DetailServiceBillID], [BillID], [ServiceID], [Quantity])
+VALUES  (17,9, 2, 15)
+INSERT INTO [dbo].[DetailServiceRoom] ([DetailServiceBillID], [BillID], [ServiceID], [Quantity])
+VALUES  (18,9, 5, 1)
 
 select * from [dbo].[Room]
 select * from [dbo].[Employee]
@@ -331,5 +332,5 @@ select * from [dbo].[Customer]
 select * from [dbo].[Service]
 select * from [dbo].[Booking]
 select * from [dbo].[DetailBill]
-select * from [dbo].[DetailServiceBill]
+select * from [dbo].[DetailServiceRoom]
 select * from [dbo].[Bill]

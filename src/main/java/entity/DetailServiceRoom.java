@@ -16,6 +16,11 @@ import jakarta.persistence.Table;
 @Table(name = "DetailServiceRoom")
 public class DetailServiceRoom implements Serializable{
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -2474794631979949052L;
+
 	@Id
 	@Column(name = "DetailServiceBillID")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

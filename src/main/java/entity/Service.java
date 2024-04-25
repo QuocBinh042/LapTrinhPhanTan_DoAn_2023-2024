@@ -18,7 +18,8 @@ public class Service implements Serializable {
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = -7382314846166790216L;	
+
 	@Id
 	@Column(name = "ServiceID")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

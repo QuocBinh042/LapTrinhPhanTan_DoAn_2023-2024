@@ -42,10 +42,7 @@ public class DetailBill implements Serializable {
 	public Double translationRoomPrice() {
 		Double money;
 		money = room.getRoomType().getPrice() * (calculateTimeUsingRoomByMinute() / 60);
-		System.out.println(money);
-		double moneyExtra = calculateTimeUsingRoomByMinute() % 60;
-		System.out.println(calculateTimeUsingRoomByMinute());
-		System.out.println(moneyExtra);
+		double moneyExtra = calculateTimeUsingRoomByMinute() % 60;;
 		if(calculateTimeUsingRoomByMinute() > 0) {
 			if(moneyExtra >= 0 && moneyExtra < 15) {
 				money += 0;

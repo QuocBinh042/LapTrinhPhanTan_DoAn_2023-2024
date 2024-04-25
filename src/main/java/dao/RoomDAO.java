@@ -15,7 +15,6 @@ public class RoomDAO extends UnicastRemoteObject implements RoomService {
 	private EntityManager em;
 	public RoomDAO() throws RemoteException {
 		em = Persistence.createEntityManagerFactory("KaraokeOneDB").createEntityManager();
-		em.close();
 	}
 
 	@Override
@@ -124,7 +123,8 @@ public class RoomDAO extends UnicastRemoteObject implements RoomService {
 	@Override
 	public List<Room> getAllRooms() throws RemoteException {
 		// TODO Auto-generated method stub
-		return em.createQuery("SELECT r FROM Room r", Room.class)
+		return em.createQuery("SELECT r FROM Room r where r.roomStatus != :status", Room.class)
+				 .setParameter("status", "Đã xóa")
 				 .getResultList();
 	}
 

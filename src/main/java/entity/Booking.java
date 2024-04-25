@@ -1,6 +1,7 @@
 package entity;
 
 import java.util.Date;
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -21,7 +22,11 @@ import jakarta.persistence.Table;
 
 @Entity()
 @Table(name = "Booking")
-public class Booking {
+public class Booking implements Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -2653333015931766654L;
 	@Id
 	@Column(name = "BookingID")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
